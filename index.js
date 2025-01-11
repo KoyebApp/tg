@@ -1,18 +1,18 @@
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-import dotenv from 'dotenv';
-import fs from 'fs';
-import path from 'path';
-import { Low, JSONFile } from 'lowdb';
-import TelegramBot from 'node-telegram-bot-api';
-import schedule from 'node-schedule';
-import { mongoDB, mongoDBV2 } from './lib/mongoDB.js';
-import CloudDBAdapter from './lib/cloudDBAdapter.js';
-import syntaxerror from 'syntax-error';
-import chalk from 'chalk';
+const { fileURLToPath } = require('url');
+const { dirname } = require('path');
+const dotenv = require('dotenv');
+const fs = require('fs');
+const path = require('path');
+const { Low, JSONFile } = require('lowdb');
+const TelegramBot = require('node-telegram-bot-api');
+const schedule = require('node-schedule');
+const { mongoDB, mongoDBV2 } = require('./lib/mongoDB');
+const CloudDBAdapter = require('./lib/cloudDBAdapter');
+const syntaxerror = require('syntax-error');
+const chalk = require('chalk');
 
-// Define __filename and __dirname in ES module scope
-const __filename = fileURLToPath(import.meta.url);
+// Define __filename and __dirname in CommonJS scope
+const __filename = fileURLToPath(require.resolve('./index.js'));
 const __dirname = dirname(__filename);
 
 // Load environment variables from .env file
