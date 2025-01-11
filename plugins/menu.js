@@ -1,7 +1,7 @@
 const axios = require('axios');
-// Corrected the syntax here
 
-let handler = async (message, { bot }) => {
+// Correct the destructuring issue by not expecting the bot in the second argument
+let handler = async (message, bot) => {
   try {
     // Fetch random quote from a GitHub raw URL
     const quoteResponse = await axios.get('https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Quotes.txt');
