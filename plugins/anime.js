@@ -47,13 +47,11 @@ const handler = async ({ bot, m, command, usedPrefix }) => {
 };
 
 // List of available commands for different anime images
-handler.command = handler.help = [
+handler.command = [
   'akira', 'akiyama', 'anna', 'asuna', 'ayuzawa', 'boruto', 'chiho', 'chitoge', 'deidara', 'erza',
   'elaina', 'eba', 'emilia', 'hestia', 'hinata', 'inori', 'isuzu', 'itachi', 'itori', 'kaga', 'kagura',
   'kaori', 'keneki', 'kotori', 'kurumi', 'madara', 'mikasa', 'miku', 'minato', 'naruto', 'nezuko',
   'sagiri', 'sasuke', 'sakura',
 ];
-
-handler.tags = ['anime'];
 
 module.exports = handler;
