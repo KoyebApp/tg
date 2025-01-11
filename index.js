@@ -10,11 +10,8 @@ const syntaxerror = require('syntax-error');
 // Load environment variables from .env file
 dotenv.config();
 
-// Dynamically import chalk in an async function (since it's an ESM module)
-let chalk;
-(async () => {
-  chalk = (await import('chalk')).default;
-})();
+// Synchronously import chalk before continuing with the rest of the logic
+const chalk = require('chalk');
 
 // Fetch secrets from environment variables
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -22,7 +19,7 @@ const BOT_TOKEN = process.env.BOT_TOKEN;
 
 // Ensure BOT_TOKEN is provided
 if (!BOT_TOKEN) {
-  console.error("Error: BOT_TOKEN is missing in environment variables");
+  console.error(chalk.red("Error: BOT_TOKEN is missing in environment variables"));
   process.exit(1); // Exit the process if the token is missing
 }
 
@@ -48,7 +45,7 @@ const ensureLowDbExists = async () => {
     // If not, create it with default structure
     const defaultData = { data: [] };
     fs.writeFileSync(dbFilePath, JSON.stringify(defaultData, null, 2));
-    console.log('database.json created successfully with default structure.');
+    console.log(chalk.green('database.json created successfully with default structure.'));
   }
 };
 
@@ -64,7 +61,7 @@ const initDatabase = async () => {
     const { Low, JSONFile } = await import('lowdb');  // Use dynamic import for lowdb
     db = new Low(new JSONFile('database.json'));
     await db.read();  // Read data from the file
-    console.log('LowDB initialized successfully with database.json');
+    console.log(chalk.green('LowDB initialized successfully with database.json'));
   } else {
     try {
       // MongoDB or CloudDB initialization
@@ -79,9 +76,9 @@ const initDatabase = async () => {
         // CloudDB connection
         db = await CloudDBAdapter(dbConfig.url);  // Connect to cloud DB
       }
-      console.log('Database initialized successfully');
+      console.log(chalk.green('Database initialized successfully'));
     } catch (err) {
-      console.error('Error initializing database:', err);
+      console.error(chalk.red('Error initializing database:'), err);
     }
   }
 
@@ -93,12 +90,12 @@ let db = null;
 initDatabase().then(database => {
   if (database) {
     db = database;
-    console.log('Database initialized successfully');
+    console.log(chalk.green('Database initialized successfully'));
   } else {
-    console.log('Failed to initialize database');
+    console.log(chalk.red('Failed to initialize database'));
   }
 }).catch(err => {
-  console.error('Error initializing database:', err);
+  console.error(chalk.red('Error initializing database:'), err);
 });
 
 // Dynamically import all plugins from the plugins folder
@@ -111,18 +108,13 @@ const loadPlugins = () => {
     try {
       const pluginHandler = require(path.join(pluginsPath, file)).default;
       handlers[pluginName] = pluginHandler;
-      console.log(`Successfully loaded plugin: ${pluginName}`);
+      console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
     } catch (error) {
-      // Ensure chalk is used after it is loaded
-      if (chalk) {
-        const err = syntaxerror(fs.readFileSync(path.join(pluginsPath, file), 'utf-8'), file);
-        if (err) {
-          console.error(chalk.red(`Syntax error in plugin '${pluginName}':`), err);
-        } else {
-          console.error(chalk.yellow(`Error loading plugin '${pluginName}':`), error);
-        }
+      const err = syntaxerror(fs.readFileSync(path.join(pluginsPath, file), 'utf-8'), file);
+      if (err) {
+        console.error(chalk.red(`Syntax error in plugin '${pluginName}':`), err);
       } else {
-        console.error('Error: chalk is not loaded yet');
+        console.error(chalk.yellow(`Error loading plugin '${pluginName}':`), error);
       }
     }
   });
@@ -171,11 +163,11 @@ bot.on('message', (msg) => {
 
       // Call the plugin handler with the context
       plugins[pluginName](context);
-      console.log(`Executed plugin: ${pluginName} for chatId: ${chatId}`);
+      console.log(chalk.green(`Executed plugin: ${pluginName} for chatId: ${chatId}`));
     } else {
       // If no plugin is found, send an error message
       bot.sendMessage(chatId, "Unknown command or no plugin available for that command.");
-      console.error(`Unknown command: ${pluginName} from chatId: ${chatId}`);
+      console.error(chalk.red(`Unknown command: ${pluginName} from chatId: ${chatId}`));
     }
   }
 });
