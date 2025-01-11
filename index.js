@@ -9,7 +9,7 @@ import syntaxerror from 'syntax-error';
 import chalk from 'chalk'; // Importing Chalk for colored console logs
 
 // Initialize Telegram bot with token
-const token = 'YOUR_TOKEN';
+const token = '7671426273:AAGr3rG4-8lWdP-nh1Xgat4wVYFF5X99MgA';
 const bot = new TelegramBot(token, { polling: true });
 
 // Get the path of the plugins folder
