@@ -3,14 +3,11 @@ const Qasim = require('api-qasim');
 const fetch = require('node-fetch');
 
 // Command handler for /gimage and /googleimage
-const handler = async ({ bot, m, text, db, usedPrefix }) => {
+const handler = async ({ bot, m, text, db, usedPrefix, query }) => {
   const chatId = m.chat.id;
 
-  // Extract the query after the /gimage command
-  const searchQuery = text.slice(7).trim();  // Remove the "/gimage" part
-
   // If no query is provided, ask the user for a search query
-  if (!searchQuery) {
+  if (!query) {
     return bot.sendMessage(chatId, "Please provide a search query for Google Image search. For example: /gimage cats");
   }
 
@@ -19,7 +16,7 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
     await bot.sendMessage(chatId, "⏳ Searching for images...");
 
     // Fetch image URLs from Google Image search API
-    const googleImageResponse = await Qasim.googleImage(searchQuery);
+    const googleImageResponse = await Qasim.googleImage(query);
 
     // Check if the response contains valid image URLs
     if (!googleImageResponse || !googleImageResponse.imageUrls || googleImageResponse.imageUrls.length === 0) {
@@ -50,7 +47,7 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
       const filename = `image_${i + 1}.${fileExtension}`;
 
       // Send the image using the correct method
-      await bot.sendPhoto(chatId, buffer, { caption: `Image ${i + 1} from the search query *${searchQuery}*` });
+      await bot.sendPhoto(chatId, buffer, { caption: `Image ${i + 1} from the search query *${query}*` });
     }
 
     // Inform the user that the search is complete
