@@ -1,39 +1,56 @@
 const axios = require('axios');
 
-const handler = async (message, { bot, command, args, usedPrefix }) => {
+const handler = async ({ bot, m, command, usedPrefix }) => {
   try {
+    // Validate the command is in the list of valid commands
+    if (!handler.command.includes(command)) {
+      return await bot.sendMessage(m.chat.id, '❌ Invalid anime command!');
+    }
+
     // Fetch the anime images from the GitHub JSON file based on the command
-    const res = (
-      await axios.get(`https://raw.githubusercontent.com/Guru322/api/Guru/BOT-JSON/anime-${command}.json`)
-    ).data;
+    const response = await axios.get(
+      `https://raw.githubusercontent.com/Guru322/api/Guru/BOT-JSON/anime-${command}.json`
+    );
+
+    // Check if the response is empty or invalid
+    if (!response.data || response.data.length === 0) {
+      return await bot.sendMessage(m.chat.id, '❌ No images found for this anime!');
+    }
 
     // Pick a random image from the fetched list
-    const randomImage = res[Math.floor(res.length * Math.random())];
+    const randomImage = response.data[Math.floor(Math.random() * response.data.length)];
 
-    // Send the image to the user
-    await bot.sendPhoto(message.chat.id, randomImage, {
+    // Send the image to the user with the command name as a caption
+    await bot.sendPhoto(m.chat.id, randomImage, {
       caption: `_${command}_`, // Caption with the command name
     });
 
     // Optional: send a button to fetch more anime images (commented out for now)
-    // await bot.sendMessage(message.chat.id, `_${command}_`.trim(), {
+    // await bot.sendMessage(m.chat.id, `_${command}_`.trim(), {
     //   reply_markup: {
     //     inline_keyboard: [
     //       [{ text: '🔄 NEXT 🔄', callback_data: `${usedPrefix + command}` }],
     //     ],
     //   },
     // });
+
   } catch (error) {
     console.error('Error fetching anime images:', error);
-    await bot.sendMessage(message.chat.id, '*ERROR: Unable to fetch image*');
+
+    // Send a more specific error message
+    if (error.response) {
+      await bot.sendMessage(m.chat.id, `❌ Error: ${error.response.status} - ${error.response.statusText}`);
+    } else {
+      await bot.sendMessage(m.chat.id, '❌ ERROR: Unable to fetch image. Please try again later.');
+    }
   }
 };
 
 // List of available commands for different anime images
 handler.command = handler.help = [
-  'akira', 'akiyama', 'anna', 'asuna', 'ayuzawa', 'boruto', 'chiho', 'chitoge', 'deidara', 'erza', 
-  'elaina', 'eba', 'emilia', 'hestia', 'hinata', 'inori', 'isuzu', 'itachi', 'itori', 'kaga', 'kagura', 
-  'kaori', 'keneki', 'kotori', 'kurumi', 'madara', 'mikasa', 'miku', 'minato', 'naruto', 'nezuko', 
+  'akira', 'akiyama', 'anna', 'asuna', 'ayuzawa', 'boruto', 'chiho', 'chitoge', 'deidara', 'erza',
+  'elaina', 'eba', 'emilia', 'hestia', 'hinata', 'inori', 'isuzu', 'itachi', 'itori', 'kaga', 'kagura',
+  'kaori', 'keneki', 'kotori', 'kurumi', 'madara', 'mikasa', 'miku', 'minato', 'naruto', 'nezuko',
   'sagiri', 'sasuke', 'sakura',
 ];
 
