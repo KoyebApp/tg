@@ -1,9 +1,11 @@
+// Inside your plugin file (e.g., menu.js)
+
 const axios = require('axios');
 
-// Correct the destructuring issue by not expecting the bot in the second argument
-const handler = async ({ bot, m, db }) => {
+// Handler function
+const handler = async ({ bot, m, text, db }) => {
   try {
-    // Ensure bot is defined before calling methods on it
+    // Check if bot is available
     if (!bot) {
       throw new Error('Bot instance is not available');
     }
@@ -45,16 +47,19 @@ const handler = async ({ bot, m, db }) => {
         ],
       },
     });
+
     await bot.sendPhoto(m.chat.id, iconBuffer, { caption: 'Here is your random bot icon!' });
   } catch (error) {
-    console.error(error);
-    // Send a message in case of error, but prevent the app from crashing
+    console.error('Error in menu plugin:', error);
+    // Send a message in case of error but prevent the app from crashing
     if (bot) {
       await bot.sendMessage(m.chat.id, 'An error occurred while generating the bot menu. Please try again later.');
     }
   }
 };
 
+handler.help = ['menu'];
+handler.tags = ['main'];
 handler.command = ['menu', 'botmenu', 'showmenu'];
 
 module.exports = handler;
