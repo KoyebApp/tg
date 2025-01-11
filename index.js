@@ -131,7 +131,6 @@ const logUserActivity = (chatId, command) => {
   fs.appendFileSync('activity.log', logMessage);
 };
 
-// Main message handler
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text.trim();  // Get the full message text
@@ -149,37 +148,37 @@ bot.on('message', async (msg) => {
       console.log('Loaded plugins:', Object.keys(plugins));
 
       // If there's a plugin handler for this command, call it
-      if (plugins[command]) {
+      const baseCommand = command.split(' ')[0].toLowerCase();  // Get the base command (before any space)
+      const query = command.slice(baseCommand.length).trim();  // Get the query part (after the base command)
+
+      // Check if the base command exists in the loaded plugins
+      if (plugins[baseCommand]) {
         const context = {
           bot,
           text,
           usedPrefix,
-          command,
+          command: baseCommand,
           m: msg,  // Pass the full message object to the plugin
           db,  // Pass the database instance to the plugin
+          query,  // Pass the query (if any)
         };
 
-        // Check for query extraction from the message
-        const query = text.slice(usedPrefix.length + command.length).trim();
-        if (query) {
-          context.query = query;  // Add query to context if it exists
-        }
-
         try {
-          plugins[command](context);  // Call the handler with the context
-          console.log(chalk.green(`Executed plugin: ${command} for chatId: ${chatId}`));
+          plugins[baseCommand](context);  // Call the handler with the context (passing the base command and the query)
+          console.log(chalk.green(`Executed plugin: ${baseCommand} for chatId: ${chatId}`));
         } catch (error) {
-          console.error(chalk.red(`Error executing plugin '${command}':`), error);
-          bot.sendMessage(chatId, `An error occurred while processing the command '${command}'. Please try again later.`);
+          console.error(chalk.red(`Error executing plugin '${baseCommand}':`), error);
+          bot.sendMessage(chatId, `An error occurred while processing the command '${baseCommand}'. Please try again later.`);
         }
       } else {
         // If no plugin is found, send an error message
         bot.sendMessage(chatId, "Unknown command or no plugin available for that command.");
-        console.error(chalk.red(`Unknown command: ${command} from chatId: ${chatId}`));
+        console.error(chalk.red(`Unknown command: ${baseCommand} from chatId: ${chatId}`));
       }
     }
   }
 });
+
 
 // Listen to callback queries (inline button callback)
 bot.on('callback_query', (callbackQuery) => {
