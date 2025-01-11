@@ -3,6 +3,11 @@ const axios = require('axios');
 // Correct the destructuring issue by not expecting the bot in the second argument
 let handler = async (message, bot) => {
   try {
+    // Ensure bot is defined before calling methods on it
+    if (!bot) {
+      throw new Error('Bot instance is not available');
+    }
+
     // Fetch random quote from a GitHub raw URL
     const quoteResponse = await axios.get('https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Quotes.txt');
     const quotes = quoteResponse.data.split('\n');
@@ -43,12 +48,13 @@ let handler = async (message, bot) => {
     await bot.sendPhoto(message.chat.id, iconBuffer, { caption: 'Here is your random bot icon!' });
   } catch (error) {
     console.error(error);
-    await bot.sendMessage(message.chat.id, 'An error occurred while generating the bot menu. Please try again later.');
+    // Send a message in case of error, but prevent the app from crashing
+    if (bot) {
+      await bot.sendMessage(message.chat.id, 'An error occurred while generating the bot menu. Please try again later.');
+    }
   }
 };
 
-handler.help = ['menu'];
-handler.tags = ['main'];
 handler.command = ['menu', 'botmenu', 'showmenu'];
 
 module.exports = handler;
