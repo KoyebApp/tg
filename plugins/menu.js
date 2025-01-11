@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 // Correct the destructuring issue by not expecting the bot in the second argument
-let handler = async (message, bot) => {
+const handler = async ({ bot, m, db }) => {
   try {
     // Ensure bot is defined before calling methods on it
     if (!bot) {
@@ -37,7 +37,7 @@ let handler = async (message, bot) => {
     Enjoy your time with the bot! 😊`;
 
     // Send the menu along with the random icon
-    await bot.sendMessage(message.chat.id, menuText, {
+    await bot.sendMessage(m.chat.id, menuText, {
       parse_mode: 'Markdown',
       reply_markup: {
         inline_keyboard: [
@@ -45,12 +45,12 @@ let handler = async (message, bot) => {
         ],
       },
     });
-    await bot.sendPhoto(message.chat.id, iconBuffer, { caption: 'Here is your random bot icon!' });
+    await bot.sendPhoto(m.chat.id, iconBuffer, { caption: 'Here is your random bot icon!' });
   } catch (error) {
     console.error(error);
     // Send a message in case of error, but prevent the app from crashing
     if (bot) {
-      await bot.sendMessage(message.chat.id, 'An error occurred while generating the bot menu. Please try again later.');
+      await bot.sendMessage(m.chat.id, 'An error occurred while generating the bot menu. Please try again later.');
     }
   }
 };
