@@ -1,6 +1,6 @@
 const Qasim = require('api-qasim');  // Import the entire package as 'pkg'
 const fetch = require('node-fetch');  // Use 'node-fetch' for HTTP requests
-const path = require('path');  // For file extension handling
+const { InputFile } = require('node-telegram-bot-api');  // Import InputFile to handle sending files
 
 const handler = async ({ bot, m, text, db, usedPrefix }) => {
   // Check if the user has provided a search query
@@ -52,17 +52,17 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
       const { buffer, url } = imageBuffers[i];
 
       // Extract file extension to determine the content type
-      const fileExtension = path.extname(url).slice(1);  // 'jpg', 'png', etc.
-      const contentType = `image/${fileExtension}`;
+      const fileExtension = url.split('.').pop();  // 'jpg', 'png', etc.
 
       // Define filename based on the image index
       const filename = `image_${i + 1}.${fileExtension}`;
 
-      // Send the image with the correct filename and content type
-      await bot.sendPhoto(m.chat.id, buffer, { 
-        caption: `Image ${i + 1} from the search query *${searchQuery}*`,
-        filename,  // Set the filename to prevent defaulting to "filename"
-        contentType  // Specify content type
+      // Create an InputFile for sending the image with proper filename
+      const inputFile = new InputFile(buffer, filename);
+
+      // Send the image with the correct filename and content type inferred from the extension
+      await bot.sendPhoto(m.chat.id, inputFile, { 
+        caption: `Image ${i + 1} from the search query *${searchQuery}*`
       });
     }
 
