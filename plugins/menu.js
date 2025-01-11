@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { format } = require('date-fns');  // Corrected the syntax here
+// Corrected the syntax here
 
 let handler = async (message, { bot }) => {
   try {
@@ -12,14 +12,10 @@ let handler = async (message, { bot }) => {
     const iconResponse = await axios.get('https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Islamic.json', { responseType: 'arraybuffer' });
     const iconBuffer = Buffer.from(iconResponse.data, 'binary');
 
-    // Get current time and date
-    const currentDateTime = format(new Date(), 'dd MMM yyyy, HH:mm:ss');
-
     // Prepare the bot menu message
     let menuText = `
     *Bot Menu*:
 
-    📅 *Current Date & Time*: ${currentDateTime}
 
     📖 *Random Quote*: 
     "${randomQuote}"
