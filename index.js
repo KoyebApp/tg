@@ -6,7 +6,9 @@ const schedule = require('node-schedule');
 const { mongoDB, mongoDBV2 } = require('./lib/mongoDB');
 const CloudDBAdapter = require('./lib/cloudDBAdapter');
 const syntaxerror = require('syntax-error');
-const chalk = require('chalk');
+
+// Dynamically import chalk since it is now an ES Module
+const chalk = (await import('chalk')).default;
 
 // Load environment variables from .env file
 dotenv.config();
