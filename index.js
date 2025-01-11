@@ -79,6 +79,7 @@ const initDatabase = async () => {
       console.log(chalk.green('Database initialized successfully'));
     } catch (err) {
       console.error(chalk.red('Error initializing database:'), err);
+      process.exit(1);  // Critical error: stop the process, PM2 will restart the bot
     }
   }
 
@@ -164,8 +165,13 @@ bot.on('message', (msg) => {
         db,  // Pass the database instance to the plugin
       };
 
-      plugins[pluginName](context);
-      console.log(chalk.green(`Executed plugin: ${pluginName} for chatId: ${chatId}`));
+      try {
+        plugins[pluginName](context);  // Call the handler with the context
+        console.log(chalk.green(`Executed plugin: ${pluginName} for chatId: ${chatId}`));
+      } catch (error) {
+        console.error(chalk.red(`Error executing plugin '${pluginName}':`), error);
+        bot.sendMessage(chatId, `An error occurred while processing the command '${pluginName}'. Please try again later.`);
+      }
     } else {
       // If no plugin is found, send an error message
       bot.sendMessage(chatId, "Unknown command or no plugin available for that command.");
