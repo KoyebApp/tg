@@ -11,8 +11,10 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
 
   try {
     // Call your image search API or logic here using the query
-    const imageUrls = await Qasim.googleImage(query);
-    console.log('Google Image Search Results:', imageUrls);
+    const response = await Qasim.googleImage(query);
+
+    // Access the imageUrls array from the response object
+    const imageUrls = response.imageUrls;
 
     // Check if imageUrls is an array and has items
     if (!Array.isArray(imageUrls) || imageUrls.length === 0) {
@@ -20,7 +22,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     }
 
     // Send the images to the user
-    for (let i = 0; i < imageUrls.length; i++) {
+    for (let i = 0; i < imageUrls.length && i < 4; i++) {  // Limit to 4 images
       const imageUrl = imageUrls[i];
       
       // You might want to add a check here to see if the URL is valid
