@@ -43,9 +43,5 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
         await bot.sendMessage(chatId, `✳️ Error: ${error.message || error}`);
     }
 };
-handler.help = ['ttstalk', 'tiktokstalk'];
-handler.tags = ['dl'];
-handler.command = ['ttstalk', 'tiktokstalk'];
-
 
 module.exports = handler;
