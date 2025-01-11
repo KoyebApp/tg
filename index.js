@@ -11,9 +11,10 @@ const CloudDBAdapter = require('./lib/cloudDBAdapter');
 const syntaxerror = require('syntax-error');
 const chalk = require('chalk');
 
-// Define __filename and __dirname in CommonJS scope
-const __filename = fileURLToPath(require.resolve('./index.js'));
-const __dirname = dirname(__filename);
+// In CommonJS, you don't need to define __filename and __dirname manually.
+// They are automatically available:
+console.log(__filename);  // Prints the absolute path of the current file
+console.log(__dirname);   // Prints the directory name of the current file
 
 // Load environment variables from .env file
 dotenv.config();
