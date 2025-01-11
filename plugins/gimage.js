@@ -22,7 +22,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     }
 
     // Send the images to the user
-    for (let i = 0; i < imageUrls.length && i < 4; i++) {  // Limit to 4 images
+    for (let i = 0; i < imageUrls.length && i < 3; i++) {  // Limit to 4 images
       const imageUrl = imageUrls[i];
       
       // You might want to add a check here to see if the URL is valid
