@@ -1,22 +1,24 @@
-const TelegramBot = require('node-telegram-bot-api');
 const Qasim = require('api-qasim');
 const fetch = require('node-fetch');
 
 // Command handler for /gimage and /googleimage
-const handler = async ({ bot, m, text, db, usedPrefix, query }) => {
+const handler = async ({ bot, m, text, usedPrefix }) => {
   const chatId = m.chat.id;
 
-  // If no query is provided, ask the user for a search query
-  if (!query) {
+  // Case when no query is provided with /gimage
+  if (!text) {
     return bot.sendMessage(chatId, "Please provide a search query for Google Image search. For example: /gimage cats");
   }
 
+  // Extract the search query from the text (strip the prefix and any extra spaces)
+  const searchQuery = text.trim();
+  
   try {
     // Inform the user that the search is in progress
     await bot.sendMessage(chatId, "⏳ Searching for images...");
 
     // Fetch image URLs from Google Image search API
-    const googleImageResponse = await Qasim.googleImage(query);
+    const googleImageResponse = await Qasim.googleImage(searchQuery);
 
     // Check if the response contains valid image URLs
     if (!googleImageResponse || !googleImageResponse.imageUrls || googleImageResponse.imageUrls.length === 0) {
@@ -47,7 +49,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, query }) => {
       const filename = `image_${i + 1}.${fileExtension}`;
 
       // Send the image using the correct method
-      await bot.sendPhoto(chatId, buffer, { caption: `Image ${i + 1} from the search query *${query}*` });
+      await bot.sendPhoto(chatId, buffer, { caption: `Image ${i + 1} from the search query *${searchQuery}*` });
     }
 
     // Inform the user that the search is complete
@@ -60,8 +62,5 @@ const handler = async ({ bot, m, text, db, usedPrefix, query }) => {
 };
 
 // Command configuration for /gimage and /googleimage
-handler.command = ['gimage', 'googleimage'];
-handler.help = ['gimage', 'googleimage'];
-handler.tags = ['search'];
-
+handler.command = ['googleimage'];
 module.exports = handler;
