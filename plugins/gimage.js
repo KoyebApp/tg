@@ -2,9 +2,9 @@ const Qasim = require('api-qasim');
 const fetch = require('node-fetch');
 
 // Command handler for /gimage
-const handler = async ({ bot, m, text, db, usedPrefix }) => {
+const handler = async ({ bot, m, text, usedPrefix }) => {
   const chatId = m.chat.id;
-  const searchQuery = text.trim().slice(usedPrefix.length + 7).trim(); // Extract query after /gimage
+  const searchQuery = text.slice(usedPrefix.length + 7).trim(); // Extract query after /gimage
 
   // If no query is provided, ask for it
   if (!searchQuery) {
@@ -56,11 +56,10 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
     console.error('Error:', error);
     await bot.sendMessage(chatId, "❌ An error occurred while fetching or downloading the images.");
   }
-
 };
 
 // Set the command(s) for this handler
-handler.command = ['gimage'];
+handler.command = 'gimage';
 
 // Export the handler
 module.exports = handler;
