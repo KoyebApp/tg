@@ -6,7 +6,8 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     return;
   }
 
-  await m.react('⌛'); // Indicating that the bot is processing the request
+  // Send a message indicating the bot is processing the request
+  await bot.sendMessage(m.chat.id, '⌛ Processing your request, please wait...');
 
   let res;
   try {
@@ -33,11 +34,12 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     const videoURL = validVideo.url;  // Get the video URL from the first valid item
     console.log("Found Video URL:", videoURL); // Log the video URL for debugging
 
-    // If a video URL is found, send the video
-    await m.react('✅'); // Indicating that the video is ready to be sent
-
+    // Send the video to the user
     const cap = 'Here is the video you requested:';
     await bot.sendVideo(m.chat.id, videoURL, { caption: cap });
+
+    // Send a message indicating the request was processed successfully
+    await bot.sendMessage(m.chat.id, '✅ Video sent successfully!');
 
   } catch (error) {
     console.error("Error:", error);
