@@ -1,6 +1,6 @@
 const Qasim = require('api-qasim');  // Import the entire package as 'pkg'
 const fetch = require('node-fetch');  // Use 'node-fetch' for HTTP requests
-const { InputFile } = require('node-telegram-bot-api');  // Import InputFile to handle sending files
+const { InputFile } = require('node-telegram-bot-api');  // Import InputFile correctly
 
 const handler = async ({ bot, m, text, db, usedPrefix }) => {
   // Check if the user has provided a search query
@@ -75,8 +75,8 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
   }
 };
 
-// Command configuration
-handler.command = ['gimage', 'googleimage'];
+// Command configuration (correctly defining the command)
+handler.command = ['gimage', 'googleimage'];  // Ensure this is in the correct format
 handler.help = ['gimage', 'googleimage'];
 handler.tags = ['search'];
 
