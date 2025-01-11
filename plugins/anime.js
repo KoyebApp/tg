@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const handler = async ({ bot, m, command }) => {
+const handler = async ({ bot, m, db, command }) => {
   try {
 
     // Fetch the anime images from the GitHub JSON file based on the command
