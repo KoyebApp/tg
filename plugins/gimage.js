@@ -13,7 +13,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
 
   try {
     // Call your image search API or logic here using the query
-    const imageUrls = await searchImages(query);
+    const imageUrls = await Qasim.googleImage(query);
 
     if (imageUrls.length === 0) {
       return bot.sendMessage(chatId, "No images found for your query.");
