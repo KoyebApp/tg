@@ -4,7 +4,11 @@ const fetch = require('node-fetch');
 // Command handler for /gimage
 const handler = async ({ bot, m, text, usedPrefix }) => {
   const chatId = m.chat.id;
-  const searchQuery = text.slice(usedPrefix.length + 7).trim(); // Extract query after /gimage
+  // Extract the query part after the command
+  const searchQuery = text.slice(usedPrefix.length + 7).trim();  // Remove the /gimage part and extra spaces
+
+  // Log the search query for debugging
+  console.log(`Search query extracted: "${searchQuery}"`);
 
   // If no query is provided, ask for it
   if (!searchQuery) {
