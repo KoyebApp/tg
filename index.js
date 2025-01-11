@@ -106,6 +106,7 @@ const loadPlugins = () => {
   pluginFiles.forEach(file => {
     const pluginName = path.basename(file, '.js');
     try {
+      // Dynamically import the plugin handler
       const pluginHandler = require(path.join(pluginsPath, file)).default;
       handlers[pluginName] = pluginHandler;
       console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
