@@ -132,7 +132,7 @@ const logUserActivity = (chatId, command) => {
 };
 
 // Main message handler
-bot.on('message', (msg) => {
+bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text.trim();  // Get the full message text
   const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));  // Check if text starts with any of the prefixes
@@ -158,6 +158,12 @@ bot.on('message', (msg) => {
           m: msg,  // Pass the full message object to the plugin
           db,  // Pass the database instance to the plugin
         };
+
+        // Check for query extraction from the message
+        const query = text.slice(usedPrefix.length + command.length).trim();
+        if (query) {
+          context.query = query;  // Add query to context if it exists
+        }
 
         try {
           plugins[command](context);  // Call the handler with the context
