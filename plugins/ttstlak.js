@@ -11,7 +11,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
         // Log the query for debugging
         console.log('TikTok Stalking Query:', query);
 
-        // Fetching TikTok user details from the API
+        // Fetching the TikTok user details from the API
         let res = await Qasim.tiktokStalk(query);
 
         // Log the response to see the data returned by the API
@@ -31,13 +31,14 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
 ▢ *🔗Link:* [TikTok Profile](https://www.tiktok.com/@${username.replace(/^@/, '') || 'NoUsername'})
 └────────────`;
 
-        // Set default profile picture URL if not available
+        // Handle profilePic: If it's missing, use a default fallback image
         const profilePicToSend = profilePic || 'https://upload.wikimedia.org/wikipedia/commons/8/85/TikTok_logo_2018.svg';
 
-        // Send the profile picture with details
+        // Send the formatted message and the profile picture (or default image)
         await bot.sendPhoto(chatId, profilePicToSend, { caption: message });
-        await bot.sendMessage(chatId, '✅ Profile fetched successfully!');
 
+        // Send success message
+        await bot.sendMessage(chatId, '✅ Profile fetched successfully!');
     } catch (error) {
         console.error("Error:", error);
         await bot.sendMessage(chatId, `✳️ An error occurred while processing the request: ${error.message || error}`);
