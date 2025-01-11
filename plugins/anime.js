@@ -1,11 +1,7 @@
 const axios = require('axios');
 
-const handler = async ({ bot, m, command, usedPrefix }) => {
+const handler = async ({ bot, m, command }) => {
   try {
-    // Validate the command is in the list of valid commands
-    if (!handler.command.includes(command)) {
-      return await bot.sendMessage(m.chat.id, '❌ Invalid anime command!');
-    }
 
     // Fetch the anime images from the GitHub JSON file based on the command
     const response = await axios.get(
