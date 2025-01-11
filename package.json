@@ -28,6 +28,7 @@
     "api-qasim": "*",
     "megajs": "*",
     "path": "*",
+    "dotenv": "^16.1.4",
     "axios": "^1.4.0",
     "chalk": "^5.1.0",
     "cheerio": "^1.0.0-rc.12",
