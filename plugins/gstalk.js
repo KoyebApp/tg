@@ -1,16 +1,21 @@
 const Qasim = require('api-qasim');
 
-let handler = async (m, { bot, args, text, usedPrefix, command }) => {
-    if (!args[0]) {
-        await bot.sendMessage(m.chat.id, `✳️ Please provide a GitHub username.\n\n📌 Example: ${usedPrefix + command} GlobalTechInfo`);
-        return;
+const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
+    const chatId = m.chat.id;
+
+    if (!query) {
+        return bot.sendMessage(chatId, `✳️ Please provide a GitHub username.\n\n📌 Example: ${usedPrefix + command} GlobalTechInfo`);
     }
 
     try {
-        await bot.sendMessage(m.chat.id, '⏳ Stalking GitHub profile...');
+        // Log the query for debugging
+        console.log('GitHub Stalking Query:', query);
 
-        // Fetching GitHub details for the user
-        let res = await Qasim.githubStalk(args[0]);
+        // Fetch GitHub details for the user
+        let res = await Qasim.githubStalk(query);
+
+        // Log the response to see the data returned by the API
+        console.log('GitHub Stalking API Response:', res);
 
         // Extracting relevant data from the API response
         const {
@@ -25,15 +30,13 @@ let handler = async (m, { bot, args, text, usedPrefix, command }) => {
             followers,
             following,
             public_repo,
-            public_gists,
-            created_at,
-            updated_at
+            public_gists
         } = res.results;
 
         // Formatting the message with relevant information
         let message = `
-┌──「 *STALKING GITHUB PROFILE*
-▢ *🔖Name:* ${nickname || 'Unknown'}
+┌──「 STALKING GITHUB 
+▢ *🔖Name:* ${nickname || 'Unknown'} 
 ▢ *🔖Username:* ${username}
 ▢ *👥Followers:* ${followers || 'N/A'}
 ▢ *🫂Following:* ${following || 'N/A'}
@@ -42,22 +45,20 @@ let handler = async (m, { bot, args, text, usedPrefix, command }) => {
 ▢ *📚Public Gists:* ${public_gists || 'N/A'}
 ▢ *🧳Location:* ${location || 'Unknown'}
 ▢ *🏢Company:* ${company || 'No company info'}
-▢ *🔗Link:* ${url || 'No URL available'}
+▢ *🔗Link:* [GitHub Profile](${url || 'No URL available'})
 └────────────`;
 
-        // Send the message with the profile image
-        const imageToSend = profile_pic || 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png';
-        
-        // Send message with the profile picture and information
-        await bot.sendPhoto(m.chat.id, imageToSend, { caption: message });
-    } catch (error) {
-        console.error('Error:', error);
-        await bot.sendMessage(m.chat.id, `✳️ An error occurred: ${error.message || error}`);
-    }
-}
+        // Set default profile picture URL if not available
+        const profilePic = profile_pic || 'https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png';
 
-handler.help = ['gstalk', 'githubstalk'];
-handler.tags = ['search'];
-handler.command = ['gstalk', 'githubstalk'];
+        // Send the profile picture with details
+        await bot.sendPhoto(chatId, profilePic, { caption: message });
+        await bot.sendMessage(chatId, '✅ Profile fetched successfully!');
+        
+    } catch (error) {
+        console.error("Error:", error);
+        await bot.sendMessage(chatId, `✳️ An error occurred while processing the request: ${error.message || error}`);
+    }
+};
 
 module.exports = handler;
