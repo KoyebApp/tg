@@ -1,3 +1,14 @@
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import dotenv from 'dotenv';
+
+// Define __filename and __dirname in ES module scope
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// Load environment variables from .env file
+dotenv.config();
+
 import TelegramBot from 'node-telegram-bot-api';
 import fs from 'fs';
 import path from 'path';
@@ -8,45 +19,44 @@ import CloudDBAdapter from './lib/cloudDBAdapter.js';
 import syntaxerror from 'syntax-error';
 import chalk from 'chalk'; // Importing Chalk for colored console logs
 
-// Define __filename and __dirname for ES modules
-import { fileURLToPath } from 'url';
+// Fetch secrets from environment variables
+const DATABASE_URL = process.env.DATABASE_URL;
+const BOT_TOKEN = process.env.BOT_TOKEN;
 
-global.__filename = function filename(pathURL = import.meta.url, rmPrefix = true) {
-  return rmPrefix
-    ? /file:\/\/\//.test(pathURL)
-      ? fileURLToPath(pathURL)
-      : pathURL
-    : pathToFileURL(pathURL).toString();
-};
-
-global.__dirname = function dirname(pathURL) {
-  return path.dirname(global.__filename(pathURL, true));
-};
+// Ensure BOT_TOKEN is provided
+if (!BOT_TOKEN) {
+  console.error(chalk.red("Error: BOT_TOKEN is missing in environment variables"));
+  process.exit(1); // Exit the process if the token is missing
+}
 
 // Initialize Telegram bot with token
-const token = '';
-const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 
 // Get the path of the plugins folder
-const pluginsPath = path.join(__dirname, 'plugins');
+const pluginsPath = path.join(__dirname, 'plugins'); // Now you can use __dirname
 
 // Database configuration and initialization
 const dbConfig = {
   type: 'mongodb',    // 'mongodb', 'cloud', or 'lowdb'
   version: 'v2',      // Optional (if 'mongodb' is used, specify version 'v1' or 'v2')
-  url: 'YOUR_MONGO_URL',   // MongoDB URL or Cloud DB URL or LowDB file path
+  url: DATABASE_URL,  // MongoDB URL or Cloud DB URL or LowDB file path
 };
 
 // Database initialization function
 const initDatabase = async () => {
+  if (!dbConfig.url) {
+    console.log(chalk.yellow('Database URL not found.'));
+    return null; // Return null if no URL is found
+  }
+
   let db;
 
-  if (dbConfig.url && dbConfig.type === 'mongodb') {
+  if (dbConfig.type === 'mongodb') {
     // MongoDB connection
     if (dbConfig.version === 'v2') {
-      db = await mongoDBV2(dbConfig.url);  // Connect to MongoDB v2
+      db = new mongoDBV2(dbConfig.url);  // Use 'new' to instantiate mongoDBV2 class
     } else {
-      db = await mongoDB(dbConfig.url);    // Connect to MongoDB v1
+      db = new mongoDB(dbConfig.url);    // Use 'new' to instantiate mongoDB class
     }
   } else if (dbConfig.type === 'cloud') {
     // CloudDB connection
@@ -63,8 +73,12 @@ const initDatabase = async () => {
 // Initialize the database
 let db = null;
 initDatabase().then(database => {
-  db = database;
-  console.log(chalk.green('Database initialized successfully'));
+  if (database) {
+    db = database;
+    console.log(chalk.green('Database initialized successfully'));
+  } else {
+    console.log(chalk.red('Failed to initialize database'));
+  }
 }).catch(err => {
   console.error(chalk.red('Error initializing database:'), err);
 });
@@ -150,3 +164,4 @@ bot.on('callback_query', (callbackQuery) => {
    
   // Handle callback query here if needed (show image, etc.)
 });
+    
