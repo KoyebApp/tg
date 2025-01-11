@@ -1,15 +1,15 @@
 const axios = require('axios');
-cost { format } = require('date-fns');
+const { format } = require('date-fns');  // Corrected the syntax here
 
 let handler = async (message, { bot }) => {
   try {
     // Fetch random quote from a GitHub raw URL
-    const quoteResponse = await axios.get('https://raw.githubusercontent.com/your-username/repository/branch/path-to-quotes.txt');
+    const quoteResponse = await axios.get('https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Quotes.txt');
     const quotes = quoteResponse.data.split('\n');
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
     // Fetch random icon image from a GitHub raw URL
-    const iconResponse = await axios.get('https://raw.githubusercontent.com/your-username/repository/branch/path-to-icons/icon.jpg', { responseType: 'arraybuffer' });
+    const iconResponse = await axios.get('https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Islamic.json', { responseType: 'arraybuffer' });
     const iconBuffer = Buffer.from(iconResponse.data, 'binary');
 
     // Get current time and date
