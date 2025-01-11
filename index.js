@@ -1,3 +1,5 @@
+// Main bot file (index.js)
+
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
@@ -9,9 +11,6 @@ const syntaxerror = require('syntax-error');
 
 // Load environment variables from .env file
 dotenv.config();
-
-// Synchronously import chalk before continuing with the rest of the logic
-const chalk = require('chalk');
 
 // Fetch secrets from environment variables
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -133,12 +132,6 @@ const logUserActivity = (chatId, command) => {
   const logMessage = `[${new Date().toISOString()}] User: ${chatId} executed command: ${command}\n`;
   fs.appendFileSync('activity.log', logMessage);
 };
-
-// Handle scheduled jobs (e.g., daily reminders)
-schedule.scheduleJob('0 9 * * *', () => {
-  const chatId = 'your_chat_id'; // Replace with a valid chatId
-  bot.sendMessage(chatId, "Good morning! Don't forget to check your tasks for today!");
-});
 
 // Main message handler
 bot.on('message', (msg) => {
