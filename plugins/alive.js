@@ -3,8 +3,6 @@ const handler = async ({ bot, m, db }) => {
   await bot.sendMessage(m.chat.id, "Bot is alive and running!");
 };
 
-handler.help = ['alive'];
-handler.tags = ['main'];
 handler.command = ['alive'];
 
 module.exports = handler;
