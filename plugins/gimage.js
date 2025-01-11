@@ -1,9 +1,12 @@
 const Qasim = require('api-qasim');  // Import the entire package as 'pkg'
 const fetch = require('node-fetch');  // Use 'node-fetch' for HTTP requests
+const path = require('path');  // For file extension handling
 
 const handler = async ({ bot, m, text, db, usedPrefix }) => {
+  // Check if the user has provided a search query
   if (!text) {
-    return bot.sendMessage(m.chat.id, "Please provide a search query for Google Image search.");
+    // If no query is provided, ask the user for a query
+    return bot.sendMessage(m.chat.id, "Please provide a search query for Google Image search. For example: /gimage <query>");
   }
 
   try {
@@ -38,7 +41,7 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
       // Ensure the image was fetched successfully
       if (response.ok) {
         const buffer = await response.buffer();  // Get image data as buffer
-        imageBuffers.push(buffer);
+        imageBuffers.push({ buffer, url: imageUrl });
       } else {
         console.log(`Failed to fetch image at index ${i}: ${imageUrl}`);
       }
@@ -46,8 +49,21 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
 
     // Send the first four images to the user in the Telegram chat
     for (let i = 0; i < imageBuffers.length; i++) {
-      const imageBuffer = imageBuffers[i];
-      await bot.sendPhoto(m.chat.id, imageBuffer, { caption: `Image ${i + 1} from the search query *${searchQuery}*` });
+      const { buffer, url } = imageBuffers[i];
+
+      // Extract file extension to determine the content type
+      const fileExtension = path.extname(url).slice(1);  // 'jpg', 'png', etc.
+      const contentType = `image/${fileExtension}`;
+
+      // Define filename based on the image index
+      const filename = `image_${i + 1}.${fileExtension}`;
+
+      // Send the image with the correct filename and content type
+      await bot.sendPhoto(m.chat.id, buffer, { 
+        caption: `Image ${i + 1} from the search query *${searchQuery}*`,
+        filename,  // Set the filename to prevent defaulting to "filename"
+        contentType  // Specify content type
+      });
     }
 
     // Send a message indicating the process is complete
