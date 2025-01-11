@@ -6,14 +6,13 @@ const fetch = require('node-fetch');
 const handler = async ({ bot, m, text, db, usedPrefix }) => {
   const chatId = m.chat.id;
 
-  // Case when no query is provided with /gimage
-  if (!text) {
-    // If no query is provided, ask for it
+  // Extract the query after the /gimage command
+  const searchQuery = text.slice(7).trim();  // Remove the "/gimage" part
+
+  // If no query is provided, ask the user for a search query
+  if (!searchQuery) {
     return bot.sendMessage(chatId, "Please provide a search query for Google Image search. For example: /gimage cats");
   }
-
-  // Extract the search query from the text (strip the prefix and any extra spaces)
-  const searchQuery = text.trim();
 
   try {
     // Inform the user that the search is in progress
