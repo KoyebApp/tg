@@ -12,7 +12,7 @@ const handler = async ({ bot, m, text, usedPrefix }) => {
 
   // Extract the search query from the text (strip the prefix and any extra spaces)
   const searchQuery = text.trim();
-  
+
   try {
     // Inform the user that the search is in progress
     await bot.sendMessage(chatId, "⏳ Searching for images...");
@@ -62,5 +62,8 @@ const handler = async ({ bot, m, text, usedPrefix }) => {
 };
 
 // Command configuration for /gimage and /googleimage
-handler.command = ['googleimage'];
+handler.command = ['gimage', 'googleimage'];
+handler.help = ['gimage', 'googleimage'];
+handler.tags = ['search'];
+
 module.exports = handler;
