@@ -1,36 +1,33 @@
-const Qasim = require('api-qasim');  // Import the entire package as 'pkg'
-const fetch = require('node-fetch');  // Use 'node-fetch' for HTTP requests
-const { InputFile } = require('node-telegram-bot-api');  // Import InputFile correctly
+const TelegramBot = require('node-telegram-bot-api');
+const Qasim = require('api-qasim');
+const fetch = require('node-fetch');
 
+// Command handler for /gimage and /googleimage
 const handler = async ({ bot, m, text, db, usedPrefix }) => {
-  // Check if the user has provided a search query
+  const chatId = m.chat.id;
+
+  // Case when no query is provided with /gimage
   if (!text) {
-    // If no query is provided, ask the user for a query
-    return bot.sendMessage(m.chat.id, "Please provide a search query for Google Image search. For example: /gimage <query>");
+    return bot.sendMessage(chatId, "Please provide a search query for Google Image search. For example: /gimage cats");
   }
 
+  // Extract the search query from the text (strip the prefix and any extra spaces)
+  const searchQuery = text.trim();
+  
   try {
-    // Add "wait" reaction to indicate the request is processing
-    await bot.sendMessage(m.chat.id, "⏳ Searching for images...");
+    // Inform the user that the search is in progress
+    await bot.sendMessage(chatId, "⏳ Searching for images...");
 
-    // Extract search query from the text
-    const searchQuery = text.trim();
+    // Fetch image URLs from Google Image search API
+    const googleImageResponse = await Qasim.googleImage(searchQuery);
 
-    // Fetch image URLs from the Google Image search API
-    let googleImageResponse = await Qasim.googleImage(searchQuery);
-
-    // Log the response for debugging
-    console.log('Google Image Search Results:', googleImageResponse);
-
-    // Check if the API returned valid image URLs
+    // Check if the response contains valid image URLs
     if (!googleImageResponse || !googleImageResponse.imageUrls || googleImageResponse.imageUrls.length === 0) {
-      return bot.sendMessage(m.chat.id, "No images found for the search query.");
+      return bot.sendMessage(chatId, "No images found for the search query.");
     }
 
-    // Limit to the first four image URLs
+    // Limit to the first 4 image URLs
     const imageUrls = googleImageResponse.imageUrls.slice(0, 4);
-
-    // Initialize an array to hold the image buffers
     const imageBuffers = [];
 
     // Download the first four images
@@ -38,7 +35,6 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
       const imageUrl = imageUrls[i];
       const response = await fetch(imageUrl);
 
-      // Ensure the image was fetched successfully
       if (response.ok) {
         const buffer = await response.buffer();  // Get image data as buffer
         imageBuffers.push({ buffer, url: imageUrl });
@@ -47,36 +43,27 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
       }
     }
 
-    // Send the first four images to the user in the Telegram chat
+    // Send the images to the user
     for (let i = 0; i < imageBuffers.length; i++) {
       const { buffer, url } = imageBuffers[i];
-
-      // Extract file extension to determine the content type
-      const fileExtension = url.split('.').pop();  // 'jpg', 'png', etc.
-
-      // Define filename based on the image index
+      const fileExtension = url.split('.').pop();
       const filename = `image_${i + 1}.${fileExtension}`;
 
-      // Create an InputFile for sending the image with proper filename
-      const inputFile = new InputFile(buffer, filename);
-
-      // Send the image with the correct filename and content type inferred from the extension
-      await bot.sendPhoto(m.chat.id, inputFile, { 
-        caption: `Image ${i + 1} from the search query *${searchQuery}*`
-      });
+      // Send the image using the correct method
+      await bot.sendPhoto(chatId, buffer, { caption: `Image ${i + 1} from the search query *${searchQuery}*` });
     }
 
-    // Send a message indicating the process is complete
-    await bot.sendMessage(m.chat.id, "✅ Image search complete!");
+    // Inform the user that the search is complete
+    await bot.sendMessage(chatId, "✅ Image search complete!");
 
   } catch (error) {
     console.error('Error:', error);
-    await bot.sendMessage(m.chat.id, "❌ An error occurred while fetching or downloading the images.");
+    await bot.sendMessage(chatId, "❌ An error occurred while fetching or downloading the images.");
   }
 };
 
-// Command configuration (correctly defining the command)
-handler.command = ['gimage', 'googleimage'];  // Ensure this is in the correct format
+// Command configuration for /gimage and /googleimage
+handler.command = ['gimage', 'googleimage'];
 handler.help = ['gimage', 'googleimage'];
 handler.tags = ['search'];
 
