@@ -4,28 +4,30 @@ const fetch = require('node-fetch');
 const Qasim = require('api-qasim');
 
 // The handler function that will process the command
-const handler = async ({ bot, m, text, db, usedPrefix }, searchQuery) => {
+const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
   const chatId = m.chat.id;
 
-  if (!searchQuery) {
-    return bot.sendMessage(chatId, "Please provide a search query after the command.");
+  if (!query) {
+    return bot.sendMessage(chatId, "Please provide a search query.");
   }
 
-  // Fetch image URLs from the respective image search API (example for gimage)
-  const googleImageResponse = await Qasim.googleImage(searchQuery);
+  try {
+    // Call your image search API or logic here using the query
+    const imageUrls = await searchImages(query);
 
-  if (!googleImageResponse || !googleImageResponse.imageUrls || googleImageResponse.imageUrls.length === 0) {
-    return bot.sendMessage(chatId, "No images found.");
+    if (imageUrls.length === 0) {
+      return bot.sendMessage(chatId, "No images found for your query.");
+    }
+
+    // Send the images to the user
+    for (let i = 0; i < imageUrls.length; i++) {
+      await bot.sendPhoto(chatId, imageUrls[i], { caption: `Image ${i + 1} for query *${query}*` });
+    }
+    await bot.sendMessage(chatId, "Image search complete!");
+  } catch (error) {
+    console.error('Error searching images:', error);
+    bot.sendMessage(chatId, "An error occurred while searching for images. Please try again later.");
   }
-
-  const imageUrls = googleImageResponse.imageUrls.slice(0, 4);
-
-  // Send images to user
-  for (let i = 0; i < imageUrls.length; i++) {
-    await bot.sendPhoto(chatId, imageUrls[i], { caption: `Image ${i + 1} for query *${searchQuery}*` });
-  }
-
-  await bot.sendMessage(chatId, "Image search complete!");
 };
 
 module.exports = handler;
