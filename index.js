@@ -8,6 +8,21 @@ import CloudDBAdapter from './lib/cloudDBAdapter.js';
 import syntaxerror from 'syntax-error';
 import chalk from 'chalk'; // Importing Chalk for colored console logs
 
+// Define __filename and __dirname for ES modules
+import { fileURLToPath } from 'url';
+
+global.__filename = function filename(pathURL = import.meta.url, rmPrefix = true) {
+  return rmPrefix
+    ? /file:\/\/\//.test(pathURL)
+      ? fileURLToPath(pathURL)
+      : pathURL
+    : pathToFileURL(pathURL).toString();
+};
+
+global.__dirname = function dirname(pathURL) {
+  return path.dirname(global.__filename(pathURL, true));
+};
+
 // Initialize Telegram bot with token
 const token = '';
 const bot = new TelegramBot(token, { polling: true });
