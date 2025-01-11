@@ -16,7 +16,7 @@ const chalk = require('chalk');
 // Fetch secrets from environment variables
 const DATABASE_URL = process.env.DATABASE_URL;
 const BOT_TOKEN = process.env.BOT_TOKEN;
-const PREFIX = process.env.PREFIX ? process.env.PREFIX.split(',') : ['/'];  // Handle single or multiple prefixes
+const PREFIX = process.env.PREFIX ? process.env.PREFIX.split(',') : ['/', '!', '.', '#'];  // Default to multiple prefixes
 
 // Ensure BOT_TOKEN is provided
 if (!BOT_TOKEN) {
