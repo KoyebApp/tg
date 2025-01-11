@@ -57,8 +57,8 @@ const initDatabase = async () => {
     // Ensure the database.json file exists and create it if necessary
     await ensureLowDbExists();
 
-    // Dynamically import LowDB
-    const { Low, JSONFile } = require('lowdb');  // Use CommonJS require
+    // Dynamically import LowDB (ESM Import inside async function)
+    const { Low, JSONFile } = await import('lowdb');  // Use dynamic import
     db = new Low(new JSONFile('database.json'));
     await db.read();  // Read data from the file
     console.log(chalk.green('LowDB initialized successfully with database.json'));
