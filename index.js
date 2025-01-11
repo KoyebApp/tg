@@ -1,4 +1,3 @@
-// Main bot file (index.js)
 const chalk = require('chalk');
 const dotenv = require('dotenv');
 const fs = require('fs');
