@@ -16,6 +16,7 @@ const chalk = require('chalk');
 // Fetch secrets from environment variables
 const DATABASE_URL = process.env.DATABASE_URL;
 const BOT_TOKEN = process.env.BOT_TOKEN;
+const PREFIX = process.env.PREFIX ? process.env.PREFIX.split(',') : ['/'];  // Handle single or multiple prefixes
 
 // Ensure BOT_TOKEN is provided
 if (!BOT_TOKEN) {
@@ -142,40 +143,43 @@ schedule.scheduleJob('0 9 * * *', () => {
 // Main message handler
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-  const command = msg.text.trim().toLowerCase();  // Convert the command to lowercase and trim any extra spaces
+  const text = msg.text.trim();  // Get the full message text
+  const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));  // Check if text starts with any of the prefixes
 
-  logUserActivity(chatId, command);  // Log user activity
+  if (usedPrefix) {
+    const command = text.substring(usedPrefix.length).trim().toLowerCase();  // Extract the command after the prefix
+    logUserActivity(chatId, command);  // Log user activity
 
-  // If the message is a command (starts with '/')
-  if (command.startsWith('/')) {
-    const pluginName = command.split(' ')[0].substring(1); // '/alive' -> 'alive'
-    console.log(`Received command: ${pluginName}`);  // Debug log
+    // If the message is a command
+    if (command) {
+      console.log(`Received command: ${command}`);  // Debug log
 
-    // Debugging: List all loaded plugin names
-    console.log('Loaded plugins:', Object.keys(plugins));
+      // Debugging: List all loaded plugin names
+      console.log('Loaded plugins:', Object.keys(plugins));
 
-    // If there's a plugin handler for this command, call it
-    if (plugins[pluginName]) {
-      const context = {
-        bot,
-        text: msg.text,
-        usedPrefix: '/',
-        command: pluginName,
-        m: msg,  // Pass the full message object to the plugin
-        db,  // Pass the database instance to the plugin
-      };
+      // If there's a plugin handler for this command, call it
+      if (plugins[command]) {
+        const context = {
+          bot,
+          text,
+          usedPrefix,
+          command,
+          m: msg,  // Pass the full message object to the plugin
+          db,  // Pass the database instance to the plugin
+        };
 
-      try {
-        plugins[pluginName](context);  // Call the handler with the context
-        console.log(chalk.green(`Executed plugin: ${pluginName} for chatId: ${chatId}`));
-      } catch (error) {
-        console.error(chalk.red(`Error executing plugin '${pluginName}':`), error);
-        bot.sendMessage(chatId, `An error occurred while processing the command '${pluginName}'. Please try again later.`);
+        try {
+          plugins[command](context);  // Call the handler with the context
+          console.log(chalk.green(`Executed plugin: ${command} for chatId: ${chatId}`));
+        } catch (error) {
+          console.error(chalk.red(`Error executing plugin '${command}':`), error);
+          bot.sendMessage(chatId, `An error occurred while processing the command '${command}'. Please try again later.`);
+        }
+      } else {
+        // If no plugin is found, send an error message
+        bot.sendMessage(chatId, "Unknown command or no plugin available for that command.");
+        console.error(chalk.red(`Unknown command: ${command} from chatId: ${chatId}`));
       }
-    } else {
-      // If no plugin is found, send an error message
-      bot.sendMessage(chatId, "Unknown command or no plugin available for that command.");
-      console.error(chalk.red(`Unknown command: ${pluginName} from chatId: ${chatId}`));
     }
   }
 });
@@ -184,6 +188,6 @@ bot.on('message', (msg) => {
 bot.on('callback_query', (callbackQuery) => {
   const message = callbackQuery.message;
   const chatId = message.chat.id;
-   
+
   // Handle callback query here if needed (show image, etc.)
 });
