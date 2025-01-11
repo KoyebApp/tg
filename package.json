@@ -32,6 +32,8 @@
     "chalk": "^5.1.0",
     "cheerio": "^1.0.0-rc.12",
     "lowdb": "^3.0.0",
+    "mongoose": "^7.4.1",
+    "got": "*",
     "perf_hooks": "^0.0.1",
     "node-fetch": "^3.3.1",
     "node-schedule": "*",
