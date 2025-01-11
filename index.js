@@ -7,11 +7,14 @@ const { mongoDB, mongoDBV2 } = require('./lib/mongoDB');
 const CloudDBAdapter = require('./lib/cloudDBAdapter');
 const syntaxerror = require('syntax-error');
 
-// Dynamically import chalk since it is now an ES Module
-const chalk = (await import('chalk')).default;
-
 // Load environment variables from .env file
 dotenv.config();
+
+// Dynamically import chalk in an async function (since it's an ESM module)
+let chalk;
+(async () => {
+  chalk = (await import('chalk')).default;
+})();
 
 // Fetch secrets from environment variables
 const DATABASE_URL = process.env.DATABASE_URL;
