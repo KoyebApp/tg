@@ -1,23 +1,22 @@
-const Qasim = require('api-qasim');
-const fetch = require('node-fetch');
+// Assuming your plugin for /gimage is in the plugins folder and is properly structured
+const fetch = require('node-fetch');  // Make sure you have 'node-fetch' installed for fetching images
+const Qasim = require('api-qasim');   // Assuming Qasim API is used for image fetching
 
-// Command handler for /gimage
-const handler = async ({ bot, m, text, query, usedPrefix }) => {
+const handler = async ({ bot, m, text, db, usedPrefix }) => {
   const chatId = m.chat.id;
-
-  // Ensure the query exists, otherwise ask the user for one
-  if (!query) {
+  const searchQuery = text.trim().slice(usedPrefix.length + 7).trim(); // Extract query after /gimage
+  
+  // If no query is provided, ask for it
+  if (!searchQuery) {
     await bot.sendMessage(chatId, "Please provide a search query for Google Image search. For example: /gimage cats");
     return;
   }
 
-  console.log(`Search query: ${query}`);  // Log the query for debugging
-
   try {
     await bot.sendMessage(chatId, "⏳ Searching for images...");
 
-    // Fetch image URLs from Google Image search API
-    const googleImageResponse = await Qasim.googleImage(query);
+    // Fetch image URLs from Google Image search API (you should replace this with your actual API call)
+    const googleImageResponse = await Qasim.googleImage(searchQuery);
 
     if (!googleImageResponse || !googleImageResponse.imageUrls || googleImageResponse.imageUrls.length === 0) {
       return bot.sendMessage(chatId, "No images found for the search query.");
@@ -47,7 +46,7 @@ const handler = async ({ bot, m, text, query, usedPrefix }) => {
       const filename = `image_${i + 1}.${fileExtension}`;
 
       // Send the image using the correct method
-      await bot.sendPhoto(chatId, buffer, { caption: `Image ${i + 1} from the search query *${query}*` });
+      await bot.sendPhoto(chatId, buffer, { caption: `Image ${i + 1} from the search query *${searchQuery}*` });
     }
 
     // Inform the user that the search is complete
@@ -57,10 +56,11 @@ const handler = async ({ bot, m, text, query, usedPrefix }) => {
     console.error('Error:', error);
     await bot.sendMessage(chatId, "❌ An error occurred while fetching or downloading the images.");
   }
+
 };
 
 // Set the command(s) for this handler
-handler.command = 'gimage';
+handler.command = ['gimage'];
 
 // Export the handler
 module.exports = handler;
