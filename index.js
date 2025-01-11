@@ -108,7 +108,7 @@ const loadPlugins = () => {
     try {
       // Dynamically import the plugin handler
       const pluginHandler = require(path.join(pluginsPath, file)).default;
-      handlers[pluginName] = pluginHandler;
+      handlers[pluginName.toLowerCase()] = pluginHandler; // Store plugin with lowercase key
       console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
     } catch (error) {
       const err = syntaxerror(fs.readFileSync(path.join(pluginsPath, file), 'utf-8'), file);
@@ -141,28 +141,29 @@ schedule.scheduleJob('0 9 * * *', () => {
 // Main message handler
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-  const command = msg.text.toLowerCase();  // Convert the command to lowercase
+  const command = msg.text.trim().toLowerCase();  // Convert the command to lowercase and trim any extra spaces
 
   logUserActivity(chatId, command);  // Log user activity
 
   // If the message is a command (starts with '/')
   if (command.startsWith('/')) {
-    // Remove '/' from the command and get the plugin name (e.g., '/alive' -> 'alive')
     const pluginName = command.split(' ')[0].substring(1); // '/alive' -> 'alive'
+    console.log(`Received command: ${pluginName}`);  // Debug log
+
+    // Debugging: List all loaded plugin names
+    console.log('Loaded plugins:', Object.keys(plugins));
 
     // If there's a plugin handler for this command, call it
     if (plugins[pluginName]) {
-      // Create the context object to pass to the plugin handler
       const context = {
         bot,
         text: msg.text,
-        usedPrefix: '/',  // You can define a different prefix if needed
+        usedPrefix: '/',
         command: pluginName,
         m: msg,  // Pass the full message object to the plugin
         db,  // Pass the database instance to the plugin
       };
 
-      // Call the plugin handler with the context
       plugins[pluginName](context);
       console.log(chalk.green(`Executed plugin: ${pluginName} for chatId: ${chatId}`));
     } else {
