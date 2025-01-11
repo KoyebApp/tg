@@ -34,7 +34,7 @@ const dbConfig = {
   url: DATABASE_URL || 'database.json',         // MongoDB URL or LowDB file path
 };
 
-// Check if database.json exists, if not, create it
+// Ensure the database.json file exists and create it if not
 const ensureLowDbExists = async () => {
   const dbFilePath = path.join(__dirname, 'database.json');
 
