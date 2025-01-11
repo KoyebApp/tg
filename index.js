@@ -58,7 +58,7 @@ const initDatabase = async () => {
     await ensureLowDbExists();
 
     // Dynamically import LowDB
-    const { Low, JSONFile } = await import('lowdb');  // Use dynamic import for lowdb
+    const { Low, JSONFile } = require('lowdb');  // Use CommonJS require
     db = new Low(new JSONFile('database.json'));
     await db.read();  // Read data from the file
     console.log(chalk.green('LowDB initialized successfully with database.json'));
@@ -98,7 +98,7 @@ initDatabase().then(database => {
   console.error(chalk.red('Error initializing database:'), err);
 });
 
-// Dynamically import all plugins from the plugins folder
+// Dynamically import all plugins from the plugins folder using require
 const loadPlugins = () => {
   const pluginFiles = fs.readdirSync(pluginsPath);
   const handlers = {};
@@ -106,8 +106,8 @@ const loadPlugins = () => {
   pluginFiles.forEach(file => {
     const pluginName = path.basename(file, '.js');
     try {
-      // Dynamically import the plugin handler
-      const pluginHandler = require(path.join(pluginsPath, file)).default;
+      // Dynamically import the plugin handler using require (CommonJS)
+      const pluginHandler = require(path.join(pluginsPath, file));  // No .default needed in CommonJS
       handlers[pluginName.toLowerCase()] = pluginHandler; // Store plugin with lowercase key
       console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
     } catch (error) {
