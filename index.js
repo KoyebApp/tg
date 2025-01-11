@@ -3,7 +3,6 @@ const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
 const TelegramBot = require('node-telegram-bot-api');
-const schedule = require('node-schedule');
 const { mongoDB, mongoDBV2 } = require('./lib/mongoDB');
 const CloudDBAdapter = require('./lib/cloudDBAdapter');
 const syntaxerror = require('syntax-error');
@@ -27,76 +26,6 @@ const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 
 // Get the path of the plugins folder
 const pluginsPath = path.join(__dirname, 'plugins');
-
-// Database configuration and initialization
-const dbConfig = {
-  type: DATABASE_URL ? 'mongodb' : 'lowdb',    // 'mongodb' or 'lowdb' based on presence of DATABASE_URL
-  version: 'v2',                                // Optional (if 'mongodb' is used, specify version 'v1' or 'v2')
-  url: DATABASE_URL || 'database.json',         // MongoDB URL or LowDB file path
-};
-
-// Check if database.json exists, if not, create it
-const ensureLowDbExists = async () => {
-  const dbFilePath = path.join(__dirname, 'database.json');
-
-  // Check if the database.json file exists
-  if (!fs.existsSync(dbFilePath)) {
-    // If not, create it with default structure
-    const defaultData = { data: [] };
-    fs.writeFileSync(dbFilePath, JSON.stringify(defaultData, null, 2));
-    console.log(chalk.green('database.json created successfully with default structure.'));
-  }
-};
-
-// Database initialization function
-const initDatabase = async () => {
-  let db;
-
-  if (!dbConfig.url || dbConfig.type === 'lowdb') {
-    // Ensure the database.json file exists and create it if necessary
-    await ensureLowDbExists();
-
-    // Dynamically import LowDB (ESM Import inside async function)
-    const { Low, JSONFile } = await import('lowdb');  // Use dynamic import
-    db = new Low(new JSONFile('database.json'));
-    await db.read();  // Read data from the file
-    console.log(chalk.green('LowDB initialized successfully with database.json'));
-  } else {
-    try {
-      // MongoDB or CloudDB initialization
-      if (dbConfig.type === 'mongodb') {
-        // MongoDB connection
-        if (dbConfig.version === 'v2') {
-          db = new mongoDBV2(dbConfig.url);  // Connect to MongoDB v2
-        } else {
-          db = new mongoDB(dbConfig.url);    // Connect to MongoDB v1
-        }
-      } else if (dbConfig.type === 'cloud') {
-        // CloudDB connection
-        db = await CloudDBAdapter(dbConfig.url);  // Connect to cloud DB
-      }
-      console.log(chalk.green('Database initialized successfully'));
-    } catch (err) {
-      console.error(chalk.red('Error initializing database:'), err);
-      process.exit(1);  // Critical error: stop the process, PM2 will restart the bot
-    }
-  }
-
-  return db;
-};
-
-// Initialize the database
-let db = null;
-initDatabase().then(database => {
-  if (database) {
-    db = database;
-    console.log(chalk.green('Database initialized successfully'));
-  } else {
-    console.log(chalk.red('Failed to initialize database'));
-  }
-}).catch(err => {
-  console.error(chalk.red('Error initializing database:'), err);
-});
 
 // Dynamically import all plugins from the plugins folder using require
 const loadPlugins = () => {
@@ -157,7 +86,6 @@ bot.on('message', (msg) => {
           usedPrefix,
           command,
           m: msg,  // Pass the full message object to the plugin
-          db,  // Pass the database instance to the plugin
         };
 
         try {
