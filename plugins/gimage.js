@@ -8,12 +8,13 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
 
   // Case when no query is provided with /gimage
   if (!text) {
+    // If no query is provided, ask for it
     return bot.sendMessage(chatId, "Please provide a search query for Google Image search. For example: /gimage cats");
   }
 
   // Extract the search query from the text (strip the prefix and any extra spaces)
   const searchQuery = text.trim();
-  
+
   try {
     // Inform the user that the search is in progress
     await bot.sendMessage(chatId, "⏳ Searching for images...");
