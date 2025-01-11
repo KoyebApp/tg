@@ -43,7 +43,6 @@
     "url": "*",
     "qrcode": "^1.5.1",
     "syntax-error": "^1.4.0",
-    "mongoose": "^8.8.3",
     "mime-types": "^2.1.35"
   },
   "contributors": [
