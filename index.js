@@ -3,7 +3,8 @@ const { dirname } = require('path');
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
-const { Low, JSONFile } = require('lowdb');
+// Instead of using require, use dynamic import
+const { Low, JSONFile } = await import('lowdb');
 const TelegramBot = require('node-telegram-bot-api');
 const schedule = require('node-schedule');
 const { mongoDB, mongoDBV2 } = require('./lib/mongoDB');
