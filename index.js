@@ -1,20 +1,13 @@
-const { fileURLToPath } = require('url');
-const { dirname } = require('path');
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
-// Instead of using require, use dynamic import for 'lowdb'
-const { Low, JSONFile } = require('lowdb');
+const { Low, JSONFile } = require('lowdb');  // LowDB import (using require)
 const TelegramBot = require('node-telegram-bot-api');
 const schedule = require('node-schedule');
 const { mongoDB, mongoDBV2 } = require('./lib/mongoDB');
 const CloudDBAdapter = require('./lib/cloudDBAdapter');
 const syntaxerror = require('syntax-error');
 const chalk = require('chalk');
-
-// Define __filename and __dirname manually for CommonJS
-const __filename = fileURLToPath(require.resolve('./index.js'));
-const __dirname = dirname(__filename);
 
 // Load environment variables from .env file
 dotenv.config();
