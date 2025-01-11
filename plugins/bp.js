@@ -12,29 +12,34 @@ const handler = async ({ bot, m, text, db, usedPrefix, command }) => {
     const chatId = m.chat.id;
 
     // Send "waiting" message to indicate the bot is processing
-    await bot.sendMessage(chatId, "⏳ Please wait, fetching the image...");
+    await bot.sendMessage(chatId, "⏳ Please wait, fetching the images...");
 
-    // Select a random image from the list
-    let img = bpink[Math.floor(Math.random() * bpink.length)];
+    // Select three random images from the list
+    const randomImages = [];
+    while (randomImages.length < 3) {
+      const img = bpink[Math.floor(Math.random() * bpink.length)];
+      if (!randomImages.includes(img)) { // Prevent duplicates
+        randomImages.push(img);
+      }
+    }
 
-    // If no image is selected, throw an error
-    if (!img) throw new Error("No image found");
+    // Fetch and send the images
+    for (const img of randomImages) {
+      const response = await fetch(img);
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
 
-    // Fetch the image
-    const response = await fetch(img);
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    // Send the image with a custom message
-    await bot.sendPhoto(chatId, buffer, {
-      caption: '*𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝚄𝙻𝚃𝚁𝙰-𝙼𝙳*',
-    });
+      // Send each image with a custom message
+      await bot.sendPhoto(chatId, buffer, {
+        caption: '*𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝚄𝙻𝚃𝚁𝙰-𝙼𝙳*',
+      });
+    }
 
     // After processing, send the "done" message
-    await bot.sendMessage(chatId, "✅ Image sent successfully!");
+    await bot.sendMessage(chatId, "✅ Images sent successfully!");
   } catch (error) {
-    console.error('Error fetching image:', error);
-    await bot.sendMessage(m.chat.id, '❌ Something went wrong while fetching the image. Please try again later.');
+    console.error('Error fetching images:', error);
+    await bot.sendMessage(m.chat.id, '❌ Something went wrong while fetching the images. Please try again later.');
   }
 };
 
