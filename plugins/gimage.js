@@ -1,7 +1,6 @@
 const Qasim = require('api-qasim');  // Import the entire package as 'pkg'
 const fetch = require('node-fetch');  // Extract 'googleImage' function from the package
 
-// Adjust handler to use the context correctly
 const handler = async ({ bot, m, text, db, usedPrefix }) => {
   if (!text) {
     return bot.sendMessage(m.chat.id, "Please provide a search query for Google Image search.");
@@ -80,11 +79,13 @@ const callbackHandler = async (callbackQuery, bot) => {
 };
 
 // Event listener for callback queries (show images button)
-bot.on('callback_query', callbackQuery => callbackHandler(callbackQuery, bot));
+module.exports = (bot) => {
+  bot.on('callback_query', callbackQuery => callbackHandler(callbackQuery, bot));
+};
 
 // List of available commands for the plugin
 handler.help = ['gimage', 'googleimage'];
 handler.tags = ['search'];
 handler.command = ['gimage', 'googleimage'];
 
-module.exports = handler;
+module.exports.handler = handler;
