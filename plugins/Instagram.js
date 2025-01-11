@@ -1,6 +1,5 @@
 const fetch = require('node-fetch');
-const { instagram } = require ('nayan-videos-downloader');
-
+const {instagram} = require("nayan-videos-downloader");
 const fetchWithRetry = async (url, options, retries = 3) => {
   for (let i = 0; i < retries; i++) {
     const response = await fetch(url, options);
