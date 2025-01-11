@@ -12,6 +12,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
   try {
     // Call your image search API or logic here using the query
     const imageUrls = await Qasim.googleImage(query);
+    console.log('Google Image Search Results:', imageUrls);
 
     // Check if imageUrls is an array and has items
     if (!Array.isArray(imageUrls) || imageUrls.length === 0) {
