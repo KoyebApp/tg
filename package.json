@@ -35,6 +35,8 @@
     "perf_hooks": "^0.0.1",
     "node-fetch": "^3.3.1",
     "pm2": "^5.4.2",
+    "lodash": "^4.17.21",
+    "url": "*",
     "qrcode": "^1.5.1",
     "syntax-error": "^1.4.0",
     "mongoose": "^8.8.3",
