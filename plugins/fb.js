@@ -1,6 +1,6 @@
 const Qasim = require('api-qasim');
 
-const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
+let handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
   if (!query) {
     await bot.sendMessage(m.chat.id, '❌ You need to provide the URL of the Facebook video.');
     return;
@@ -18,23 +18,20 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     console.log("API Response:", res);
 
     // Check if res is valid and contains the expected properties
-    if (!res || !res.status || res.status === false) {
-      throw new Error(res.msg || '❌ No video data found or the response structure is incorrect.');
+    if (!res || !res.data) {
+      throw new Error('No data field found in API response.');
     }
 
-    // If the response contains the expected data, process it
-    let data = res.data; // Extract video data from the response
-
-    // Ensure data is an array before trying to access it
-    if (!Array.isArray(data) || data.length === 0) {
-      throw new Error('❌ No valid video data found in the response.');
+    // Check if res.data is an array and contains valid video data
+    if (!Array.isArray(res.data) || res.data.length === 0) {
+      throw new Error('API response does not contain an array of video data.');
     }
 
-    // Check if there is any valid video URL (find the first valid item with 'url')
-    const validVideo = data.find(item => item.url);
+    // Try to find the first valid video URL from the data
+    const validVideo = res.data.find(item => item.url);
 
     if (!validVideo) {
-      throw new Error('❌ No valid video URL found in the response.');
+      throw new Error('No valid video URL found in the API response.');
     }
 
     const videoURL = validVideo.url;  // Get the video URL from the first valid item
@@ -48,7 +45,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     await bot.sendMessage(m.chat.id, '✅ Video sent successfully!');
 
   } catch (error) {
-    console.error("Error:", error.message);
+    console.error("Error:", error.message || error);
     await bot.sendMessage(m.chat.id, `❌ An error occurred while processing the request: ${error.message || error}`);
   }
 };
