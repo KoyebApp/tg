@@ -1,7 +1,6 @@
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
-const { Low, JSONFile } = require('lowdb');  // LowDB import (using require)
 const TelegramBot = require('node-telegram-bot-api');
 const schedule = require('node-schedule');
 const { mongoDB, mongoDBV2 } = require('./lib/mongoDB');
@@ -56,7 +55,8 @@ const initDatabase = async () => {
     // Ensure the database.json file exists and create it if necessary
     await ensureLowDbExists();
 
-    // Initialize LowDB with 'database.json'
+    // Dynamically import LowDB
+    const { Low, JSONFile } = await import('lowdb');  // Use dynamic import for lowdb
     db = new Low(new JSONFile('database.json'));
     await db.read();  // Read data from the file
     console.log(chalk.green('LowDB initialized successfully with database.json'));
