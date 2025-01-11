@@ -8,8 +8,14 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     }
 
     try {
+        // Log the query for debugging
+        console.log('Instagram Stalking Query:', query);
+
         // Call the Instagram profile stalking API with the username
         let res = await Qasim.igStalk(query);
+
+        // Log the response to see the data returned by the API
+        console.log('Instagram Stalking API Response:', res);
 
         let message = `
 ┌──「 *STALKING INSTAGRAM PROFILE* 
