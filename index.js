@@ -1,6 +1,15 @@
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { Low, JSONFile } from 'lowdb';
+import TelegramBot from 'node-telegram-bot-api';
+import schedule from 'node-schedule';
+import { mongoDB, mongoDBV2 } from './lib/mongoDB.js';
+import CloudDBAdapter from './lib/cloudDBAdapter.js';
+import syntaxerror from 'syntax-error';
+import chalk from 'chalk';
 
 // Define __filename and __dirname in ES module scope
 const __filename = fileURLToPath(import.meta.url);
@@ -8,16 +17,6 @@ const __dirname = dirname(__filename);
 
 // Load environment variables from .env file
 dotenv.config();
-
-import TelegramBot from 'node-telegram-bot-api';
-import fs from 'fs';
-import path from 'path';
-import schedule from 'node-schedule';
-import { Low, JSONFile } from 'lowdb';
-import { mongoDB, mongoDBV2 } from './lib/mongoDB.js';
-import CloudDBAdapter from './lib/cloudDBAdapter.js';
-import syntaxerror from 'syntax-error';
-import chalk from 'chalk'; // Importing Chalk for colored console logs
 
 // Fetch secrets from environment variables
 const DATABASE_URL = process.env.DATABASE_URL;
@@ -33,38 +32,58 @@ if (!BOT_TOKEN) {
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 
 // Get the path of the plugins folder
-const pluginsPath = path.join(__dirname, 'plugins'); // Now you can use __dirname
+const pluginsPath = path.join(__dirname, 'plugins');
 
 // Database configuration and initialization
 const dbConfig = {
-  type: 'mongodb',    // 'mongodb', 'cloud', or 'lowdb'
-  version: 'v2',      // Optional (if 'mongodb' is used, specify version 'v1' or 'v2')
-  url: DATABASE_URL,  // MongoDB URL or Cloud DB URL or LowDB file path
+  type: DATABASE_URL ? 'mongodb' : 'lowdb',    // 'mongodb' or 'lowdb' based on presence of DATABASE_URL
+  version: 'v2',                                // Optional (if 'mongodb' is used, specify version 'v1' or 'v2')
+  url: DATABASE_URL || 'database.json',         // MongoDB URL or LowDB file path
+};
+
+// Check if database.json exists, if not, create it
+const ensureLowDbExists = async () => {
+  const dbFilePath = path.join(__dirname, 'database.json');
+
+  // Check if the database.json file exists
+  if (!fs.existsSync(dbFilePath)) {
+    // If not, create it with default structure
+    const defaultData = { data: [] };
+    fs.writeFileSync(dbFilePath, JSON.stringify(defaultData, null, 2));
+    console.log(chalk.green('database.json created successfully with default structure.'));
+  }
 };
 
 // Database initialization function
 const initDatabase = async () => {
-  if (!dbConfig.url) {
-    console.log(chalk.yellow('Database URL not found.'));
-    return null; // Return null if no URL is found
-  }
-
   let db;
 
-  if (dbConfig.type === 'mongodb') {
-    // MongoDB connection
-    if (dbConfig.version === 'v2') {
-      db = new mongoDBV2(dbConfig.url);  // Use 'new' to instantiate mongoDBV2 class
-    } else {
-      db = new mongoDB(dbConfig.url);    // Use 'new' to instantiate mongoDB class
-    }
-  } else if (dbConfig.type === 'cloud') {
-    // CloudDB connection
-    db = await CloudDBAdapter(dbConfig.url);  // Connect to cloud DB
-  } else {
-    // Use LowDB (local file storage)
-    db = new Low(new JSONFile('database.json'));  // Default to 'database.json'
+  if (!dbConfig.url || dbConfig.type === 'lowdb') {
+    // Ensure the database.json file exists and create it if necessary
+    await ensureLowDbExists();
+
+    // Initialize LowDB with 'database.json'
+    db = new Low(new JSONFile('database.json'));
     await db.read();  // Read data from the file
+    console.log(chalk.green('LowDB initialized successfully with database.json'));
+  } else {
+    try {
+      // MongoDB or CloudDB initialization
+      if (dbConfig.type === 'mongodb') {
+        // MongoDB connection
+        if (dbConfig.version === 'v2') {
+          db = new mongoDBV2(dbConfig.url);  // Connect to MongoDB v2
+        } else {
+          db = new mongoDB(dbConfig.url);    // Connect to MongoDB v1
+        }
+      } else if (dbConfig.type === 'cloud') {
+        // CloudDB connection
+        db = await CloudDBAdapter(dbConfig.url);  // Connect to cloud DB
+      }
+      console.log(chalk.green('Database initialized successfully'));
+    } catch (err) {
+      console.error(chalk.red('Error initializing database:'), err);
+    }
   }
 
   return db;
@@ -164,4 +183,3 @@ bot.on('callback_query', (callbackQuery) => {
    
   // Handle callback query here if needed (show image, etc.)
 });
-    
