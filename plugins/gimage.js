@@ -1,66 +1,31 @@
-// Assuming your plugin for /gimage is in the plugins folder and is properly structured
-const fetch = require('node-fetch');  // Make sure you have 'node-fetch' installed for fetching images
-const Qasim = require('api-qasim');   // Assuming Qasim API is used for image fetching
+// gimage.js (plugin file)
 
-const handler = async ({ bot, m, text, db, usedPrefix }) => {
+const fetch = require('node-fetch');
+const Qasim = require('api-qasim');
+
+// The handler function that will process the command
+const handler = async ({ bot, m, text, db, usedPrefix }, searchQuery) => {
   const chatId = m.chat.id;
-  const searchQuery = text.trim().slice(usedPrefix.length + 7).trim(); // Extract query after /gimage
-  
-  // If no query is provided, ask for it
+
   if (!searchQuery) {
-    await bot.sendMessage(chatId, "Please provide a search query for Google Image search. For example: /gimage cats");
-    return;
+    return bot.sendMessage(chatId, "Please provide a search query after the command.");
   }
 
-  try {
-    await bot.sendMessage(chatId, "⏳ Searching for images...");
+  // Fetch image URLs from the respective image search API (example for gimage)
+  const googleImageResponse = await Qasim.googleImage(searchQuery);
 
-    // Fetch image URLs from Google Image search API (you should replace this with your actual API call)
-    const googleImageResponse = await Qasim.googleImage(searchQuery);
-
-    if (!googleImageResponse || !googleImageResponse.imageUrls || googleImageResponse.imageUrls.length === 0) {
-      return bot.sendMessage(chatId, "No images found for the search query.");
-    }
-
-    // Limit to the first 4 image URLs
-    const imageUrls = googleImageResponse.imageUrls.slice(0, 4);
-    const imageBuffers = [];
-
-    // Download the first four images
-    for (let i = 0; i < imageUrls.length; i++) {
-      const imageUrl = imageUrls[i];
-      const response = await fetch(imageUrl);
-
-      if (response.ok) {
-        const buffer = await response.buffer();  // Get image data as buffer
-        imageBuffers.push({ buffer, url: imageUrl });
-      } else {
-        console.log(`Failed to fetch image at index ${i}: ${imageUrl}`);
-      }
-    }
-
-    // Send the images to the user
-    for (let i = 0; i < imageBuffers.length; i++) {
-      const { buffer, url } = imageBuffers[i];
-      const fileExtension = url.split('.').pop();
-      const filename = `image_${i + 1}.${fileExtension}`;
-
-      // Send the image using the correct method
-      await bot.sendPhoto(chatId, buffer, { caption: `Image ${i + 1} from the search query *${searchQuery}*` });
-    }
-
-    // Inform the user that the search is complete
-    await bot.sendMessage(chatId, "✅ Image search complete!");
-
-  } catch (error) {
-    console.error('Error:', error);
-    await bot.sendMessage(chatId, "❌ An error occurred while fetching or downloading the images.");
+  if (!googleImageResponse || !googleImageResponse.imageUrls || googleImageResponse.imageUrls.length === 0) {
+    return bot.sendMessage(chatId, "No images found.");
   }
 
+  const imageUrls = googleImageResponse.imageUrls.slice(0, 4);
+
+  // Send images to user
+  for (let i = 0; i < imageUrls.length; i++) {
+    await bot.sendPhoto(chatId, imageUrls[i], { caption: `Image ${i + 1} for query *${searchQuery}*` });
+  }
+
+  await bot.sendMessage(chatId, "Image search complete!");
 };
 
-// Set the command(s) for this handler
-handler.command = ['gimage'];
-
-// Export the handler
 module.exports = handler;
