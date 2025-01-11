@@ -1,7 +1,7 @@
 const Qasim = require('api-qasim');  // Import the entire package as 'pkg'
 const fetch = require('node-fetch');  // Extract 'googleImage' function from the package
 
-let handler = async (m, { bot, text }) => {
+const handler = async ({ bot, m, db }) => {
   if (!text) {
     return bot.sendMessage(m.chat.id, "Please provide a search query for Google Image search.");
   }
