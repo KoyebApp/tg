@@ -35,6 +35,9 @@ const handler = async ({ bot, m, query, usedPrefix, command }) => {
         // Fetch video details with ytmp4
         const response = await Qasim.ytmp4(url);
         
+        // Log the full response for debugging
+        console.log('API Response:', response);
+
         // Check if response is valid and contains 'video' field
         if (!response || !response.video) {
             console.error('Invalid response structure:', response); // Log invalid response for better debugging
