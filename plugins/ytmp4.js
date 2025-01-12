@@ -34,8 +34,15 @@ const handler = async ({ bot, m, query, usedPrefix, command }) => {
     try {
         console.log('Fetching video details from Qasim API...');  // Log just before calling the API
 
-        // Fetch video details with ytmp4
-        const response = await Qasim.ytmp4(url);
+        // Add a try-catch here to catch errors during the API call
+        let response;
+        try {
+            response = await Qasim.ytmp4(url);
+        } catch (apiError) {
+            console.error('Error occurred while calling Qasim API:', apiError);
+            await bot.sendMessage(chatId, '❌ An error occurred while contacting the API. Please try again later.');
+            return; // Return early if the API call fails
+        }
 
         // Log the raw response to see what is returned from the API
         console.log('API Response:', response);
