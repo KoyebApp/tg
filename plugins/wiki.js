@@ -10,6 +10,9 @@ const handler = async ({ bot, m, query, db, usedPrefix, command }) => {
     // Fetch Wikipedia data using Qasim API
     const res = await Qasim.wikipedia(query);
 
+    // Log the response for debugging purposes
+    console.log('API Response:', res);
+
     // Check if the response is valid
     if (!res || !res.extract) {
       await bot.sendMessage(m.chat.id, '⚠️ No results found for the search term.');
@@ -20,10 +23,8 @@ const handler = async ({ bot, m, query, db, usedPrefix, command }) => {
     await bot.sendMessage(m.chat.id, `▢ *Wikipedia*\n\n‣ Searched: ${res.title}\n\n${res.extract}`);
     
     // Optional: Save the query to the database
-    if (db) {
-      await db.saveSearch(query, m.chat.id); // Assuming a method `saveSearch` exists in your db
-    }
   } catch (e) {
+    console.error('Error:', e);
     await bot.sendMessage(m.chat.id, '⚠️ Error while fetching data from Wikipedia');
   }
 };
