@@ -80,7 +80,8 @@ let handler = async ({ bot, m, text, query }) => {
 
     // Determine the MIME type based on the file extension
     let mimeType = '';
-    switch (mediafireData.ext.toLowerCase()) {
+    const fileExtension = mediafireData.ext.toLowerCase();
+    switch (fileExtension) {
       case 'zip':
         mimeType = 'application/zip';
         break;
@@ -88,17 +89,17 @@ let handler = async ({ bot, m, text, query }) => {
         mimeType = 'application/pdf';
         break;
       case 'apk':
-        mimeType = 'application/vnd.android.package-archive';
+        mimeType = 'application/vnd.android.package-archive';  // MIME type for APK files
         break;
       case 'jpg':
       case 'jpeg':
-        mimeType = 'image/jpeg';
+        mimeType = 'image/jpeg';  // MIME type for JPEG images
         break;
       case 'png':
-        mimeType = 'image/png';
+        mimeType = 'image/png';   // MIME type for PNG images
         break;
       case 'gif':
-        mimeType = 'image/gif';
+        mimeType = 'image/gif';   // MIME type for GIF images
         break;
       case 'mp4':
         mimeType = 'video/mp4';
@@ -110,7 +111,7 @@ let handler = async ({ bot, m, text, query }) => {
         mimeType = 'video/webm';
         break;
       default:
-        mimeType = `application/${mediafireData.ext.toLowerCase()}`;
+        mimeType = `application/${fileExtension}`;  // Fallback MIME type
     }
 
     // Send the file to the chat
@@ -121,5 +122,4 @@ let handler = async ({ bot, m, text, query }) => {
     bot.sendMessage(m.chat.id, "An error occurred while fetching or downloading the file from MediaFire.");
   }
 };
-
 module.exports = handler;
