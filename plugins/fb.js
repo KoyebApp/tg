@@ -1,18 +1,21 @@
 const Qasim = require('api-qasim');
 
 let handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
-  // Check if a URL is provided
+  // Ensure query (URL) is provided
   if (!query) {
     await bot.sendMessage(m.chat.id, '❌ You need to provide the URL of the Facebook video.');
     return;
   }
 
-  // Send a message indicating that the bot is processing the request
+  // Log the query (which is the URL) to verify
+  console.log("Received URL (query): ", query);
+
+  // Send a message indicating the bot is processing the request
   await bot.sendMessage(m.chat.id, '⌛ Processing your request, please wait...');
 
   let res;
   try {
-    // Fetch the video data using the provided URL
+    // Use the query (URL) directly in the API call
     res = await Qasim.fbdl(query);
 
     // Log the API response for debugging
