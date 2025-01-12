@@ -1,18 +1,18 @@
 const mega = require('megajs');
 const path = require('path');
 
-let handler = async ({ bot, m, text, command }) => {
+let handler = async ({ bot, m, query, command }) => {
   try {
-    // Ensure the MEGA link is provided
-    if (!text) {
-      return bot.sendMessage(m.chat.id, `❌ Please provide the MEGA link. Example: /${command} https://mega.nz/file/yourFileLink`);
+    // Ensure query (URL) is provided
+    if (!query || !query.trim().startsWith('https://mega.nz/')) {
+      return bot.sendMessage(m.chat.id, `❌ Please provide a valid MEGA URL. Example: /${command} https://mega.nz/file/yourFileLink`);
     }
 
     // Parse the file from the provided URL
-    const file = mega.File.fromURL(text.trim());
+    const file = mega.File.fromURL(query.trim());
     await file.loadAttributes();
 
-    // Check file size limit (300MB)
+    // Check if file size exceeds the limit (300MB)
     if (file.size >= 300 * 1024 * 1024) {
       return bot.sendMessage(m.chat.id, '❌ File size is too large (Maximum Size: 300MB).');
     }
