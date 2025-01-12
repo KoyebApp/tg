@@ -47,7 +47,14 @@ const handler = async ({ bot, m, query, usedPrefix, command }) => {
         // Log the raw response to see what is returned from the API
         console.log('API Response:', response);
 
-        // Check for specific error response
+        // If the response is a string, it might be an error message
+        if (typeof response === 'string') {
+            console.error('API Error:', response);  // Log the error string
+            await bot.sendMessage(chatId, `❌ Error: ${response}`);
+            return;
+        }
+
+        // Check for specific error response from the API if response is structured
         if (response && response.error) {
             console.error('API Error:', response.error);  // Log specific error
             await bot.sendMessage(chatId, `❌ Error: ${response.error}`);
