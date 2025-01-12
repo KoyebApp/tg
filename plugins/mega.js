@@ -1,31 +1,33 @@
 const mega = require('megajs');
 const path = require('path');
 
-let handler = async (m, { bot, text, command }) => {
+let handler = async ({ bot, m, text, command }) => {
   try {
-    // Ask the user to provide the link if no link is provided
-    if (!text)
-      return bot.sendMessage(m.chat.id, `Please provide the MEGA link. Example: /${command} https://mega.nz/file/yourFileLink`);
+    // Ensure the MEGA link is provided
+    if (!text) {
+      return bot.sendMessage(m.chat.id, `❌ Please provide the MEGA link. Example: /${command} https://mega.nz/file/yourFileLink`);
+    }
 
     // Parse the file from the provided URL
-    const file = mega.File.fromURL(text);
+    const file = mega.File.fromURL(text.trim());
     await file.loadAttributes();
 
-    // Check file size limit
-    if (file.size >= 300000000)
-      return bot.sendMessage(m.chat.id, 'Error: File size is too large (Maximum Size: 300MB)');
+    // Check file size limit (300MB)
+    if (file.size >= 300 * 1024 * 1024) {
+      return bot.sendMessage(m.chat.id, '❌ File size is too large (Maximum Size: 300MB).');
+    }
 
     // Notify the user that the file is being downloaded
-    const downloadingMessage = `🌩️ Downloading file... Please wait.`;
+    const downloadingMessage = '🌩️ Downloading file... Please wait.';
     await bot.sendMessage(m.chat.id, downloadingMessage);
 
-    // Format the download completion message
-    const caption = `*_Successfully downloaded..._*\nFile: ${file.name}\nSize: ${formatBytes(file.size)}`;
+    // Prepare caption and file info
+    const caption = `*Download Complete!*\nFile: ${file.name}\nSize: ${formatBytes(file.size)}`;
 
-    // Download the file data
+    // Download the file as a buffer
     const data = await file.downloadBuffer();
 
-    // Determine the file extension and MIME type
+    // Determine the MIME type based on file extension
     const fileExtension = path.extname(file.name).toLowerCase();
     const mimeTypes = {
       '.mp4': 'video/mp4',
@@ -38,21 +40,17 @@ let handler = async (m, { bot, text, command }) => {
       '.png': 'image/png',
     };
 
-    let mimetype = mimeTypes[fileExtension] || 'application/octet-stream';
+    const mimetype = mimeTypes[fileExtension] || 'application/octet-stream';
 
     // Send the file to the user
-    await bot.sendDocument(m.chat.id, data, { caption }, { filename: file.name, mimetype });
+    await bot.sendDocument(m.chat.id, data, { caption, filename: file.name, mimetype });
 
   } catch (error) {
     // Handle errors gracefully
-    console.error(error);
-    return bot.sendMessage(m.chat.id, `Error: ${error.message}`);
+    console.error('Error:', error);
+    return bot.sendMessage(m.chat.id, `❌ Error: ${error.message}`);
   }
 };
-
-handler.help = ['mega'];
-handler.tags = ['downloader'];
-handler.command = /^(mega)$/i;
 
 module.exports = handler;
 
@@ -64,7 +62,5 @@ function formatBytes(bytes) {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
-  return parseFloat(
-    (bytes / Math.pow(k, i)).toFixed(2)
-  ) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
