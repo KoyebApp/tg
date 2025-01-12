@@ -32,10 +32,12 @@ const handler = async ({ bot, m, query, usedPrefix, command }) => {
     await bot.sendMessage(chatId, '⏳ Fetching the video, please wait...');
 
     try {
+        console.log('Fetching video details from Qasim API...');  // Log just before calling the API
+
         // Fetch video details with ytmp4
         const response = await Qasim.ytmp4(url);
-        
-        // Log the full response for debugging
+
+        // Log the raw response to see what is returned from the API
         console.log('API Response:', response);
 
         // Check if response is valid and contains 'video' field
