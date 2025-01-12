@@ -1,29 +1,40 @@
-const fetch = require('node-fetch');  // Import fetch to handle file download
+const fetch = require('node-fetch');  // Importing fetch to handle file download
 const { URLSearchParams } = require('url'); // To work with query parameters
-const Qasim = require('api-qasim');  // Import the entire package as 'pkg'
+const Qasim = require('api-qasim');  // Import the API package for MediaFire functionality
 
-// Extract 'mediafire' function from the package
+let handler = async ({ bot, m, text, db, query, usedPrefix, command }) => {
+  // Ensure that a valid query (URL) is provided
+  if (!query) {
+    await bot.sendMessage(m.chat.id, "❌ Please provide a valid MediaFire URL.");
+    return;
+  }
 
-let handler = async (m, { bot, text }) => {
-  if (!text) {
-    return bot.sendMessage(m.chat.id, "Please provide a MediaFire URL.");
+  // Log the query (URL) into the database for tracking
+  if (db) {
+    await db.save({
+      query: query,
+      timestamp: Date.now(),
+      user: m.from
+    });
+    console.log(`Logged query from user: ${m.from}`);
   }
 
   try {
+    // Send message indicating bot is processing
     await bot.sendMessage(m.chat.id, "⏳ Fetching the MediaFire file, please wait...");
 
-    const mediafireUrl = text.trim();  // Extract MediaFire URL
+    const mediafireUrl = query.trim();  // Extract MediaFire URL
 
-    // Fetch data from MediaFire using the API
+    // Fetch data from MediaFire using Qasim API
     let mediafireResponse = await Qasim.mediafire(mediafireUrl);
     let mediafireData = mediafireResponse;
 
     // Log the response for debugging
     console.log('MediaFire Data:', mediafireData);
 
-    // Validate the response to ensure valid data
+    // Validate if valid data is returned
     if (!mediafireData || !mediafireData.name || !mediafireData.link) {
-      return bot.sendMessage(m.chat.id, "No valid data found for the provided URL.");
+      return bot.sendMessage(m.chat.id, "❌ No valid data found for the provided URL.");
     }
 
     // Format the caption to display file information
@@ -37,9 +48,9 @@ let handler = async (m, { bot, text }) => {
 
     await bot.sendMessage(m.chat.id, caption);
 
-    // Check for file size limit (100MB) for WhatsApp
+    // Check for file size limit (100MB) for Telegram
     if (mediafireData.size > 100 * 1024 * 1024) {
-      return bot.sendMessage(m.chat.id, "The file is too large to be sent via Telegram (limit is 100MB).");
+      return bot.sendMessage(m.chat.id, "❌ The file is too large to be sent via Telegram (limit is 100MB).");
     }
 
     // Get the direct download URL from the response
@@ -59,7 +70,7 @@ let handler = async (m, { bot, text }) => {
     // Check if the response is valid
     if (!response.ok) {
       console.error('Failed to fetch the file:', response.statusText);
-      return bot.sendMessage(m.chat.id, "Failed to download the file from MediaFire.");
+      return bot.sendMessage(m.chat.id, "❌ Failed to download the file from MediaFire.");
     }
 
     // Check the content length of the file
@@ -67,7 +78,7 @@ let handler = async (m, { bot, text }) => {
 
     // If content length is suspiciously small (less than 1KB), abort
     if (parseInt(contentLength) < 1000) {
-      return bot.sendMessage(m.chat.id, "The file seems too small to be the actual download. Something went wrong.");
+      return bot.sendMessage(m.chat.id, "❌ The file seems too small to be the actual download. Something went wrong.");
     }
 
     // Buffer the response (file data)
@@ -75,7 +86,7 @@ let handler = async (m, { bot, text }) => {
 
     // Check if the buffer is empty or corrupt
     if (!buffer || buffer.length === 0) {
-      return bot.sendMessage(m.chat.id, "Failed to download the file properly.");
+      return bot.sendMessage(m.chat.id, "❌ Failed to download the file properly.");
     }
 
     // Determine the MIME type based on the file extension
@@ -118,12 +129,8 @@ let handler = async (m, { bot, text }) => {
 
   } catch (error) {
     console.error('Error:', error);
-    bot.sendMessage(m.chat.id, "An error occurred while fetching or downloading the file from MediaFire.");
+    await bot.sendMessage(m.chat.id, "❌ An error occurred while fetching or downloading the file from MediaFire.");
   }
 };
-
-handler.help = ['mediafire', 'mfire'];
-handler.tags = ['search'];
-handler.command = ['mediafire', 'mfire'];
 
 module.exports = handler;
