@@ -47,6 +47,13 @@ const handler = async ({ bot, m, query, usedPrefix, command }) => {
         // Log the raw response to see what is returned from the API
         console.log('API Response:', response);
 
+        // Check for specific error response
+        if (response && response.error) {
+            console.error('API Error:', response.error);  // Log specific error
+            await bot.sendMessage(chatId, `❌ Error: ${response.error}`);
+            return;
+        }
+
         // Check if response is valid and contains 'video' field
         if (!response || !response.video) {
             console.error('Invalid response structure:', response); // Log invalid response for better debugging
