@@ -20,7 +20,7 @@ const handler = async ({ bot, m, query, db, usedPrefix, command }) => {
     }
 
     // Get at least 10 results, but if there are fewer, use all of them
-    const resultsToSend = results.slice(0, 10);
+    const resultsToSend = results.slice(0, 3);
 
     let messageText = 'Here are the top results:\n\n';
     resultsToSend.forEach((result, index) => {
