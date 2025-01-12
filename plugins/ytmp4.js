@@ -82,7 +82,11 @@ const handler = async ({ bot, m, query, usedPrefix, command }) => {
 
         await bot.sendMessage(chatId, '✅ Video sent successfully!'); // Confirmation message after sending the video
     } catch (error) {
-        console.error('Error fetching video:', error.message, error.stack);
+        // Log the error message and stack trace for debugging
+        console.error('Error fetching video:', error.message);
+        console.error('Stack Trace:', error.stack);
+        
+        // Send a detailed error message to the user
         await bot.sendMessage(chatId, '❌ An error occurred while fetching the video. Please try again later.');
     }
 };
