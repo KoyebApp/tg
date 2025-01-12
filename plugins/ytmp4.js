@@ -11,10 +11,12 @@ const fetchWithRetry = async (url, options, retries = 3) => {
     throw new Error('Failed to fetch media content after retries');
 };
 
-const handler = async (m, { query, bot }) => {
+const handler = async ({ bot, m, query, usedPrefix, command }) => {
+    const chatId = m.chat.id;
+
     // Check if a URL was provided
     if (!query) {
-        await bot.sendMessage(m.chat.id, '❌ Please provide a YouTube URL.');
+        await bot.sendMessage(chatId, '❌ Please provide a YouTube URL.');
         return;
     }
 
@@ -23,11 +25,11 @@ const handler = async (m, { query, bot }) => {
 
     // Validate the URL format
     if (!youtubeRegex.test(url)) {
-        await bot.sendMessage(m.chat.id, '❌ Invalid YouTube URL. Please provide a valid URL.');
+        await bot.sendMessage(chatId, '❌ Invalid YouTube URL. Please provide a valid URL.');
         return;
     }
 
-    await bot.sendMessage(m.chat.id, '⏳ Fetching the video, please wait...');
+    await bot.sendMessage(chatId, '⏳ Fetching the video, please wait...');
 
     try {
         // Fetch video details with ytmp4
@@ -76,12 +78,12 @@ const handler = async (m, { query, bot }) => {
         if (mediaBuffer.length === 0) throw new Error('Downloaded file is empty');
 
         // Send the video file along with the caption
-        await bot.sendDocument(m.chat.id, mediaBuffer, { caption }, { filename: `${title}.mp4`, mimetype: 'video/mp4' });
+        await bot.sendDocument(chatId, mediaBuffer, { caption }, { filename: `${title}.mp4`, mimetype: 'video/mp4' });
 
-        await bot.sendMessage(m.chat.id, '✅ Video sent successfully!'); // Confirmation message after sending the video
+        await bot.sendMessage(chatId, '✅ Video sent successfully!'); // Confirmation message after sending the video
     } catch (error) {
         console.error('Error fetching video:', error.message, error.stack);
-        await bot.sendMessage(m.chat.id, '❌ An error occurred while fetching the video. Please try again later.');
+        await bot.sendMessage(chatId, '❌ An error occurred while fetching the video. Please try again later.');
     }
 };
 
