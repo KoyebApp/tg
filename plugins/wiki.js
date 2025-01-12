@@ -26,11 +26,6 @@ const handler = async ({ bot, m, query, db, usedPrefix, command }) => {
 
     // Send the Wikipedia data to the user
     await bot.sendPhoto(m.chat.id, wikiThumbnail, { caption: messageText });
-
-    // Optional: Save the query to the database
-    if (db) {
-      await db.saveSearch(query, m.chat.id); // Assuming a method `saveSearch` exists in your db
-    }
   } catch (e) {
     console.error('Error:', e);
     await bot.sendMessage(m.chat.id, '⚠️ Error while fetching data from Wikipedia');
