@@ -1,5 +1,4 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
+const Qasim = require('api-qasim');
 
 const handler = async ({ bot, m, query, db, usedPrefix, command }) => {
   if (!query) {
@@ -8,23 +7,24 @@ const handler = async ({ bot, m, query, db, usedPrefix, command }) => {
   }
 
   try {
-    // Send a GET request to Wikipedia
-    const link = await axios.get(`https://en.wikipedia.org/wiki/${query}`);
-    const $ = cheerio.load(link.data);
+    // Fetch Wikipedia data using Qasim API
+    const res = await Qasim.wikipedia(query);
 
-    // Extract the title and a brief paragraph
-    let wik = $('#firstHeading').text().trim();
-    let result = $('#mw-content-text > div.mw-parser-output').find('p').text().trim();
+    // Check if the response is valid
+    if (!res || !res.extract) {
+      await bot.sendMessage(m.chat.id, '⚠️ No results found for the search term.');
+      return;
+    }
 
-    // Send the response with the Wikipedia data
-    await bot.sendMessage(m.chat.id, `▢ *Wikipedia*\n\n‣ Searched: ${wik}\n\n${result}`);
+    // Send the Wikipedia data to the user
+    await bot.sendMessage(m.chat.id, `▢ *Wikipedia*\n\n‣ Searched: ${res.title}\n\n${res.extract}`);
     
-    // Optional: Save the query to database (db logic)
+    // Optional: Save the query to the database
     if (db) {
       await db.saveSearch(query, m.chat.id); // Assuming a method `saveSearch` exists in your db
     }
   } catch (e) {
-    await bot.sendMessage(m.chat.id, '⚠️ No results found');
+    await bot.sendMessage(m.chat.id, '⚠️ Error while fetching data from Wikipedia');
   }
 };
 
