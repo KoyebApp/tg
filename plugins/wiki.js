@@ -8,7 +8,7 @@ const handler = async ({ bot, m, query, db, usedPrefix, command }) => {
 
   try {
     // Fetch Wikipedia data using Qasim API
-    const res = await Qasim.wikipedia(query);
+    const res = await Qasim.wikisearch(query);
 
     // Log the response for debugging purposes
     console.log('API Response:', res);
