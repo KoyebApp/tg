@@ -1,23 +1,24 @@
 const Qasim = require('api-qasim');
 
 let handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
+  // Check if a URL is provided
   if (!query) {
     await bot.sendMessage(m.chat.id, '❌ You need to provide the URL of the Facebook video.');
     return;
   }
 
-  // Send a message indicating the bot is processing the request
+  // Send a message indicating that the bot is processing the request
   await bot.sendMessage(m.chat.id, '⌛ Processing your request, please wait...');
 
   let res;
   try {
-    // Fetch the video data using fbdl with the provided query (URL)
+    // Fetch the video data using the provided URL
     res = await Qasim.fbdl(query);
 
-    // Log the response to inspect its structure
+    // Log the API response for debugging
     console.log("API Response:", res);
 
-    // Check if res is valid and contains the expected properties
+    // Check if res is valid and contains the expected data
     if (!res || !res.data) {
       throw new Error('No data field found in API response.');
     }
@@ -27,7 +28,7 @@ let handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
       throw new Error('API response does not contain an array of video data.');
     }
 
-    // Try to find the first valid video URL from the data
+    // Find the first valid video URL from the response data
     const validVideo = res.data.find(item => item.url);
 
     if (!validVideo) {
@@ -37,7 +38,7 @@ let handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     const videoURL = validVideo.url;  // Get the video URL from the first valid item
     console.log("Found Video URL:", videoURL); // Log the video URL for debugging
 
-    // Send the video to the user
+    // Send the video URL to the user
     const cap = 'Here is the video you requested:';
     await bot.sendVideo(m.chat.id, videoURL, { caption: cap });
 
