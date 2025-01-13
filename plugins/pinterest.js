@@ -5,11 +5,12 @@ const Qasim = require('api-qasim');
 const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
   const chatId = m.chat.id;
   // Send "waiting" message to indicate the bot is processing
-    await bot.sendMessage(chatId, "⏳ Please wait, fetching the images...");
-
+    
   if (!query) {
     return bot.sendMessage(chatId, "Please provide a search query.");
   }
+  await bot.sendMessage(chatId, "⏳ Please wait, fetching the images...");
+  
 
   try {
     // Call Pinterest API (or logic here) using the query
