@@ -138,25 +138,28 @@ bot.on('message', (msg) => {
   const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));  // Check if text starts with any of the prefixes
 
   if (usedPrefix) {
-    const command = text.substring(usedPrefix.length).trim().toLowerCase();  // Extract the command after the prefix
+    // Extract the command and query
+    const commandWithQuery = text.substring(usedPrefix.length).trim();
+    const [command, ...queryArr] = commandWithQuery.split(' ');  // Split the command and query
+    const query = queryArr.join(' ').trim();  // Join the remaining words as query
 
-    // Extract query by removing the command part
-    const query = text.substring(usedPrefix.length + command.length).trim();  // Extract query after the command (if any)
+    // Convert the command to lowercase to match with plugins
+    const normalizedCommand = command.toLowerCase();
 
-    logUserActivity(chatId, command);  // Log user activity
+    logUserActivity(chatId, normalizedCommand);  // Log user activity
 
-    console.log(`Received command: ${command}`);  // Debug log
+    console.log(`Received command: ${normalizedCommand}`);  // Debug log
     console.log(`Received query: ${query}`);  // Debug log
 
     // If the message is a command
-    if (command) {
-      console.log(`Processing command: ${command}`);  // Debug log
+    if (normalizedCommand) {
+      console.log(`Processing command: ${normalizedCommand}`);  // Debug log
 
       // Debugging: List all loaded plugin names
       console.log('Loaded plugins:', Object.keys(plugins));
 
       // Ensure the command is correctly passed to the plugin handler
-      const handler = plugins[command];
+      const handler = plugins[normalizedCommand];
 
       if (handler) {
         const context = {
@@ -164,24 +167,24 @@ bot.on('message', (msg) => {
           text,
           query,  // Pass the query (if any) to the plugin
           usedPrefix,
-          command,
+          command: normalizedCommand,
           m: msg,  // Pass the full message object to the plugin
           db,  // Pass the database instance to the plugin
         };
 
         try {
           // Debug log before executing the plugin
-          console.log(`Executing plugin for command: ${command} with query: ${query}`);
+          console.log(`Executing plugin for command: ${normalizedCommand} with query: ${query}`);
           handler(context);  // Call the handler with the context
-          console.log(chalk.green(`Executed plugin: ${command} for chatId: ${chatId}`));
+          console.log(chalk.green(`Executed plugin: ${normalizedCommand} for chatId: ${chatId}`));
         } catch (error) {
-          console.error(chalk.red(`Error executing plugin '${command}':`), error);
-          bot.sendMessage(chatId, `An error occurred while processing the command '${command}'. Please try again later.`);
+          console.error(chalk.red(`Error executing plugin '${normalizedCommand}':`), error);
+          bot.sendMessage(chatId, `An error occurred while processing the command '${normalizedCommand}'. Please try again later.`);
         }
       } else {
         // If no plugin is found, send an error message
         bot.sendMessage(chatId, "Unknown command or no plugin available for that command.");
-        console.error(chalk.red(`Unknown command: ${command} from chatId: ${chatId}`));
+        console.error(chalk.red(`Unknown command: ${normalizedCommand} from chatId: ${chatId}`));
       }
     }
   }
