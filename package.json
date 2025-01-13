@@ -12,8 +12,10 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "start": "node index.js",
-    "restart": "pm2 restart bot"
+    "run": "pm2 start . --deep-monitoring --attach --name Qasim",
+    "qasim": "pm2 start . --deep-monitoring --attach --name Qasim",
+    "start": "pm2 start . --attach --name Qasim",
+    "stop": "pm2 stop Qasim"
   },
   "keywords": [
     "telegram",
@@ -41,6 +43,7 @@
     "pm2": "^5.4.2",
     "lodash": "^4.17.21",
     "qrcode": "^1.5.1",
+    "simple-git": "^3.27.0",
     "syntax-error": "^1.4.0",
     "mime-types": "^2.1.35"
   },
