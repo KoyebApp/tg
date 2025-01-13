@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 const Qasim = require('api-qasim');
 
 // The handler function that will process the command
-const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
+const handler = async ({ bot, m, text, db, usedPrefix, query }) => {
   const chatId = m.chat.id;
 
   if (!query) {
