@@ -1,6 +1,7 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
+let isUpdating = false;  // Flag to prevent repeated updates
 
 // Common paths to look for git and bash
 const GIT_PATHS = [
@@ -40,8 +41,17 @@ let handler = async ({ m, bot, text }) => {
 
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
+      // Prevent repeated updates if already in progress
+      if (isUpdating) {
+        await bot.sendMessage(chatId, "Update is already in progress. Please wait...");
+        return;
+      }
+
+      // Set flag to indicate that update is in progress
+      isUpdating = true;
+
       // Notify user that the bot is updating
-      await bot.sendMessage(chatId, "Getting Changes... Please wait...");
+      await bot.sendMessage(chatId, "Updating the bot... Please wait...");
 
       // Try to find the correct git and bash paths
       const gitPath = getExecutablePath(GIT_PATHS);
@@ -64,8 +74,15 @@ let handler = async ({ m, bot, text }) => {
       // Send the output of git pull command
       await bot.sendMessage(chatId, stdout.toString());
 
-      // Restart the bot using pm2
-      execSync('pm2 restart Qasim');  // Replace <your-bot-name> with the actual name of your bot process in pm2
+      // Restart the bot using pm2 (if using pm2)
+      execSync('pm2 restart <your-bot-name>');  // Replace <your-bot-name> with your actual pm2 process name
+
+      // Update complete, set flag back to false
+      isUpdating = false;
+
+      // Exit the process to trigger a restart (if not using pm2)
+      process.exit(0);  // Optional, only if not using pm2
+
     } else {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
     }
@@ -80,6 +97,9 @@ let handler = async ({ m, bot, text }) => {
     } else {
       console.error("chatId is not available to send error message.");
     }
+
+    // If there was an error, reset the updating flag
+    isUpdating = false;
   }
 };
 
