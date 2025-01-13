@@ -1,6 +1,5 @@
 const fetch = require('node-fetch');
 const Qasim = require('api-qasim');
-const paginationHandler = require('../lib/paginationHandler');
 
 // The handler function that will process the command
 const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
@@ -22,20 +21,19 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
       return bot.sendMessage(chatId, "No images found for your query.");
     }
 
-    // Function to send image content
-    const sendImage = async (bot, chatId, imageUrl, index) => {
-      await bot.sendPhoto(chatId, imageUrl, { caption: `Image ${index}` });
-    };
+    // Send the images to the user
+    for (let i = 0; i < imageUrls.length && i < 3; i++) {  // Limit to 4 images
+      const imageUrl = imageUrls[i];
+      
+      // You might want to add a check here to see if the URL is valid
+      if (imageUrl && imageUrl.startsWith('http')) {
+        await bot.sendPhoto(chatId, imageUrl, { caption: `Image ${i + 1} for query *${query}*` });
+      } else {
+        console.warn(`Skipping invalid URL: ${imageUrl}`);
+      }
+    }
 
-    // Call the generic pagination handler to manage the "Next" button
-    await paginationHandler({
-      bot,
-      chatId,
-      content: imageUrls,
-      page: 0,  // Initial page
-      sendContent: sendImage,
-    });
-
+    await bot.sendMessage(chatId, "Image search complete!");
   } catch (error) {
     console.error('Error searching images:', error);
     bot.sendMessage(chatId, "An error occurred while searching for images. Please try again later.");
