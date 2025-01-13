@@ -76,7 +76,7 @@ let handler = async ({ m, bot, text }) => {
 
       // Restart the bot using pm2 (replace with correct bot name or ID)
       try {
-        execSync('pm2 restart 0');  // Replace `my-bot-name` with your actual pm2 process name or ID
+        execSync('pm2 restart Qasim');  // Replace `my-bot-name` with your actual pm2 process name or ID
       } catch (err) {
         console.error("Error restarting the bot with pm2:", err);
         await bot.sendMessage(chatId, "Failed to restart the bot. Please check the server logs.");
