@@ -1,3 +1,4 @@
+// Alive.js Plugin: Updated with confirmation message
 const chalk = require('chalk');
 const dotenv = require('dotenv');
 const fs = require('fs');
@@ -34,7 +35,7 @@ const dbConfig = {
   url: DATABASE_URL || 'database.json',         // MongoDB URL or LowDB file path
 };
 
-// Ensure the database.json file exists and create it if not
+// Check if database.json exists, if not, create it
 const ensureLowDbExists = async () => {
   const dbFilePath = path.join(__dirname, 'database.json');
 
@@ -97,31 +98,17 @@ initDatabase().then(database => {
   console.error(chalk.red('Error initializing database:'), err);
 });
 
-
+// Dynamically import all plugins from the plugins folder using require
 const loadPlugins = () => {
   const pluginFiles = fs.readdirSync(pluginsPath);
   const handlers = {};
 
-  // Log the plugin files detected in the directory
-  console.log(`Plugin files in directory:`, pluginFiles);
-
   pluginFiles.forEach(file => {
     const pluginName = path.basename(file, '.js');
     try {
-      const pluginPath = path.join(pluginsPath, file);
-      console.log(`Loading plugin from: ${pluginPath}`);  // Log the path being loaded
-
-      const pluginHandler = require(pluginPath);
-
-      if (pluginHandler.command && pluginHandler.handler) {
-        pluginHandler.command.forEach(command => {
-          handlers[command.toLowerCase()] = pluginHandler.handler;
-          console.log(`Loaded command: ${command.toLowerCase()}`);  // Log each command loaded
-        });
-      } else {
-        console.warn(`Plugin '${pluginName}' does not have both 'command' and 'handler' exports.`);
-      }
-
+      // Dynamically import the plugin handler using require (CommonJS)
+      const pluginHandler = require(path.join(pluginsPath, file));  // No .default needed in CommonJS
+      handlers[pluginName.toLowerCase()] = pluginHandler; // Store plugin with lowercase key
       console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
     } catch (error) {
       const err = syntaxerror(fs.readFileSync(path.join(pluginsPath, file), 'utf-8'), file);
@@ -133,7 +120,6 @@ const loadPlugins = () => {
     }
   });
 
-  console.log('Final handlers:', handlers);  // Log the final handlers object
   return handlers;
 };
 
@@ -146,36 +132,42 @@ const logUserActivity = (chatId, command) => {
   fs.appendFileSync('activity.log', logMessage);
 };
 
-// Bot message handler
-bot.on('message', async (msg) => {
+// Send confirmation message
+const sendConfirmationMessage = (chatId) => {
+  const pluginCount = Object.keys(plugins).length;
+  const prefixUsed = PREFIX.length > 1 ? 'Multiprefix' : PREFIX[0]; // If multiple prefixes are used, show "Multiprefix"
+  const confirmationMessage = `MEGA AI GOT CONNECTED\nPlugins Count: ${pluginCount}\nPrefix: ${prefixUsed} GlobalTechInfo`;
+
+  bot.sendMessage(chatId, confirmationMessage);
+};
+
+// Main message handler
+bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text.trim();  // Get the full message text
-
-  // Debug: Log the received message text
-  console.log(`Received message: ${text}`);
-
   const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));  // Check if text starts with any of the prefixes
-
-  // Debug: Log the used prefix
-  console.log(`Used prefix: ${usedPrefix}`);
 
   if (usedPrefix) {
     const command = text.substring(usedPrefix.length).trim().toLowerCase();  // Extract the command after the prefix
     logUserActivity(chatId, command);  // Log user activity
 
+    // Send confirmation message when the bot connects
+    if (command === 'start' || command === 'connect') {
+      sendConfirmationMessage(chatId);
+    }
+
     // If the message is a command
     if (command) {
       console.log(`Received command: ${command}`);  // Debug log
 
-      // Debugging: List all loaded commands
-      console.log('Loaded commands:', Object.keys(plugins));
+      // Debugging: List all loaded plugin names
+      console.log('Loaded plugins:', Object.keys(plugins));
 
       // If there's a plugin handler for this command, call it
       if (plugins[command]) {
         const context = {
           bot,
           text,
-          query,
           usedPrefix,
           command,
           m: msg,  // Pass the full message object to the plugin
@@ -183,7 +175,7 @@ bot.on('message', async (msg) => {
         };
 
         try {
-          await plugins[command](context);  // Execute the handler with the context
+          plugins[command](context);  // Call the handler with the context
           console.log(chalk.green(`Executed plugin: ${command} for chatId: ${chatId}`));
         } catch (error) {
           console.error(chalk.red(`Error executing plugin '${command}':`), error);
@@ -197,9 +189,6 @@ bot.on('message', async (msg) => {
     }
   }
 });
-
-
-
 
 // Listen to callback queries (inline button callback)
 bot.on('callback_query', (callbackQuery) => {
