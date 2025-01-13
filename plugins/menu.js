@@ -1,35 +1,36 @@
-const axios = require('axios');
-const path = require('path');  // Import path module for file handling
-const fs = require('fs');  // Import fs module to check file existence
+const path = require('path');
+const fs = require('fs');
 
 // Handler function
-const handler = async ({ bot, m, text, db }) => {
+const handler = async ({ bot, m, text, db, usedPrefix }) => {
   try {
     // Check if bot is available
     if (!bot) {
       throw new Error('Bot instance is not available');
     }
 
-    // Fetch random quote from a GitHub raw URL
-    const quoteResponse = await axios.get('https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Quotes.txt');
-    const quotes = quoteResponse.data.split('\n');
-    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+    // Fetch random quote from a local file (Quotes.txt)
+    const quoteFilePath = path.join(__dirname, '../assets/Quotes.txt');
+    if (!fs.existsSync(quoteFilePath)) {
+      throw new Error('Quotes file not found');
+    }
+
+    const quotes = fs.readFileSync(quoteFilePath, 'utf8').split('\n');
+    const randomQuote = quotes[Math.floor(Math.random() * quotes.length)].trim();
 
     // Prepare the bot menu message
     let menuText = `
     *Bot Menu*:
 
-    📖 *Random Quote*: 
+    📖 *Quote For You*: 
     "${randomQuote}"
 
     🔧 *Commands*:
-    - /start: Start the bot
-    - /help: List available commands
-    - /info: Information about the bot
-    - /update: Update the bot
-    - /ping: Check bot status
-
-    *Icons and Quotes are refreshed with each new menu request!*
+    - ${usedPrefix}start: Start the bot
+    - ${usedPrefix}help: List available commands
+    - ${usedPrefix}info: Information about the bot
+    - ${usedPrefix}update: Update the bot
+    - ${usedPrefix}ping: Check bot status
 
     Enjoy your time with the bot! 😊`;
 
