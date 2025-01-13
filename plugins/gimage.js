@@ -5,28 +5,29 @@ const handler = async ({ bot, m, text, db, usedPrefix, query }) => {
   const chatId = m.chat.id;
 
   // Ensure the query is provided
-  const query = text.split(' ').slice(1).join(' ');
-  if (!query) {
+  const searchQuery = text.split(' ').slice(1).join(' ');  // Extract query after the command
+  if (!searchQuery) {
     return bot.sendMessage(chatId, "Please provide a search query.");
   }
 
   try {
     // Call the API and get the image URLs
-    const response = await Qasim.googleImage(query);
+    const response = await Qasim.googleImage(searchQuery);
     console.log(response);  // Log the response for debugging
 
-    const imageUrls = response.imageUrls;
-
-    // Check if we received any images
-    if (!Array.isArray(imageUrls) || imageUrls.length === 0) {
+    // Check the structure of the response
+    const imageUrls = response && response.imageUrls ? response.imageUrls : [];
+    
+    // If no images are found
+    if (imageUrls.length === 0) {
       return bot.sendMessage(chatId, "No images found for your query.");
     }
 
-    // Send the images
+    // Send the images (limit to 3 images)
     for (let i = 0; i < imageUrls.length && i < 3; i++) {
       const imageUrl = imageUrls[i];
       if (imageUrl && imageUrl.startsWith('http')) {
-        await bot.sendPhoto(chatId, imageUrl, { caption: `Image ${i + 1} for query *${query}*` });
+        await bot.sendPhoto(chatId, imageUrl, { caption: `Image ${i + 1} for query *${searchQuery}*` });
       } else {
         console.warn(`Skipping invalid URL: ${imageUrl}`);
       }
