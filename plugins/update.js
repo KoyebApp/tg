@@ -1,9 +1,11 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 
+// Fetch the owner ID from environment variables
 const OWNER_ID = process.env.OWNER_ID;
 
-let handler = async ({ msg, bot, chatId, text }) => {
+// The handler function to process the update
+const handler = async ({ msg, bot, chatId, text }) => {
   try {
     // Ensure chatId is defined
     if (!chatId) {
@@ -18,11 +20,11 @@ let handler = async ({ msg, bot, chatId, text }) => {
       // Notify the user that the bot is updating
       await bot.sendMessage(chatId, "Updating the bot... Please wait...");
 
-      // Execute the git pull command
+      // Execute the git pull command, appending the text if provided
       let stdout = execSync('git pull' + (text ? ' ' + text : ''));
 
       // Reload all plugins (ensure the reload function exists or modify to fit your code)
-      fs.readdirSync('plugins').forEach(v => global.reload('', v));
+      fs.readdirSync('plugins').forEach(v => global.reload && global.reload('', v));
 
       // Send the output of the git pull command
       await bot.sendMessage(chatId, stdout.toString());
@@ -36,4 +38,5 @@ let handler = async ({ msg, bot, chatId, text }) => {
   }
 };
 
+// Export the handler function
 module.exports = handler;
