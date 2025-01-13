@@ -37,14 +37,12 @@ function isUpdatingInProgress() {
 
 // Set the flag file to indicate that an update is in progress
 function setUpdatingInProgress() {
-  console.log('Setting update flag...');
   fs.writeFileSync(updateFlagPath, 'true');
 }
 
 // Clear the flag file after update is complete
 function clearUpdatingInProgress() {
   if (fs.existsSync(updateFlagPath)) {
-    console.log('Clearing update flag...');
     fs.unlinkSync(updateFlagPath);
   }
 }
@@ -56,13 +54,11 @@ let handler = async ({ m, bot, text }) => {
       throw new Error('chatId is undefined');
     }
 
-    console.log('Received chatId:', chatId);
-
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
-      // Prevent repeated updates if already in progress
+      // Ensure flag is cleared if no update is in progress
       if (isUpdatingInProgress()) {
-        console.log('Update already in progress. Skipping this update request.');
+        // If the flag exists, it means an update is still marked as in progress
         await bot.sendMessage(chatId, "Update is already in progress. Please wait...");
         return;
       }
@@ -86,46 +82,32 @@ let handler = async ({ m, bot, text }) => {
       }
 
       // Run git pull directly
-      let stdout = execSync(`${gitPath} pull`, { cwd: gitDirectory });
+      execSync(`${gitPath} pull`, { cwd: gitDirectory });
 
-      // Send the output of git pull command
-      await bot.sendMessage(chatId, stdout.toString());
-
-      // Reload plugins after update (assumes reload logic is correct)
+      // Reload plugins after update
       fs.readdirSync('plugins').forEach(v => global.reload && global.reload('', v));
 
-      // Restart the bot using pm2 (replace with correct bot name or ID)
+      // Clear the update flag before restarting the bot
+      clearUpdatingInProgress();
+
+      // Restart the bot using pm2
       try {
-        console.log('Attempting to restart the bot with pm2...');
         execSync('pm2 restart my-bot-name');  // Replace `my-bot-name` with your actual pm2 process name or ID
-        console.log('Bot restart command executed successfully.');
       } catch (err) {
-        console.error("Error restarting the bot with pm2:", err);
         await bot.sendMessage(chatId, "Failed to restart the bot. Please check the server logs.");
       }
-
-      // Update complete, clear the flag file
-      clearUpdatingInProgress();
 
     } else {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
     }
   } catch (error) {
-    console.error("Error during update:", error);
+    // Clear the updating flag in case of any errors
+    clearUpdatingInProgress();
 
     // Provide feedback to user
-    if (error.message.includes("chatId is undefined")) {
-      console.error("The chatId is not being passed correctly. Check your message format.");
-    }
-    // Ensure chatId is available for sending error message
     if (m.chat && m.chat.id) {
       await bot.sendMessage(m.chat.id, "An error occurred while updating the bot. Please try again later.");
-    } else {
-      console.error("chatId is not available to send error message.");
     }
-
-    // If there was an error, clear the updating flag
-    clearUpdatingInProgress();
   }
 };
 
