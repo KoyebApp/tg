@@ -97,21 +97,29 @@ initDatabase().then(database => {
   console.error(chalk.red('Error initializing database:'), err);
 });
 
-// Load plugins dynamically
+
 const loadPlugins = () => {
   const pluginFiles = fs.readdirSync(pluginsPath);
   const handlers = {};
 
+  // Log the plugin files detected in the directory
+  console.log(`Plugin files in directory:`, pluginFiles);
+
   pluginFiles.forEach(file => {
     const pluginName = path.basename(file, '.js');
     try {
-      const pluginHandler = require(path.join(pluginsPath, file));
+      const pluginPath = path.join(pluginsPath, file);
+      console.log(`Loading plugin from: ${pluginPath}`);  // Log the path being loaded
+
+      const pluginHandler = require(pluginPath);
 
       if (pluginHandler.command && pluginHandler.handler) {
         pluginHandler.command.forEach(command => {
           handlers[command.toLowerCase()] = pluginHandler.handler;
-          console.log(`Loaded command: ${command.toLowerCase()}`);  // Debug: Log each loaded command
+          console.log(`Loaded command: ${command.toLowerCase()}`);  // Log each command loaded
         });
+      } else {
+        console.warn(`Plugin '${pluginName}' does not have both 'command' and 'handler' exports.`);
       }
 
       console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
@@ -125,6 +133,7 @@ const loadPlugins = () => {
     }
   });
 
+  console.log('Final handlers:', handlers);  // Log the final handlers object
   return handlers;
 };
 
@@ -166,8 +175,8 @@ bot.on('message', async (msg) => {
         const context = {
           bot,
           text,
-          usedPrefix,
           query,
+          usedPrefix,
           command,
           m: msg,  // Pass the full message object to the plugin
           db,  // Pass the database instance to the plugin
@@ -188,6 +197,7 @@ bot.on('message', async (msg) => {
     }
   }
 });
+
 
 
 
