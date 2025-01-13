@@ -1,7 +1,7 @@
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-let isUpdating = false;  // Flag to prevent repeated updates
+const updateFlagPath = path.join(__dirname, 'isUpdating.flag');  // Path to store update flag file
 
 // Common paths to look for git and bash
 const GIT_PATHS = [
@@ -30,6 +30,23 @@ function getExecutablePath(paths) {
   throw new Error('Executable not found in any of the specified paths.');
 }
 
+// Check if the update flag file exists (indicating the bot is updating)
+function isUpdatingInProgress() {
+  return fs.existsSync(updateFlagPath);
+}
+
+// Set the flag file to indicate that an update is in progress
+function setUpdatingInProgress() {
+  fs.writeFileSync(updateFlagPath, 'true');
+}
+
+// Clear the flag file after update is complete
+function clearUpdatingInProgress() {
+  if (fs.existsSync(updateFlagPath)) {
+    fs.unlinkSync(updateFlagPath);
+  }
+}
+
 let handler = async ({ m, bot, text }) => {
   try {
     const chatId = m.chat.id;
@@ -42,13 +59,13 @@ let handler = async ({ m, bot, text }) => {
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
       // Prevent repeated updates if already in progress
-      if (isUpdating) {
+      if (isUpdatingInProgress()) {
         await bot.sendMessage(chatId, "Update is already in progress. Please wait...");
         return;
       }
 
       // Set flag to indicate that update is in progress
-      isUpdating = true;
+      setUpdatingInProgress();
 
       // Notify user that the bot is updating
       await bot.sendMessage(chatId, "Updating the bot... Please wait...");
@@ -84,8 +101,8 @@ let handler = async ({ m, bot, text }) => {
         await bot.sendMessage(chatId, "Failed to restart the bot. Please check the server logs.");
       }
 
-      // Update complete, set flag back to false
-      isUpdating = false;
+      // Update complete, clear the flag file
+      clearUpdatingInProgress();
 
     } else {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
@@ -104,8 +121,8 @@ let handler = async ({ m, bot, text }) => {
       console.error("chatId is not available to send error message.");
     }
 
-    // If there was an error, reset the updating flag
-    isUpdating = false;
+    // If there was an error, clear the updating flag
+    clearUpdatingInProgress();
   }
 };
 
