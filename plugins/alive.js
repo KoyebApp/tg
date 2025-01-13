@@ -13,6 +13,7 @@ const handler = async ({ bot, m, db }) => {
 
   // Send a photo with a caption
   try {
+    // Sending the photo using the file path
     await bot.sendPhoto(m.chat.id, { source: photoPath }, { caption: 'Bot Is Alive And Running!' });
     console.log('Photo sent successfully!');
   } catch (error) {
