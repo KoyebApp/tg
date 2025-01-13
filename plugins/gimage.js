@@ -1,5 +1,6 @@
 const fetch = require('node-fetch');
 const Qasim = require('api-qasim');
+const paginationHandler = require('../lib/paginationHandler');
 
 // The handler function that will process the command
 const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
@@ -21,61 +22,18 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
       return bot.sendMessage(chatId, "No images found for your query.");
     }
 
-    // Pagination state - store the current image index
-    let page = 0;  // Keep track of the current page
-
-    // Function to send images with next button
-    const sendImages = async () => {
-      const startIndex = page * 3;  // Show 3 images per page
-      const endIndex = Math.min(startIndex + 3, imageUrls.length);  // Limit to 3 images
-
-      // Send images for the current page
-      for (let i = startIndex; i < endIndex; i++) {
-        const imageUrl = imageUrls[i];
-        
-        // Check if the URL is valid
-        if (imageUrl && imageUrl.startsWith('http')) {
-          await bot.sendPhoto(chatId, imageUrl, { caption: `Image ${i + 1} for query *${query}*` });
-        } else {
-          console.warn(`Skipping invalid URL: ${imageUrl}`);
-        }
-      }
-
-      // If there are more images, show the "Next" button
-      if (endIndex < imageUrls.length) {
-        await bot.sendMessage(chatId, "More images available!", {
-          reply_markup: {
-            inline_keyboard: [
-              [{ text: 'Next', callback_data: `next_image_${page + 1}` }],
-            ],
-          },
-        });
-      } else {
-        await bot.sendMessage(chatId, "No more images to show.");
-      }
+    // Function to send image content
+    const sendImage = async (bot, chatId, imageUrl, index) => {
+      await bot.sendPhoto(chatId, imageUrl, { caption: `Image ${index}` });
     };
 
-    // Call sendImages to send the first set of images
-    await sendImages();
-
-    // Handle the callback query for the "Next" button
-    bot.on('callback_query', async (callbackQuery) => {
-      const { data, message } = callbackQuery;
-      
-      if (data.startsWith('next_image_')) {
-        const nextPage = parseInt(data.split('_')[2]);
-
-        // Ensure the page number is valid
-        if (nextPage >= 0 && nextPage * 3 < imageUrls.length) {
-          page = nextPage;
-          await sendImages();  // Send the next set of images
-
-          // Answer the callback query to let Telegram know we handled it
-          await bot.answerCallbackQuery(callbackQuery.id, { text: 'Loading next images...' });
-        } else {
-          await bot.answerCallbackQuery(callbackQuery.id, { text: 'No more images.' });
-        }
-      }
+    // Call the generic pagination handler to manage the "Next" button
+    await paginationHandler({
+      bot,
+      chatId,
+      content: imageUrls,
+      page: 0,  // Initial page
+      sendContent: sendImage,
     });
 
   } catch (error) {
