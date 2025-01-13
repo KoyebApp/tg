@@ -1,7 +1,7 @@
-const path = require('path');  // Import the 'path' module to handle file paths
-const fs = require('fs');  // Import 'fs' to check file existence
+const path = require('path');  // Import 'path' module to handle file paths
+const fs = require('fs');  // Import 'fs' module to check file existence
 
-const handler = async ({ bot, m, db }) => {
+const handler = async ({ bot, m, db, text }) => {
   // Correct the path to the photo relative to the current file's location
   const photoPath = path.join(__dirname, '../assets/A.jpg');  // Going up one level from ./plugins to ./assets
 
@@ -13,8 +13,8 @@ const handler = async ({ bot, m, db }) => {
 
   // Send a photo with a caption
   try {
-    // Sending the photo using the file path
-    await bot.sendPhoto(m.chat.id, { source: photoPath }, { caption: 'Bot Is Alive And Running!' });
+    // Send the photo directly by passing the file path
+    await bot.sendPhoto(m.chat.id, photoPath, { caption: 'Bot Is Alive And Running!' });
     console.log('Photo sent successfully!');
   } catch (error) {
     console.error('Error sending photo:', error);
