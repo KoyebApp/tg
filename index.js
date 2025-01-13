@@ -103,24 +103,34 @@ const loadPlugins = () => {
   const handlers = {};
 
   pluginFiles.forEach(file => {
-    const pluginName = path.basename(file, '.js');
-    try {
-      // Dynamically import the plugin handler using require (CommonJS)
-      const pluginHandler = require(path.join(pluginsPath, file));  // No .default needed in CommonJS
-      handlers[pluginName.toLowerCase()] = pluginHandler; // Store plugin with lowercase key
-      console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
-    } catch (error) {
-      const err = syntaxerror(fs.readFileSync(path.join(pluginsPath, file), 'utf-8'), file);
-      if (err) {
-        console.error(chalk.red(`Syntax error in plugin '${pluginName}':`), err);
-      } else {
-        console.error(chalk.yellow(`Error loading plugin '${pluginName}':`), error);
+    const pluginPath = path.join(pluginsPath, file);
+
+    // Check if it's a file (not a directory)
+    const stat = fs.lstatSync(pluginPath);
+
+    if (stat.isFile() && file.endsWith('.js')) {  // Ensure it's a .js file
+      const pluginName = path.basename(file, '.js');
+      try {
+        // Dynamically import the plugin handler using require (CommonJS)
+        const pluginHandler = require(pluginPath);  // No .default needed in CommonJS
+        handlers[pluginName.toLowerCase()] = pluginHandler; // Store plugin with lowercase key
+        console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
+      } catch (error) {
+        const err = syntaxerror(fs.readFileSync(pluginPath, 'utf-8'), file);
+        if (err) {
+          console.error(chalk.red(`Syntax error in plugin '${pluginName}':`), err);
+        } else {
+          console.error(chalk.yellow(`Error loading plugin '${pluginName}':`), error);
+        }
       }
+    } else {
+      console.warn(chalk.yellow(`Skipping directory or non-JS file: ${file}`));
     }
   });
 
   return handlers;
 };
+
 
 // Load all plugin handlers
 const plugins = loadPlugins();
