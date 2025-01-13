@@ -11,9 +11,20 @@ const handler = async ({ bot, m, text, query }) => {
   // Prepare the API URL with the query (user-provided WhatsApp URL)
   const apiUrl = `https://api.giftedtech.web.id/api/stalk/wachannel?apikey=gifted-md&url=${encodeURIComponent(query)}`;
 
+  console.log("API URL:", apiUrl); // Log the URL to ensure it is correct
+
   try {
     // Fetch data from the API
     const response = await fetch(apiUrl);
+    
+    // Log the response status code
+    console.log("Response Status:", response.status);
+
+    // Check if response status is OK (200-299)
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
     const data = await response.json();
 
     // Log the API response to the console for debugging
