@@ -68,15 +68,17 @@ let handler = async ({ m, bot, text }) => {
       // Run git pull directly
       let stdout = execSync(`${gitPath} pull`, { cwd: gitDirectory });
 
-      // Reload plugins after update (assumes reload logic is correct)
-      fs.readdirSync('plugins').forEach(v => global.reload && global.reload('', v));
-
       // Send the output of git pull command
       await bot.sendMessage(chatId, stdout.toString());
 
+      // Reload plugins after update (assumes reload logic is correct)
+      fs.readdirSync('plugins').forEach(v => global.reload && global.reload('', v));
+
       // Restart the bot using pm2 (replace with correct bot name or ID)
       try {
+        console.log('Attempting to restart the bot with pm2...');
         execSync('pm2 restart Qasim');  // Replace `my-bot-name` with your actual pm2 process name or ID
+        console.log('Bot restart command executed successfully.');
       } catch (err) {
         console.error("Error restarting the bot with pm2:", err);
         await bot.sendMessage(chatId, "Failed to restart the bot. Please check the server logs.");
@@ -85,20 +87,19 @@ let handler = async ({ m, bot, text }) => {
       // Update complete, set flag back to false
       isUpdating = false;
 
-      // Exit the process to trigger a restart (if not using pm2)
-      process.exit(0);  // Optional, only if not using pm2
-
     } else {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
     }
   } catch (error) {
     console.error("Error during update:", error);
+
+    // Provide feedback to user
     if (error.message.includes("chatId is undefined")) {
       console.error("The chatId is not being passed correctly. Check your message format.");
     }
     // Ensure chatId is available for sending error message
-    if (chatId) {
-      await bot.sendMessage(chatId, "An error occurred while updating the bot. Please try again later.");
+    if (m.chat && m.chat.id) {
+      await bot.sendMessage(m.chat.id, "An error occurred while updating the bot. Please try again later.");
     } else {
       console.error("chatId is not available to send error message.");
     }
