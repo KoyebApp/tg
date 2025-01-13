@@ -155,8 +155,10 @@ bot.on('message', (msg) => {
       // Debugging: List all loaded plugin names
       console.log('Loaded plugins:', Object.keys(plugins));
 
-      // If there's a plugin handler for this command, call it
-      if (plugins[command]) {
+      // Ensure the command is correctly passed to the plugin handler
+      const handler = plugins[command];
+
+      if (handler) {
         const context = {
           bot,
           text,
@@ -170,7 +172,7 @@ bot.on('message', (msg) => {
         try {
           // Debug log before executing the plugin
           console.log(`Executing plugin for command: ${command} with query: ${query}`);
-          plugins[command](context);  // Call the handler with the context
+          handler(context);  // Call the handler with the context
           console.log(chalk.green(`Executed plugin: ${command} for chatId: ${chatId}`));
         } catch (error) {
           console.error(chalk.red(`Error executing plugin '${command}':`), error);
