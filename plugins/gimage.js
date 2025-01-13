@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 const Qasim = require('api-qasim');
 
 // The handler function that will process the command
-const handler = async ({ bot, m, text, db, usedPrefix, command, query, from }) => {
+const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
   const chatId = m.chat.id;
 
   if (!query) {
@@ -60,7 +60,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query, from }) =
 
     // Handle the callback query for the "Next" button
     bot.on('callback_query', async (callbackQuery) => {
-      const { data, message, from: user } = callbackQuery;
+      const { data, message } = callbackQuery;
       
       if (data.startsWith('next_image_')) {
         const nextPage = parseInt(data.split('_')[2]);
