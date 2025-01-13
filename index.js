@@ -153,6 +153,7 @@ bot.on('message', (msg) => {
         const context = {
           bot,
           text,
+          query,
           usedPrefix,
           command,
           m: msg,  // Pass the full message object to the plugin
