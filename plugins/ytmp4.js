@@ -1,4 +1,6 @@
 const fetch = require('node-fetch');  // Ensure node-fetch is available to make the API request
+const fs = require('fs');
+const path = require('path');
 
 const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
   const chatId = m.chat.id;
@@ -23,11 +25,26 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     console.log('API Response:', data);  // Log the response to the console
 
     // Check if the API request was successful
-    if (data.status === 'success' && data.result && data.result.download) {
-      const downloadUrl = data.result.download;
+    if (data.success && data.result && data.result.download_url) {
+      const downloadUrl = data.result.download_url;
+      const videoTitle = data.result.title;
 
-      // Send the download link to the user
-      await bot.sendMessage(m.chat.id, `🎬 Your video is ready! Download it from here: ${downloadUrl}`);
+      // Create a temporary file path to download the video
+      const videoFilePath = path.join(__dirname, 'downloads', `${videoTitle}.mp4`);
+
+      // Download the video file
+      const videoResponse = await fetch(downloadUrl);
+      const videoBuffer = await videoResponse.buffer();
+
+      // Save the video to the local file system
+      fs.mkdirSync(path.dirname(videoFilePath), { recursive: true });
+      fs.writeFileSync(videoFilePath, videoBuffer);
+
+      // Send the video file to the user
+      await bot.sendDocument(m.chat.id, videoFilePath, { caption: `Here is your video: ${videoTitle}` });
+
+      // Optionally, delete the video file after sending it to the user
+      fs.unlinkSync(videoFilePath);  // Remove the file after sending it to the user
     } else {
       // If the API returns an error or doesn't contain the download URL
       await bot.sendMessage(m.chat.id, '❌ Failed to fetch the video. Please ensure the URL is correct and try again.');
@@ -37,6 +54,5 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     await bot.sendMessage(m.chat.id, '❌ An error occurred while processing your request. Please try again later.');
   }
 };
-
 // Export the handler
 module.exports = handler;
