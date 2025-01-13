@@ -97,6 +97,7 @@ initDatabase().then(database => {
   console.error(chalk.red('Error initializing database:'), err);
 });
 
+// Load plugins dynamically
 const loadPlugins = () => {
   const pluginFiles = fs.readdirSync(pluginsPath);
   const handlers = {};
@@ -104,13 +105,12 @@ const loadPlugins = () => {
   pluginFiles.forEach(file => {
     const pluginName = path.basename(file, '.js');
     try {
-      // Dynamically import the plugin using require (CommonJS)
       const pluginHandler = require(path.join(pluginsPath, file));
-      
-      // Ensure that the plugin has both `command` and `handler` exported
+
       if (pluginHandler.command && pluginHandler.handler) {
         pluginHandler.command.forEach(command => {
-          handlers[command.toLowerCase()] = pluginHandler.handler;  // Map each command to the handler
+          handlers[command.toLowerCase()] = pluginHandler.handler;
+          console.log(`Loaded command: ${command.toLowerCase()}`);  // Debug: Log each loaded command
         });
       }
 
@@ -137,10 +137,18 @@ const logUserActivity = (chatId, command) => {
   fs.appendFileSync('activity.log', logMessage);
 };
 
+// Bot message handler
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text.trim();  // Get the full message text
+
+  // Debug: Log the received message text
+  console.log(`Received message: ${text}`);
+
   const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));  // Check if text starts with any of the prefixes
+
+  // Debug: Log the used prefix
+  console.log(`Used prefix: ${usedPrefix}`);
 
   if (usedPrefix) {
     const command = text.substring(usedPrefix.length).trim().toLowerCase();  // Extract the command after the prefix
@@ -159,8 +167,8 @@ bot.on('message', async (msg) => {
           bot,
           text,
           usedPrefix,
-          command,
           query,
+          command,
           m: msg,  // Pass the full message object to the plugin
           db,  // Pass the database instance to the plugin
         };
