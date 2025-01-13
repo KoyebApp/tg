@@ -63,6 +63,9 @@ let handler = async ({ m, bot, text }) => {
 
       // Send the output of git pull command
       await bot.sendMessage(chatId, stdout.toString());
+
+      // Restart the bot using pm2
+      execSync('pm2 restart Qasim');  // Replace <your-bot-name> with the actual name of your bot process in pm2
     } else {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
     }
