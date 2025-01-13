@@ -143,9 +143,12 @@ bot.on('message', (msg) => {
 
     logUserActivity(chatId, command);  // Log user activity
 
+    console.log(`Received command: ${command}`);  // Debug log
+    console.log(`Received query: ${query}`);  // Debug log
+
     // If the message is a command
     if (command) {
-      console.log(`Received command: ${command}`);  // Debug log
+      console.log(`Processing command: ${command}`);  // Debug log
 
       // Debugging: List all loaded plugin names
       console.log('Loaded plugins:', Object.keys(plugins));
@@ -163,6 +166,8 @@ bot.on('message', (msg) => {
         };
 
         try {
+          // Debug log before executing the plugin
+          console.log(`Executing plugin for command: ${command} with query: ${query}`);
           plugins[command](context);  // Call the handler with the context
           console.log(chalk.green(`Executed plugin: ${command} for chatId: ${chatId}`));
         } catch (error) {
