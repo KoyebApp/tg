@@ -41,7 +41,7 @@ let handler = async ({ m, bot, text }) => {
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
       // Notify user that the bot is updating
-      await bot.sendMessage(chatId, "Updating the bot... Please wait...");
+      await bot.sendMessage(chatId, "Getting Changes... Please wait...");
 
       // Try to find the correct git and bash paths
       const gitPath = getExecutablePath(GIT_PATHS);
