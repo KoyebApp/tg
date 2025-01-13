@@ -139,6 +139,8 @@ bot.on('message', (msg) => {
 
   if (usedPrefix) {
     const command = text.substring(usedPrefix.length).trim().toLowerCase();  // Extract the command after the prefix
+    const query = text.substring(usedPrefix.length + command.length).trim();  // Extract query after the command (if any)
+
     logUserActivity(chatId, command);  // Log user activity
 
     // If the message is a command
@@ -153,7 +155,7 @@ bot.on('message', (msg) => {
         const context = {
           bot,
           text,
-          query,
+          query,  // Pass the query (if any) to the plugin
           usedPrefix,
           command,
           m: msg,  // Pass the full message object to the plugin
