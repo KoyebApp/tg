@@ -60,6 +60,7 @@ let handler = async ({ m, bot, text }) => {
     if (chatId.toString() === process.env.OWNER_ID) {
       // Prevent repeated updates if already in progress
       if (isUpdatingInProgress()) {
+        console.log('Update already in progress. Skipping this update request.');
         await bot.sendMessage(chatId, "Update is already in progress. Please wait...");
         return;
       }
@@ -94,7 +95,7 @@ let handler = async ({ m, bot, text }) => {
       // Restart the bot using pm2 (replace with correct bot name or ID)
       try {
         console.log('Attempting to restart the bot with pm2...');
-        execSync('pm2 restart Qasim');  // Replace `my-bot-name` with your actual pm2 process name or ID
+        execSync('pm2 restart my-bot-name');  // Replace `my-bot-name` with your actual pm2 process name or ID
         console.log('Bot restart command executed successfully.');
       } catch (err) {
         console.error("Error restarting the bot with pm2:", err);
