@@ -1,6 +1,6 @@
-// Inside your plugin file (e.g., menu.js)
-
 const axios = require('axios');
+const path = require('path');  // Import path module for file handling
+const fs = require('fs');  // Import fs module to check file existence
 
 // Handler function
 const handler = async ({ bot, m, text, db }) => {
@@ -15,14 +15,9 @@ const handler = async ({ bot, m, text, db }) => {
     const quotes = quoteResponse.data.split('\n');
     const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
 
-    // Fetch random icon image from a GitHub raw URL
-    const iconResponse = await axios.get('https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Islamic.json', { responseType: 'arraybuffer' });
-    const iconBuffer = Buffer.from(iconResponse.data, 'binary');
-
     // Prepare the bot menu message
     let menuText = `
     *Bot Menu*:
-
 
     📖 *Random Quote*: 
     "${randomQuote}"
@@ -38,17 +33,27 @@ const handler = async ({ bot, m, text, db }) => {
 
     Enjoy your time with the bot! 😊`;
 
-    // Send the menu along with the random icon
-    await bot.sendMessage(m.chat.id, menuText, {
-      parse_mode: 'Markdown',
-      reply_markup: {
-        inline_keyboard: [
-          [{ text: 'Refresh Menu', callback_data: 'refresh_menu' }],
-        ],
-      },
+    // Check if the photo exists
+    const photoPath = path.join(__dirname, '../assets/A.jpg');  // Ensure the correct path
+    if (!fs.existsSync(photoPath)) {
+      console.error('Photo file not found at path:', photoPath);
+      return;
+    }
+
+    // Prepare the inline keyboard buttons
+    const inlineKeyboard = {
+      inline_keyboard: [
+        [{ text: 'Refresh Menu', callback_data: 'refresh_menu' }],
+      ],
+    };
+
+    // Send the menu along with the photo (image as caption) and inline buttons
+    await bot.sendPhoto(m.chat.id, photoPath, {
+      caption: menuText,  // Full menu as caption
+      reply_markup: inlineKeyboard,  // Inline keyboard buttons
     });
 
-    await bot.sendPhoto(m.chat.id, iconBuffer, { caption: 'Here is your random bot icon!' });
+    console.log('Menu sent with photo and buttons!');
   } catch (error) {
     console.error('Error in menu plugin:', error);
     // Send a message in case of error but prevent the app from crashing
