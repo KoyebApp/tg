@@ -37,12 +37,11 @@ const handler = async ({ bot, m, text, query }) => {
       // Format the information to send to the user
       const message = `
         *WhatsApp Channel Information:*
-        - *Name*: ${result.name}
+        - *Title*: ${result.title}
         - *Description*: ${result.description}
-        - *Link*: [Click here](https://wa.me/${result.phone})
-        - *Phone*: ${result.phone}
-        - *Total Members*: ${result.members}
-        - *Profile Image*: [View Image](${result.profile_picture})
+        - *Followers*: ${result.followers}
+        - *Link*: [Click here](https://wa.me/${result.phone || 'undefined'})
+        - *Profile Image*: [View Image](${result.img})
       `;
 
       // Send the information to the user
