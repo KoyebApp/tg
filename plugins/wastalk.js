@@ -11,41 +11,41 @@ const handler = async ({ bot, m, text, query }) => {
   // Prepare the API URL with the query (user-provided WhatsApp URL)
   const apiUrl = `https://api.giftedtech.web.id/api/stalk/wachannel?apikey=gifted-md&url=${encodeURIComponent(query)}`;
 
+  console.log("API URL:", apiUrl); // Log the URL to ensure it is correct
+
   try {
     // Fetch data from the API
     const response = await fetch(apiUrl);
+    
+    // Log the response status code
+    console.log("Response Status:", response.status);
 
+    // Check if response status is OK (200-299)
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
 
     const data = await response.json();
 
+    // Log the API response to the console for debugging
+    console.log("API Response:", data);
+
     // Check if the response is successful
     if (data.status === 200 && data.success) {
       const result = data.result;
 
-      // Adjust description length and add Read More link
-      const maxDescriptionLength = 200;  // You can adjust this value as per your preference
-      let description = result.description;
-
-      if (description.length > maxDescriptionLength) {
-        description = description.substring(0, maxDescriptionLength) + '... [Read More](' + query + ')';
-      }
-
-      // Format the message to send to the user
+      // Format the information to send to the user
       const message = `
         *WhatsApp Channel Information:*
         - *Title*: ${result.title}
-        - *Description*: ${description}
+        - *Description*: ${result.description}
         - *Followers*: ${result.followers}
+        - *Link*: [Click here](https://wa.me/${result.phone || 'undefined'})
+        - *Profile Image*: [View Image](${result.img})
       `;
 
-      // Send the profile image along with the caption
-      await bot.sendPhoto(chatId, result.img, {
-        caption: message,
-        parse_mode: 'Markdown',
-      });
+      // Send the information to the user
+      await bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
     } else {
       await bot.sendMessage(chatId, 'Failed to retrieve information about the WhatsApp channel. Please make sure the URL is correct.');
     }
