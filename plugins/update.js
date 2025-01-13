@@ -5,9 +5,11 @@ const fs = require('fs');
 const OWNER_ID = process.env.OWNER_ID;
 
 // The handler function to process the update
-const handler = async ({ msg, bot, chatId, text }) => {
+let handler = async ({ msg, bot, text }) => {
   try {
-    // Ensure chatId is defined
+    // Ensure chatId is extracted correctly from the msg object
+    const chatId = msg?.chat?.id; // This should give you the chat ID if the structure is as expected
+
     if (!chatId) {
       throw new Error('chatId is undefined');
     }
@@ -34,6 +36,9 @@ const handler = async ({ msg, bot, chatId, text }) => {
     }
   } catch (error) {
     console.error("Error during update:", error);
+    if (error.message.includes("chatId is undefined")) {
+      console.error("The chatId is not being passed correctly. Check your message format.");
+    }
     await bot.sendMessage(chatId, "An error occurred while updating the bot. Please try again later.");
   }
 };
