@@ -139,6 +139,8 @@ bot.on('message', (msg) => {
 
   if (usedPrefix) {
     const command = text.substring(usedPrefix.length).trim().toLowerCase();  // Extract the command after the prefix
+
+    // Extract query by removing the command part
     const query = text.substring(usedPrefix.length + command.length).trim();  // Extract query after the command (if any)
 
     logUserActivity(chatId, command);  // Log user activity
