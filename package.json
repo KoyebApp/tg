@@ -15,7 +15,7 @@
     "run": "pm2 start . --deep-monitoring --attach --name Qasim",
     "qasim": "pm2 start . --deep-monitoring --attach --name Qasim",
     "start": "pm2 start . --attach --name Qasim",
-    "restart": "pm2 restart Qasim"
+    "restart": "pm2 restart Qasim",
     "stop": "pm2 stop Qasim"
   },
   "keywords": [
