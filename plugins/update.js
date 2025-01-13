@@ -6,7 +6,7 @@ const path = require('path');
 // Get the owner's chat ID from the environment variables
 const OWNER_ID = process.env.OWNER_ID;
 
-let handler = async (msg, { bot }) => {
+let handler = async ({ msg, bot }) => {
   // Ensure the command is executed by the owner
   if (msg.chat.id.toString() === OWNER_ID) {
     try {
