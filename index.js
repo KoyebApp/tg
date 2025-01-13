@@ -1,4 +1,3 @@
-// Alive.js Plugin: Updated with confirmation message
 const chalk = require('chalk');
 const dotenv = require('dotenv');
 const fs = require('fs');
@@ -132,15 +131,6 @@ const logUserActivity = (chatId, command) => {
   fs.appendFileSync('activity.log', logMessage);
 };
 
-// Send confirmation message
-const sendConfirmationMessage = (chatId) => {
-  const pluginCount = Object.keys(plugins).length;
-  const prefixUsed = PREFIX.length > 1 ? 'Multiprefix' : PREFIX[0]; // If multiple prefixes are used, show "Multiprefix"
-  const confirmationMessage = `MEGA AI GOT CONNECTED\nPlugins Count: ${pluginCount}\nPrefix: ${prefixUsed} GlobalTechInfo`;
-
-  bot.sendMessage(chatId, confirmationMessage);
-};
-
 // Main message handler
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
@@ -150,11 +140,6 @@ bot.on('message', (msg) => {
   if (usedPrefix) {
     const command = text.substring(usedPrefix.length).trim().toLowerCase();  // Extract the command after the prefix
     logUserActivity(chatId, command);  // Log user activity
-
-    // Send confirmation message when the bot connects
-    if (command === 'start' || command === 'connect') {
-      sendConfirmationMessage(chatId);
-    }
 
     // If the message is a command
     if (command) {
