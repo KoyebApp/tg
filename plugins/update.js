@@ -4,17 +4,15 @@ const fs = require('fs');
 // Fetch the owner ID from environment variables
 const OWNER_ID = process.env.OWNER_ID;
 
-// The handler function to process the update
-let handler = async ({ msg, bot, text }) => {
+let handler = async ({ m, bot, text }) => {
   try {
-    // Ensure chatId is extracted correctly from the msg object
-    const chatId = msg?.chat?.id; // This should give you the chat ID if the structure is as expected
+    // Extract chatId from m.chat.id
+    const chatId = m.chat.id; // Correctly access the chatId from m
 
     if (!chatId) {
       throw new Error('chatId is undefined');
     }
 
-    console.log('Received msg:', msg);  // Debug log to inspect msg object
     console.log('Received chatId:', chatId);  // Debug log for chatId
 
     // Ensure the command is executed by the owner
@@ -22,7 +20,7 @@ let handler = async ({ msg, bot, text }) => {
       // Notify the user that the bot is updating
       await bot.sendMessage(chatId, "Updating the bot... Please wait...");
 
-      // Execute the git pull command, appending the text if provided
+      // Execute the git pull command
       let stdout = execSync('git pull' + (text ? ' ' + text : ''));
 
       // Reload all plugins (ensure the reload function exists or modify to fit your code)
@@ -43,5 +41,4 @@ let handler = async ({ msg, bot, text }) => {
   }
 };
 
-// Export the handler function
 module.exports = handler;
