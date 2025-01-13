@@ -97,7 +97,6 @@ initDatabase().then(database => {
   console.error(chalk.red('Error initializing database:'), err);
 });
 
-// Dynamically import all plugins from the plugins folder using require
 const loadPlugins = () => {
   const pluginFiles = fs.readdirSync(pluginsPath);
   const handlers = {};
@@ -105,9 +104,16 @@ const loadPlugins = () => {
   pluginFiles.forEach(file => {
     const pluginName = path.basename(file, '.js');
     try {
-      // Dynamically import the plugin handler using require (CommonJS)
-      const pluginHandler = require(path.join(pluginsPath, file));  // No .default needed in CommonJS
-      handlers[pluginName.toLowerCase()] = pluginHandler; // Store plugin with lowercase key
+      // Dynamically import the plugin using require (CommonJS)
+      const pluginHandler = require(path.join(pluginsPath, file));
+      
+      // Ensure that the plugin has both `command` and `handler` exported
+      if (pluginHandler.command && pluginHandler.handler) {
+        pluginHandler.command.forEach(command => {
+          handlers[command.toLowerCase()] = pluginHandler.handler;  // Map each command to the handler
+        });
+      }
+
       console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
     } catch (error) {
       const err = syntaxerror(fs.readFileSync(path.join(pluginsPath, file), 'utf-8'), file);
@@ -144,40 +150,37 @@ bot.on('message', async (msg) => {
     if (command) {
       console.log(`Received command: ${command}`);  // Debug log
 
-      // Debugging: List all loaded plugin names
-      console.log('Loaded plugins:', Object.keys(plugins));
+      // Debugging: List all loaded commands
+      console.log('Loaded commands:', Object.keys(plugins));
 
       // If there's a plugin handler for this command, call it
-      const baseCommand = command.split(' ')[0].toLowerCase();  // Get the base command (before any space)
-      const query = command.slice(baseCommand.length).trim();  // Get the query part (after the base command)
-
-      // Check if the base command exists in the loaded plugins
-      if (plugins[baseCommand]) {
+      if (plugins[command]) {
         const context = {
           bot,
           text,
           usedPrefix,
-          command: baseCommand,
+          command,
+          query,
           m: msg,  // Pass the full message object to the plugin
           db,  // Pass the database instance to the plugin
-          query,  // Pass the query (if any)
         };
 
         try {
-          plugins[baseCommand](context);  // Call the handler with the context (passing the base command and the query)
-          console.log(chalk.green(`Executed plugin: ${baseCommand} for chatId: ${chatId}`));
+          await plugins[command](context);  // Execute the handler with the context
+          console.log(chalk.green(`Executed plugin: ${command} for chatId: ${chatId}`));
         } catch (error) {
-          console.error(chalk.red(`Error executing plugin '${baseCommand}':`), error);
-          bot.sendMessage(chatId, `An error occurred while processing the command '${baseCommand}'. Please try again later.`);
+          console.error(chalk.red(`Error executing plugin '${command}':`), error);
+          bot.sendMessage(chatId, `An error occurred while processing the command '${command}'. Please try again later.`);
         }
       } else {
         // If no plugin is found, send an error message
         bot.sendMessage(chatId, "Unknown command or no plugin available for that command.");
-        console.error(chalk.red(`Unknown command: ${baseCommand} from chatId: ${chatId}`));
+        console.error(chalk.red(`Unknown command: ${command} from chatId: ${chatId}`));
       }
     }
   }
 });
+
 
 
 // Listen to callback queries (inline button callback)
