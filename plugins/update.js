@@ -37,12 +37,14 @@ function isUpdatingInProgress() {
 
 // Set the flag file to indicate that an update is in progress
 function setUpdatingInProgress() {
+  console.log('Setting update flag...');
   fs.writeFileSync(updateFlagPath, 'true');
 }
 
 // Clear the flag file after update is complete
 function clearUpdatingInProgress() {
   if (fs.existsSync(updateFlagPath)) {
+    console.log('Clearing update flag...');
     fs.unlinkSync(updateFlagPath);
   }
 }
