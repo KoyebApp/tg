@@ -1,7 +1,10 @@
 // alive.js plugin example
 const handler = async ({ bot, m, db }) => {
-  await bot.sendMessage(m.chat.id, "Bot is alive and running!");
+  const photoPath = './assets/A.jpg';  // Path to your photo
+
+  // Send a photo with a caption
+  await bot.sendPhoto(m.chat.id, { source: photoPath }, { caption: 'Bot Is Alive And Running!' });
+
 };
 
-handler.command = ['alive', 'help'];  // List commands handled by this plugin
 module.exports = handler;
