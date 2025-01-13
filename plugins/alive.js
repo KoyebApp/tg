@@ -1,5 +1,5 @@
 // Example plugin: alive.js
-const handler = async ({ bot, m, db }) => {
+const handler = async ({ bot, m, db, command, usedPrefix }) => {
   await bot.sendMessage(m.chat.id, "Bot is alive and running!");
 };
 
