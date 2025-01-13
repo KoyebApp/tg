@@ -34,18 +34,19 @@ const handler = async ({ bot, m, text, query }) => {
     if (data.status === 200 && data.success) {
       const result = data.result;
 
-      // Format the information to send to the user
+      // Format the information to send to the user as a caption
       const message = `
         *WhatsApp Channel Information:*
         - *Title*: ${result.title}
         - *Description*: ${result.description}
         - *Followers*: ${result.followers}
-        - *Link*: [Click here](https://wa.me/${result.phone || 'undefined'})
-        - *Profile Image*: [View Image](${result.img})
       `;
 
-      // Send the information to the user
-      await bot.sendMessage(chatId, message, { parse_mode: 'Markdown' });
+      // Send the profile image along with the caption
+      await bot.sendPhoto(chatId, result.img, {
+        caption: message,
+        parse_mode: 'Markdown',
+      });
     } else {
       await bot.sendMessage(chatId, 'Failed to retrieve information about the WhatsApp channel. Please make sure the URL is correct.');
     }
