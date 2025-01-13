@@ -74,8 +74,13 @@ let handler = async ({ m, bot, text }) => {
       // Send the output of git pull command
       await bot.sendMessage(chatId, stdout.toString());
 
-      // Restart the bot using pm2 (if using pm2)
-      execSync('pm2 restart <your-bot-name>');  // Replace <your-bot-name> with your actual pm2 process name
+      // Restart the bot using pm2 (replace with correct bot name or ID)
+      try {
+        execSync('pm2 restart 0');  // Replace `my-bot-name` with your actual pm2 process name or ID
+      } catch (err) {
+        console.error("Error restarting the bot with pm2:", err);
+        await bot.sendMessage(chatId, "Failed to restart the bot. Please check the server logs.");
+      }
 
       // Update complete, set flag back to false
       isUpdating = false;
