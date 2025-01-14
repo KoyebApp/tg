@@ -1,15 +1,15 @@
 const fetch = require('node-fetch');
 
-let handler = async ({ m, bot, text, command }) => {
+let handler = async ({ m, bot, query, command }) => {
   const suggest = "Type the command along with the prompt 🥺";
 
-  if (!text) {
+  if (!query) {
     await bot.sendMessage(m.chat.id, suggest);
     return;
   }
 
   try {
-    const res = await (await fetch('https://lexica.art/api/v1/search?q=' + text)).json();
+    const res = await (await fetch('https://lexica.art/api/v1/search?q=' + query)).json();
     const randm = res.images;
     const resul = randm[Math.floor(Math.random() * randm.length)]; // Pick a random image from the array
 
