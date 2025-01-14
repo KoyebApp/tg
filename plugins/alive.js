@@ -7,7 +7,6 @@ const handler = async ({ bot, m, db, text }) => {
 
   // Check if the file exists at the given path
   if (!fs.existsSync(photoPath)) {
-    console.error('Photo file not found at path:', photoPath);
     return;  // Exit the function if the file doesn't exist
   }
 
@@ -15,7 +14,6 @@ const handler = async ({ bot, m, db, text }) => {
   try {
     // Send the photo directly by passing the file path
     await bot.sendPhoto(m.chat.id, photoPath, { caption: 'Bot Is Alive And Running!' });
-    console.log('Photo sent successfully!');
   } catch (error) {
     console.error('Error sending photo:', error);
   }
