@@ -9,7 +9,8 @@ let handler = async ({ m, bot, query }) => {
 
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
-      const sanitizedQuery = query.trim().toLowerCase();
+      const sanitizedQuery = query.trim().toLowerCase();  // Normalize the query
+      console.log(`Received query: "${sanitizedQuery}"`);  // Log query for debugging
 
       if (sanitizedQuery === 'restart') {
         // Run pm2 restart Qasim by default
