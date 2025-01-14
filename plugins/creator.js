@@ -12,9 +12,9 @@ X-WA-BIZ-DESCRIPTION:Developer of the Bot
 X-WA-BIZ-NAME:Qasim Ali
 END:VCARD`;
 
-  // Send contact information
+  // Send contact information with caption and reply to the user's message
   await bot.sendContact(m.chat.id, [{ phone_number: "923444844060", vcard: vcard }], {
-    caption: 'Creator: Qasim Ali',
+    caption: `Creator: Qasim Ali\nFor support, contact me at +923444844060.\nUse ${usedPrefix}help for more commands.`,
     reply_to_message_id: m.message_id,
   });
 };
