@@ -12,7 +12,7 @@ let handler = async ({ m, bot, query }) => {
       const sanitizedQuery = query.trim().toLowerCase();
 
       if (sanitizedQuery === 'restart') {
-        // Run pm2 restart command
+        // Run pm2 restart Qasim by default
         exec('pm2 restart Qasim', { cwd: process.cwd() }, (error, stdout, stderr) => {
           if (error) {
             console.error(`Error executing pm2 restart: ${error}`);
@@ -27,9 +27,9 @@ let handler = async ({ m, bot, query }) => {
 
           // Send the success message after pm2 restart
           console.log(`pm2 restart stdout: ${stdout}`);
-          bot.sendMessage(chatId, "Bot restarted successfully using pm2!");
+          bot.sendMessage(chatId, "Bot restarted successfully using pm2 (Qasim)!");
 
-          // Run npm start after pm2 restart (optional step)
+          // Optionally, you can run npm start after pm2 restart if needed
           exec('npm start', { cwd: process.cwd() }, (error, stdout, stderr) => {
             if (error) {
               console.error(`Error executing npm start: ${error}`);
