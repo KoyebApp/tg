@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 
-let handler = async (m, { bot, text, command }) => {
+let handler = async ({ m, bot, text, command }) => {
   const suggest = "Type the command along with the prompt 🥺";
 
   if (!text) {
@@ -28,9 +28,5 @@ let handler = async (m, { bot, text, command }) => {
     await bot.sendMessage(m.chat.id, "❌ An error occurred while generating the image. Please try again later.");
   }
 };
-
-handler.help = ["lexica"];
-handler.tags = ['ai'];
-handler.command = ["lexica"];
 
 module.exports = handler;
