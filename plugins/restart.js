@@ -12,8 +12,9 @@ let handler = async ({ m, bot, query }) => {
       const sanitizedQuery = query.trim().toLowerCase();  // Normalize the query
       console.log(`Received query: "${sanitizedQuery}"`);  // Log query for debugging
 
-      if (sanitizedQuery === 'restart') {
-        // Run pm2 restart Qasim by default
+      // Default action for restart
+      if (sanitizedQuery === '' || sanitizedQuery === 'restart') {
+        // Execute pm2 restart for 'Qasim'
         exec('pm2 restart Qasim', { cwd: process.cwd() }, (error, stdout, stderr) => {
           if (error) {
             console.error(`Error executing pm2 restart: ${error}`);
@@ -29,24 +30,6 @@ let handler = async ({ m, bot, query }) => {
           // Send the success message after pm2 restart
           console.log(`pm2 restart stdout: ${stdout}`);
           bot.sendMessage(chatId, "Bot restarted successfully using pm2 (Qasim)!");
-
-          // Optionally, you can run npm start after pm2 restart if needed
-          exec('npm start', { cwd: process.cwd() }, (error, stdout, stderr) => {
-            if (error) {
-              console.error(`Error executing npm start: ${error}`);
-              bot.sendMessage(chatId, "Failed to start the bot with npm start. Please check the server logs.");
-              return;
-            }
-
-            // If there's any stderr output
-            if (stderr) {
-              console.error(`npm start stderr: ${stderr}`);
-            }
-
-            // Send the success message after npm start
-            console.log(`npm start stdout: ${stdout}`);
-            bot.sendMessage(chatId, "Npm start completed successfully!");
-          });
         });
       } else {
         bot.sendMessage(chatId, "Invalid command. Please use 'restart' to restart the bot.");
