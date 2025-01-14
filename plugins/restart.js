@@ -13,7 +13,7 @@ let handler = async ({ m, bot, query }) => {
 
       if (sanitizedQuery === 'restart') {
         // Run pm2 restart command
-        exec('pm2 restart my-bot-name', { cwd: process.cwd() }, (error, stdout, stderr) => {
+        exec('pm2 restart Qasim', { cwd: process.cwd() }, (error, stdout, stderr) => {
           if (error) {
             console.error(`Error executing pm2 restart: ${error}`);
             bot.sendMessage(chatId, "Failed to restart the bot with pm2. Please check the server logs.");
