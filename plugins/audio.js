@@ -38,7 +38,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
       fs.writeFileSync(audioFilePath, audioBuffer);
 
       // Send the audio file to the user
-      await bot.sendDocument(m.chat.id, audioFilePath, { caption: `Here is your audio: ${audioTitle}` });
+      await bot.sendDocument(m.chat.id, audioFilePath, { caption: `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸: ${audioTitle}` });
 
       // Optionally, delete the audio file after sending it to the user
       fs.unlinkSync(audioFilePath);  // Remove the file after sending it to the user
