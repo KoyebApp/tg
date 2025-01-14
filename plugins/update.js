@@ -9,10 +9,14 @@ let handler = async ({ m, bot, query }) => {
 
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
-      // Extract query from the text
-      const query = query.trim().toLowerCase();
+      // Check what query is coming in for debugging purposes
+      console.log('Received query:', query);
 
-      if (query === 'git pull') {
+      const sanitizedQuery = query.trim().toLowerCase();
+      console.log('Sanitized query:', sanitizedQuery);
+
+      if (sanitizedQuery === 'git pull') {
+        console.log('Running git pull command...');
         // Run git pull command
         exec('git pull', { cwd: process.cwd() }, (error, stdout, stderr) => {
           if (error) {
@@ -20,10 +24,14 @@ let handler = async ({ m, bot, query }) => {
             bot.sendMessage(chatId, "An error occurred while executing git pull. Please try again later.");
             return;
           }
-          console.log(stdout);
+          if (stderr) {
+            console.error(`git pull stderr: ${stderr}`);
+          }
+          console.log(`git pull stdout: ${stdout}`);
           bot.sendMessage(chatId, "Git pull completed successfully!");
         });
-      } else if (query === 'npm start') {
+      } else if (sanitizedQuery === 'npm start') {
+        console.log('Running npm start command...');
         // Run npm start command
         exec('npm start', { cwd: process.cwd() }, (error, stdout, stderr) => {
           if (error) {
@@ -31,7 +39,10 @@ let handler = async ({ m, bot, query }) => {
             bot.sendMessage(chatId, "Failed to start the bot. Please check the server logs.");
             return;
           }
-          console.log(stdout);
+          if (stderr) {
+            console.error(`npm start stderr: ${stderr}`);
+          }
+          console.log(`npm start stdout: ${stdout}`);
           bot.sendMessage(chatId, "Npm start completed successfully!");
         });
       } else {
@@ -41,7 +52,8 @@ let handler = async ({ m, bot, query }) => {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
     }
   } catch (error) {
-    // Provide feedback to user
+    // Provide feedback to user and log the error
+    console.error('Error occurred:', error);
     if (m.chat && m.chat.id) {
       await bot.sendMessage(m.chat.id, "An error occurred. Please try again later.");
     }
