@@ -7,7 +7,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
 
   // Ensure a URL is provided
   if (!query) {
-    await bot.sendMessage(m.chat.id, 'Please provide the URL of the video. Example: .ytmp3 https://youtube.com/video-url');
+    await bot.sendMessage(m.chat.id, 'Please provide the URL of the video.');
     return;
   }
 
@@ -20,9 +20,6 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     // Make the API request
     const response = await fetch(apiUrl);
     const data = await response.json();
-
-    // Log the API response for debugging
-    console.log('API Response:', data);  // Log the response to the console
 
     // Check if the API request was successful
     if (data.success && data.result && data.result.download_url) {
