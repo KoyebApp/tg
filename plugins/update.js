@@ -34,6 +34,7 @@ let handler = async ({ m, bot, text }) => {
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
       console.log('Checking if update is in progress...');
+      
       if (isUpdatingInProgress()) {
         // If the flag exists, it means an update is still marked as in progress
         await bot.sendMessage(chatId, "Update is already in progress. Please wait...");
@@ -67,6 +68,7 @@ let handler = async ({ m, bot, text }) => {
       }
 
       // Clear the update flag after the update process is complete
+      console.log('Clearing update flag after update process...');
       clearUpdatingInProgress();
 
     } else {
@@ -74,8 +76,9 @@ let handler = async ({ m, bot, text }) => {
     }
   } catch (error) {
     // Ensure the flag is cleared even if an error occurs
-    clearUpdatingInProgress();
     console.error('Error during update process:', error);
+    console.log('Clearing update flag due to error...');
+    clearUpdatingInProgress();
 
     // Provide feedback to the user
     if (m.chat && m.chat.id) {
