@@ -17,10 +17,16 @@ END:VCARD`;
     phone_number: "+923444844060",
     first_name: "Qasim",
     last_name: "Ali",
-    vcard: vcard
   }], {
     caption: `Creator: Qasim Ali\nFor support, contact me at +923444844060.\nUse ${usedPrefix}help for more commands.`,
     reply_to_message_id: m.message_id, // reply to the user's message
+  });
+
+  // Optionally, send a separate message with the vCard attached (if required by your use case)
+  await bot.sendMessage(m.chat.id, {
+    document: { url: 'data:text/vcard;base64,' + Buffer.from(vcard).toString('base64') },
+    caption: "Click to save contact.",
+    reply_to_message_id: m.message_id
   });
 };
 
