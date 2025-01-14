@@ -5,7 +5,7 @@ const handler = async ({ bot, m, db, command }) => {
 
     // Fetch the anime images from the GitHub JSON file based on the command
     const response = await axios.get(
-      `https://raw.githubusercontent.com/Guru322/api/Guru/BOT-JSON/anime-${command}.json`
+      `https://raw.githubusercontent.com/Guru322/api/Guru/BOT-JSON/anime-akira.json`
     );
 
     // Check if the response is empty or invalid
@@ -41,13 +41,5 @@ const handler = async ({ bot, m, db, command }) => {
     }
   }
 };
-
-// List of available commands for different anime images
-handler.command = [
-  'akira', 'akiyama', 'anna', 'asuna', 'ayuzawa', 'boruto', 'chiho', 'chitoge', 'deidara', 'erza',
-  'elaina', 'eba', 'emilia', 'hestia', 'hinata', 'inori', 'isuzu', 'itachi', 'itori', 'kaga', 'kagura',
-  'kaori', 'keneki', 'kotori', 'kurumi', 'madara', 'mikasa', 'miku', 'minato', 'naruto', 'nezuko',
-  'sagiri', 'sasuke', 'sakura',
-];
 
 module.exports = handler;
