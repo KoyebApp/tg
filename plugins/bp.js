@@ -31,12 +31,9 @@ const handler = async ({ bot, m, text, db, usedPrefix, command }) => {
 
       // Send each image with a custom message
       await bot.sendPhoto(chatId, buffer, {
-        caption: '*𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝚄𝙻𝚃𝚁𝙰-𝙼𝙳*',
+        caption: '*𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸*',
       });
     }
-
-    // After processing, send the "done" message
-    await bot.sendMessage(chatId, "✅ Images sent successfully!");
   } catch (error) {
     console.error('Error fetching images:', error);
     await bot.sendMessage(m.chat.id, '❌ Something went wrong while fetching the images. Please try again later.');
