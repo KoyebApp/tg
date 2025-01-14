@@ -37,6 +37,7 @@ let handler = async ({ m, bot, text }) => {
       if (isUpdatingInProgress()) {
         // If the flag exists, it means an update is still marked as in progress
         await bot.sendMessage(chatId, "Update is already in progress. Please wait...");
+        console.log('Update is already in progress.');
         return;
       }
 
@@ -50,11 +51,13 @@ let handler = async ({ m, bot, text }) => {
       const gitDirectory = process.cwd();  // Using the current working directory as the repo path
 
       try {
-        console.log('Running git pull...');
-        execSync('git pull', { cwd: gitDirectory });
+        console.log('Running git pull in directory:', gitDirectory);
+        const gitPullOutput = execSync('git pull', { cwd: gitDirectory }).toString();
+        console.log('Git pull output:', gitPullOutput);
 
-        console.log('Running npm start...');
-        execSync('npm start', { cwd: gitDirectory });
+        console.log('Running npm start in directory:', gitDirectory);
+        const npmStartOutput = execSync('npm start', { cwd: gitDirectory }).toString();
+        console.log('Npm start output:', npmStartOutput);
 
         console.log('Update completed successfully.');
         await bot.sendMessage(chatId, "Bot update completed successfully!");
