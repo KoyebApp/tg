@@ -17,6 +17,9 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
   const apiUrl = `https://api.giftedtech.web.id/api/download/dlmp3?apikey=gifted-md&url=${encodeURIComponent(videoUrl)}`;
 
   try {
+
+    await bot.sendMessage(chatId, "⏳ Please wait, fetching the images...");
+    
     // Make the API request
     const response = await fetch(apiUrl);
     const data = await response.json();
