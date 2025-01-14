@@ -1,9 +1,9 @@
 const axios = require('axios');
 
-const handler = async ({ bot, m, db, command, text }) => {
+const handler = async ({ bot, m, db, command, query }) => {
   try {
     // Ask the user to provide a query (e.g., 'akira', 'anime', 'naruto', etc.)
-    if (!text) {
+    if (!query) {
       return await bot.sendMessage(m.chat.id, "❌ Please provide a query (e.g., 'akira', 'naruto', etc.).");
     }
 
