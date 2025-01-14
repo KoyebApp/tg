@@ -1,14 +1,13 @@
 const axios = require('axios');
 
-const handler = async ({ bot, m, db, command }) => {
+const handler = async ({ bot, m, db, command, usedPrefix }) => {
   try {
-
-    await bot.sendMessage(chatId, "⏳ Please wait, fetching the images...");
-    
+    // Notify the user that the bot is fetching images
+    await bot.sendMessage(m.chat.id, "⏳ Please wait, fetching the images...");
 
     // Fetch the anime images from the GitHub JSON file based on the command
     const response = await axios.get(
-      `https://raw.githubusercontent.com/Guru322/api/Guru/BOT-JSON/anime-akira.json`
+      `https://raw.githubusercontent.com/GlobalTechInfo/Anime-API/Guru/BOT-JSON/anime-akira.json`
     );
 
     // Check if the response is empty or invalid
@@ -16,22 +15,13 @@ const handler = async ({ bot, m, db, command }) => {
       return await bot.sendMessage(m.chat.id, '❌ No images found for this anime!');
     }
 
-    // Pick a random image from the fetched list
+    // Pick a random image URL from the fetched JSON data
     const randomImage = response.data[Math.floor(Math.random() * response.data.length)];
 
     // Send the image to the user with the command name as a caption
     await bot.sendPhoto(m.chat.id, randomImage, {
       caption: `_${command}_`, // Caption with the command name
     });
-
-    // Optional: send a button to fetch more anime images (commented out for now)
-    // await bot.sendMessage(m.chat.id, `_${command}_`.trim(), {
-    //   reply_markup: {
-    //     inline_keyboard: [
-    //       [{ text: '🔄 NEXT 🔄', callback_data: `${usedPrefix + command}` }],
-    //     ],
-    //   },
-    // });
 
   } catch (error) {
     console.error('Error fetching anime images:', error);
