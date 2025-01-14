@@ -9,13 +9,13 @@ let handler = async ({ m, bot, query }) => {
 
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
-      // Normalize the query
+      // Normalize the query and default to 'restart' if no query is provided
       const sanitizedQuery = (query && query.trim().toLowerCase()) || 'restart';  // Default to 'restart' if query is empty
       console.log(`Received query: "${sanitizedQuery}"`);  // Log query for debugging
 
-      // Default action for restart
+      // If the query is 'restart' or empty (default)
       if (sanitizedQuery === 'restart') {
-        // Execute pm2 stop for 'Qasim'
+        // Stop the pm2 process for 'Qasim'
         exec('pm2 stop Qasim', { cwd: process.cwd() }, (stopError, stopStdout, stopStderr) => {
           if (stopError) {
             console.error(`Error stopping pm2 process: ${stopError}`);
@@ -24,6 +24,8 @@ let handler = async ({ m, bot, query }) => {
           }
           if (stopStderr) {
             console.error(`pm2 stop stderr: ${stopStderr}`);
+            bot.sendMessage(chatId, "There was an issue stopping the bot with pm2.");
+            return;
           }
 
           console.log(`pm2 stop stdout: ${stopStdout}`);
@@ -38,9 +40,11 @@ let handler = async ({ m, bot, query }) => {
 
             if (startStderr) {
               console.error(`pm2 start stderr: ${startStderr}`);
+              bot.sendMessage(chatId, "There was an issue starting the bot with pm2.");
+              return;
             }
 
-            // Send the success message after pm2 restart
+            // If everything works fine, send success message
             console.log(`pm2 start stdout: ${startStdout}`);
             bot.sendMessage(chatId, "Bot restarted successfully using pm2 (Qasim)!");
           });
