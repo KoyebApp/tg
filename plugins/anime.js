@@ -35,7 +35,7 @@ const handler = async ({ bot, m, db, command, query }) => {
 
     // Send the image to the user with the query as the caption
     await bot.sendPhoto(m.chat.id, randomImage, {
-      caption: `Random image for query: *${query}*`, // Include the query in the caption
+      caption: `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`,
     });
 
   } catch (error) {
