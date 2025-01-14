@@ -9,10 +9,12 @@ let handler = async ({ m, bot, query }) => {
 
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
+      // Ensure the query is empty or matches 'update'
       const sanitizedQuery = query.trim().toLowerCase();
 
-      if (sanitizedQuery === 'update') {
-        // If the query is 'update', execute the git pull command
+      // If the query is 'update' (or empty), trigger 'git pull' by default
+      if (sanitizedQuery === 'update' || sanitizedQuery === '') {
+        // Execute the git pull command
         exec('git pull', { cwd: process.cwd() }, (error, stdout, stderr) => {
           if (error) {
             console.error(`Error executing git pull: ${error}`);
