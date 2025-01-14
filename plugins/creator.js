@@ -19,8 +19,4 @@ END:VCARD`;
   });
 };
 
-handler.help = ['owner'];
-handler.tags = ['main'];
-handler.command = ['creator', 'creador', 'dueño'];
-
 module.exports = handler;
