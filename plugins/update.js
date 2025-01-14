@@ -15,8 +15,12 @@ function setUpdatingInProgress() {
 
 // Clear the flag file after update is complete
 function clearUpdatingInProgress() {
-  if (fs.existsSync(updateFlagPath)) {
-    fs.unlinkSync(updateFlagPath);
+  try {
+    if (fs.existsSync(updateFlagPath)) {
+      fs.unlinkSync(updateFlagPath);  // Remove the flag file
+    }
+  } catch (error) {
+    console.error('Error while clearing the update flag:', error);
   }
 }
 
@@ -29,7 +33,7 @@ let handler = async ({ m, bot, text }) => {
 
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
-      // Ensure flag is cleared if no update is in progress
+      // Check if update is already in progress
       if (isUpdatingInProgress()) {
         // If the flag exists, it means an update is still marked as in progress
         await bot.sendMessage(chatId, "Update is already in progress. Please wait...");
@@ -43,10 +47,18 @@ let handler = async ({ m, bot, text }) => {
       await bot.sendMessage(chatId, "Updating the bot... Please wait...");
 
       // Run git pull to update the repo
-      execSync('git pull', { stdio: 'inherit' });
+      try {
+        execSync('git pull', { stdio: 'inherit' });
+      } catch (err) {
+        throw new Error('Git pull failed: ' + err.message);
+      }
 
       // Run npm start to restart the bot
-      execSync('npm start', { stdio: 'inherit' });
+      try {
+        execSync('npm start', { stdio: 'inherit' });
+      } catch (err) {
+        throw new Error('npm start failed: ' + err.message);
+      }
 
       // Clear the update flag after successful update
       clearUpdatingInProgress();
@@ -59,6 +71,8 @@ let handler = async ({ m, bot, text }) => {
   } catch (error) {
     // Handle errors and clear the update flag
     clearUpdatingInProgress();
+    console.error('Error during update process:', error);
+
     if (m.chat && m.chat.id) {
       await bot.sendMessage(m.chat.id, "An error occurred while updating the bot. Please try again later.");
     }
