@@ -3,6 +3,9 @@ const axios = require('axios');
 const handler = async ({ bot, m, db, command }) => {
   try {
 
+    await bot.sendMessage(chatId, "⏳ Please wait, fetching the images...");
+    
+
     // Fetch the anime images from the GitHub JSON file based on the command
     const response = await axios.get(
       `https://raw.githubusercontent.com/Guru322/api/Guru/BOT-JSON/anime-akira.json`
