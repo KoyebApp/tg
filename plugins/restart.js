@@ -14,23 +14,35 @@ let handler = async ({ m, bot, query }) => {
 
       // Default action for restart
       if (sanitizedQuery === '' || sanitizedQuery === 'restart') {
-        // Execute pm2 restart for 'Qasim'
-        exec('pm2 stop Qasim', { cwd: process.cwd() };
-        exec('pm2 start . --attach --name Qasim', { cwd: process.cwd() }, (error, stdout, stderr) => {
-          if (error) {
-            console.error(`Error executing pm2 restart: ${error}`);
-            bot.sendMessage(chatId, "Failed to restart the bot with pm2. Please check the server logs.");
+        // Execute pm2 stop for 'Qasim'
+        exec('pm2 stop Qasim', { cwd: process.cwd() }, (stopError, stopStdout, stopStderr) => {
+          if (stopError) {
+            console.error(`Error stopping pm2 process: ${stopError}`);
+            bot.sendMessage(chatId, "Failed to stop the bot with pm2. Please check the server logs.");
             return;
           }
-
-          // If there's any stderr output
-          if (stderr) {
-            console.error(`pm2 restart stderr: ${stderr}`);
+          if (stopStderr) {
+            console.error(`pm2 stop stderr: ${stopStderr}`);
           }
 
-          // Send the success message after pm2 restart
-          console.log(`pm2 restart stdout: ${stdout}`);
-          bot.sendMessage(chatId, "Bot restarted successfully using pm2 (Qasim)!");
+          console.log(`pm2 stop stdout: ${stopStdout}`);
+
+          // Now, restart the bot with pm2
+          exec('pm2 start . --attach --name Qasim', { cwd: process.cwd() }, (startError, startStdout, startStderr) => {
+            if (startError) {
+              console.error(`Error executing pm2 start: ${startError}`);
+              bot.sendMessage(chatId, "Failed to start the bot with pm2. Please check the server logs.");
+              return;
+            }
+
+            if (startStderr) {
+              console.error(`pm2 start stderr: ${startStderr}`);
+            }
+
+            // Send the success message after pm2 restart
+            console.log(`pm2 start stdout: ${startStdout}`);
+            bot.sendMessage(chatId, "Bot restarted successfully using pm2 (Qasim)!");
+          });
         });
       } else {
         bot.sendMessage(chatId, "Invalid command. Please use 'restart' to restart the bot.");
