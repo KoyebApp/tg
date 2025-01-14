@@ -13,7 +13,12 @@ X-WA-BIZ-NAME:Qasim Ali
 END:VCARD`;
 
   // Send contact information with correct phone number format
-  await bot.sendContact(m.chat.id, [{ phone_number: "+923444844060", vcard: vcard }], {
+  await bot.sendContact(m.chat.id, [{
+    phone_number: "+923444844060",
+    first_name: "Qasim",
+    last_name: "Ali",
+    vcard: vcard
+  }], {
     caption: `Creator: Qasim Ali\nFor support, contact me at +923444844060.\nUse ${usedPrefix}help for more commands.`,
     reply_to_message_id: m.message_id, // reply to the user's message
   });
