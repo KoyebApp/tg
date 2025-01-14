@@ -16,7 +16,7 @@ const handler = async ({ bot, m, db, command, query }) => {
     };
 
     // Check if the query exists in the mapping
-    const apiUrl = queryMap[text.toLowerCase()];
+    const apiUrl = queryMap[query.toLowerCase()];
 
     if (!apiUrl) {
       return await bot.sendMessage(m.chat.id, "❌ Sorry, no images found for this query. Please try a different one.");
