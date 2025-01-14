@@ -9,11 +9,12 @@ let handler = async ({ m, bot, query }) => {
 
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
-      const sanitizedQuery = query.trim().toLowerCase();  // Normalize the query
+      // Normalize the query
+      const sanitizedQuery = (query && query.trim().toLowerCase()) || 'restart';  // Default to 'restart' if query is empty
       console.log(`Received query: "${sanitizedQuery}"`);  // Log query for debugging
 
       // Default action for restart
-      if (sanitizedQuery === '' || sanitizedQuery === 'restart') {
+      if (sanitizedQuery === 'restart') {
         // Execute pm2 stop for 'Qasim'
         exec('pm2 stop Qasim', { cwd: process.cwd() }, (stopError, stopStdout, stopStderr) => {
           if (stopError) {
