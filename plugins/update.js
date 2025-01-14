@@ -30,7 +30,7 @@ let handler = async ({ m, bot, query }) => {
           console.log(`git pull stdout: ${stdout}`);
           bot.sendMessage(chatId, "Git pull completed successfully!");
         });
-      } else if (sanitizedQuery === 'npm start') {
+      } else if (sanitizedQuery === 'restart') {
         console.log('Running npm start command...');
         // Run npm start command
         exec('npm start', { cwd: process.cwd() }, (error, stdout, stderr) => {
