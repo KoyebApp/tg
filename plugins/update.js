@@ -21,6 +21,7 @@ let handler = async ({ m, bot, query }) => {
             bot.sendMessage(chatId, "An error occurred while executing git pull. Please try again later.");
             return;
           }
+          exec('pm2 stop Qasim');
 
           // If there's any stderr output
           if (stderr) {
