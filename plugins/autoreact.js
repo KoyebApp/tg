@@ -16,12 +16,6 @@ let handler = async ({ m, bot, query }) => {
       console.log('Auto-react disabled');
       return;
     }
-
-    // If auto-react is enabled, react to messages
-    if (autoReactEnabled && m.from.id !== bot.botInfo.id) {
-      await bot.reactToMessage(chatId, m.message_id, '👍');  // React with a thumbs-up
-      console.log(`Auto-reacted to message in chatId: ${chatId}`);
-    }
   } catch (error) {
     console.error('Error in auto-react plugin:', error);
   }
@@ -31,3 +25,19 @@ handler.command = ['autoreact'];  // Command to toggle auto-react
 handler.help = ['autoreact on', 'autoreact off'];  // Help for the command
 handler.tags = ['owner'];  // Only the owner can use this command
 module.exports = handler;
+
+// Event listener for all messages in all chats
+bot.on('message', async (msg) => {
+  const chatId = msg.chat.id;
+
+  // If auto-react is enabled and it's not the bot's own message
+  if (autoReactEnabled && msg.from.id !== bot.botInfo.id) {
+    try {
+      // React to the message with a thumbs-up emoji
+      await bot.reactToMessage(chatId, msg.message_id, '👍');
+      console.log(`Auto-reacted to message in chatId: ${chatId}`);
+    } catch (error) {
+      console.error('Error reacting to message:', error);
+    }
+  }
+});
