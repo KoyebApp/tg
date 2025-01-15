@@ -1,4 +1,6 @@
 const { exec } = require('child_process');
+const path = require('path');  // Import 'path' module to handle file paths
+const fs = require('fs');  // Import 'fs' module to check file existence
 
 // Define the handler function that processes the update command
 let handler = async ({ m, bot, query }) => {
@@ -78,7 +80,8 @@ let handler = async ({ m, bot, query }) => {
 };
 
 // Define the necessary properties for the plugin
-  handler.help: ['update'],  // List of commands that trigger this plugin
-  handler.tags: ['owner'],   // Tags for categorization
-  handler.command: ['update'], // Command that this plugin responds to
-  module.exports = handler,
+handler.command = ['update'];  // Command list
+handler.help = ['update'];     // Help message list
+handler.tags = ['owner'];      // Tags for categorization
+
+module.exports = handler;
