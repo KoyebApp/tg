@@ -5,7 +5,7 @@ let handler = async ({ bot, m, query, command }) => {
   try {
     // Ensure query (URL) is provided
     if (!query || !query.trim().startsWith('https://mega.nz/')) {
-      return bot.sendMessage(m.chat.id, `❌ Please provide a valid MEGA URL. Example: /${command} https://mega.nz/file/yourFileLink`);
+      return bot.sendMessage(m.chat.id, `Please provide a valid MEGA URL. Example: /${command} https://mega.nz/file/yourFileLink`);
     }
 
     // Parse the file from the provided URL
@@ -14,7 +14,7 @@ let handler = async ({ bot, m, query, command }) => {
 
     // Check if file size exceeds the limit (300MB)
     if (file.size >= 300 * 1024 * 1024) {
-      return bot.sendMessage(m.chat.id, '❌ File size is too large (Maximum Size: 300MB).');
+      return bot.sendMessage(m.chat.id, 'File size is too large (Maximum Size: 300MB).');
     }
 
     // Notify the user that the file is being downloaded
@@ -22,7 +22,7 @@ let handler = async ({ bot, m, query, command }) => {
     await bot.sendMessage(m.chat.id, downloadingMessage);
 
     // Prepare caption and file info
-    const caption = `*Download Complete!*\nFile: ${file.name}\nSize: ${formatBytes(file.size)}`;
+    const caption = `Download Complete!\nFile: ${file.name}\nSize: ${formatBytes(file.size)}`;
 
     // Download the file as a buffer
     const data = await file.downloadBuffer();
