@@ -8,14 +8,11 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     }
 
     try {
-        // Log the query for debugging
-        console.log('Instagram Stalking Query:', query);
 
+          // Send "waiting" message to indicate the bot is processing
+    await bot.sendMessage(chatId, "⏳ Please wait, fetching the images...");
         // Call the Instagram profile stalking API with the username
         let res = await Qasim.igStalk(query);
-
-        // Log the response to see the data returned by the API
-        console.log('Instagram Stalking API Response:', res);
 
         let message = `
 ┌──「 *STALKING INSTAGRAM PROFILE* 
@@ -33,8 +30,6 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
         
         // Send the profile picture with details
         await bot.sendPhoto(chatId, profilePic, { caption: message });
-        await bot.sendMessage(chatId, '✅ Profile fetched successfully!');
-
     } catch (error) {
         console.error("Error:", error);
         await bot.sendMessage(chatId, `✳️ An error occurred while processing the request: ${error.message || error}`);
