@@ -21,25 +21,42 @@ let handler = async ({ m, bot, query }) => {
             bot.sendMessage(chatId, "An error occurred while executing git pull. Please try again later.");
             return;
           }
-          exec('pm2 stop Qasim');
 
-          // If there's any stderr output
-          if (stderr) {
-            console.error(`git pull stderr: ${stderr}`);
-          }
+          // Stop the PM2 process
+          exec('pm2 stop Qasim', (stopError, stopStdout, stopStderr) => {
+            if (stopError) {
+              console.error(`Error stopping pm2 process: ${stopError}`);
+              bot.sendMessage(chatId, "An error occurred while stopping the process. Please try again later.");
+              return;
+            }
 
-          // Split stdout into lines
-          const outputLines = stdout.split('\n');
+            // Restart the PM2 process
+            exec('npm start', (startError, startStdout, startStderr) => {
+              if (startError) {
+                console.error(`Error restarting pm2 process: ${startError}`);
+                bot.sendMessage(chatId, "An error occurred while restarting the process. Please try again later.");
+                return;
+              }
 
-          // Prepare the message to be sent (limit to 10 lines)
-          let message = outputLines.slice(0, 10).join('\n');
-          if (outputLines.length > 10) {
-            message += '\n... Read more';
-          }
+              // If there's any stderr output
+              if (stderr) {
+                console.error(`git pull stderr: ${stderr}`);
+              }
 
-          // Send the message back to the chat
-          console.log(`git pull stdout: ${stdout}`);
-          bot.sendMessage(chatId, message);
+              // Split stdout into lines
+              const outputLines = stdout.split('\n');
+
+              // Prepare the message to be sent (limit to 10 lines)
+              let message = outputLines.slice(0, 10).join('\n');
+              if (outputLines.length > 10) {
+                message += '\n... Read more';
+              }
+
+              // Send the message back to the chat
+              console.log(`git pull stdout: ${stdout}`);
+              bot.sendMessage(chatId, message);
+            });
+          });
         });
       } else {
         bot.sendMessage(chatId, "Invalid command. Please use 'update' for updates.");
