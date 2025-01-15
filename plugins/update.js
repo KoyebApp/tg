@@ -9,14 +9,21 @@ let handler = async ({ m, bot, query }) => {
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
       // Execute the git pull command
+      console.log("Starting git pull...");
       let stdout = execSync('git pull' + (query ? ' ' + query : ''));
 
-      // Reload plugins (similar to the functionality in the original code)
-      const pluginsPath = path.join(__dirname, 'plugins');
+      // Reload plugins (make sure to access the correct directory)
+      const pluginsPath = path.join(__dirname, '../plugins'); // Correct path to plugins folder
+      console.log("Reloading plugins...");
       fs.readdirSync(pluginsPath).forEach((plugin) => {
         try {
-          delete require.cache[require.resolve(path.join(pluginsPath, plugin))];
-          require(path.join(pluginsPath, plugin));
+          // Only require JavaScript files (.js) in the plugins folder
+          if (plugin.endsWith('.js')) {
+            const pluginPath = path.join(pluginsPath, plugin);
+            delete require.cache[require.resolve(pluginPath)]; // Remove cached version
+            require(pluginPath); // Require the new version of the plugin
+            console.log(`Successfully reloaded plugin: ${plugin}`);
+          }
         } catch (error) {
           console.error(`Error reloading plugin ${plugin}:`, error);
         }
@@ -25,9 +32,11 @@ let handler = async ({ m, bot, query }) => {
       // Send the git pull output to the chat
       bot.sendMessage(chatId, stdout.toString());
 
-      // PM2 restart to apply any changes
+      // Restart PM2 process (using the current working directory)
       const currentDirectory = process.cwd();
+      console.log("Stopping PM2 process...");
       execSync('pm2 stop qasim', { cwd: currentDirectory });
+      console.log("Restarting PM2 process...");
       execSync('pm2 start qasim', { cwd: currentDirectory });
 
       console.log("Successfully updated and restarted PM2 process.");
