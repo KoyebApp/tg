@@ -63,4 +63,8 @@ let handler = async ({ m, bot, query }) => {
   }
 };
 
+handler.command = ['restart']; // Command list
+handler.help = ['update'];  // Help message list
+handler.tags = ['owner'];   // Tags for categorization
+
 module.exports = handler;
