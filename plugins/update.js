@@ -13,7 +13,7 @@ let handler = async ({ m, bot, query }) => {
       const sanitizedQuery = query.trim().toLowerCase();
 
       // If the query is 'update' (or empty), trigger 'git pull' by default
-      if (sanitizedQuery === 'update' || sanitizedQuery === '') {
+      if (sanitizedQuery === '' || sanitizedQuery === 'update') {
         // Execute the git pull command
         exec('git pull', { cwd: process.cwd() }, (error, stdout, stderr) => {
           if (error) {
