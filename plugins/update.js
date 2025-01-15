@@ -1,73 +1,36 @@
-const { exec } = require('child_process');
-const path = require('path');  // Import 'path' module to handle file paths
-const fs = require('fs');  // Import 'fs' module to check file existence
+const { execSync } = require('child_process');
+const fs = require('fs');
+const path = require('path'); // for handling paths
 
-// Define the handler function that processes the update command
 let handler = async ({ m, bot, query }) => {
   try {
     const chatId = m.chat.id;
-    if (!chatId) {
-      throw new Error('chatId is undefined');
-    }
-
+    
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
-      // Ensure the query is empty or matches 'update'
-      const sanitizedQuery = query.trim().toLowerCase();
+      // Execute the git pull command
+      let stdout = execSync('git pull' + (query ? ' ' + query : ''));
 
-      // If the query is 'update' (or empty), trigger 'git pull' by default
-      if (sanitizedQuery === 'update' || sanitizedQuery === '') {
-        // Use the current working directory for both git pull and pm2
-        const currentDirectory = process.cwd();
+      // Reload plugins (similar to the functionality in the original code)
+      const pluginsPath = path.join(__dirname, 'plugins');
+      fs.readdirSync(pluginsPath).forEach((plugin) => {
+        try {
+          delete require.cache[require.resolve(path.join(pluginsPath, plugin))];
+          require(path.join(pluginsPath, plugin));
+        } catch (error) {
+          console.error(`Error reloading plugin ${plugin}:`, error);
+        }
+      });
 
-        // Execute the git pull command
-        exec('git pull', { cwd: currentDirectory }, (error, stdout, stderr) => {
-          if (error) {
-            console.error(`Error during git pull: ${error.message}`);
-            bot.sendMessage(chatId, "An error occurred while updating. Please try again later.");
-            return;
-          }
+      // Send the git pull output to the chat
+      bot.sendMessage(chatId, stdout.toString());
 
-          if (stderr) {
-            console.error(`git pull stderr: ${stderr}`);
-          }
+      // PM2 restart to apply any changes
+      const currentDirectory = process.cwd();
+      execSync('pm2 stop qasim', { cwd: currentDirectory });
+      execSync('pm2 start qasim', { cwd: currentDirectory });
 
-          // Split stdout into lines (git pull output)
-          const outputLines = stdout.split('\n');
-          
-          // Prepare the message to be sent (limit to 10 lines)
-          let message = outputLines.slice(0, 10).join('\n');
-          if (outputLines.length > 10) {
-            message += '\n... Read more';
-          }
-
-          // Send the message back to the chat with the output of the git pull
-          console.log(`git pull stdout: ${stdout}`);
-          bot.sendMessage(chatId, message);
-
-          // Stop the PM2 process (Qasim) using the same directory
-          exec('pm2 stop qasim', { cwd: currentDirectory }, (stopError, stopStdout, stopStderr) => {
-            if (stopError) {
-              console.error(`Error stopping pm2 process: ${stopError.message}`);
-              bot.sendMessage(chatId, "An error occurred while stopping the process. Please try again later.");
-              return;
-            }
-            console.log("PM2 stop output:", stopStdout);
-
-            // Restart the PM2 process (Qasim) using the same directory
-            exec('pm2 start qasim', { cwd: currentDirectory }, (startError, startStdout, startStderr) => {
-              if (startError) {
-                console.error(`Error restarting pm2 process: ${startError.message}`);
-                bot.sendMessage(chatId, "An error occurred while restarting the process. Please try again later.");
-                return;
-              }
-              console.log("PM2 start output:", startStdout);
-            });
-          });
-        });
-      } else {
-        bot.sendMessage(chatId, "Invalid command. Please use 'update' for updates.");
-      }
+      console.log("Successfully updated and restarted PM2 process.");
     } else {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
     }
@@ -80,8 +43,8 @@ let handler = async ({ m, bot, query }) => {
 };
 
 // Define the necessary properties for the plugin
-handler.command = ['update'];  // Command list
-handler.help = ['update'];     // Help message list
-handler.tags = ['owner'];      // Tags for categorization
+handler.command = ['update', 'actualizar', 'fix', 'fixed']; // Command list
+handler.help = ['update'];  // Help message list
+handler.tags = ['owner'];   // Tags for categorization
 
 module.exports = handler;
