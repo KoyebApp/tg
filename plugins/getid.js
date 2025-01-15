@@ -1,12 +1,21 @@
 let handler = async ({ m, bot }) => {
   try {
     const chatId = m.chat.id;
+    const chatType = m.chat.type; // Get the type of chat
 
-    // Ensure the bot is in a group chat
-    if (m.chat.type !== 'private') {
-      bot.sendMessage(m.chat.id, `The chat ID of this group is: ${chatId}`);
+    // Log chat type to see what it is
+    console.log('Chat Type:', chatType);
+    console.log('Chat ID:', chatId);
+
+    if (chatType === 'private') {
+      // If the message is from a private chat
+      bot.sendMessage(m.chat.id, `Your private chat ID is: ${chatId}`);
+    } else if (chatType === 'group' || chatType === 'supergroup') {
+      // If the message is from a group chat
+      bot.sendMessage(m.chat.id, `This group chat ID is: ${chatId}`);
     } else {
-      bot.sendMessage(m.chat.id, `The chat ID of your private chat is: ${chatId}`);
+      // In case it's a different type of chat (e.g., channel, bot)
+      bot.sendMessage(m.chat.id, `Chat ID: ${chatId}`);
     }
   } catch (error) {
     console.error('Error occurred while fetching chatId:', error);
@@ -16,8 +25,8 @@ let handler = async ({ m, bot }) => {
   }
 };
 
-handler.command = ['/getchatid']; // Add the command for fetch chat ID
+handler.command = ['/getchatid']; // Command to trigger chat ID fetch
 handler.help = ['/getchatid'];  // Help for the command
-handler.tags = ['utility'];  // Tags for easy categorization
+handler.tags = ['utility'];  // Tag for categorization
 
 module.exports = handler;
