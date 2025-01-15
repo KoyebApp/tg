@@ -188,6 +188,23 @@ bot.on('message', (msg) => {
   }
 });
 
+// Handle all other events
+const eventTypes = [
+  'message', 'text', 'audio', 'document', 'photo', 'sticker', 'video', 'voice', 'contact', 'location', 'new_chat_members', 'left_chat_member', 'new_chat_title',
+  'new_chat_photo', 'delete_chat_photo', 'group_chat_created', 'game', 'pinned_message', 'poll', 'dice', 'migrate_from_chat_id', 'migrate_to_chat_id', 'channel_chat_created',
+  'supergroup_chat_created', 'successful_payment', 'invoice', 'video_note', 'new_chat_participant', 'left_chat_participant',
+  'callback_query', 'inline_query', 'chosen_inline_result', 'channel_post', 'edited_message', 'edited_channel_post',
+  'shipping_query', 'pre_checkout_query', 'poll_answer', 'chat_member', 'my_chat_member', 'chat_join_request', 'polling_error', 'webhook_error', 'error'
+];
+
+// Add listeners for all events
+eventTypes.forEach((event) => {
+  bot.on(event, (data) => {
+    console.log(chalk.green(`Received ${event}:`), data);
+    // Handle event-specific logic here (optional)
+  });
+});
+
 // Main callback query handler
 bot.on('callback_query', async (callbackQuery) => {
   const chatId = callbackQuery.message.chat.id;
