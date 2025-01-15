@@ -9,7 +9,7 @@ let handler = async ({ m, bot, query }) => {
 
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
-      // Ensure the query is empty or matches 'update'
+      // Sanitize and trim the query (ensure it's in lowercase)
       const sanitizedQuery = query.trim().toLowerCase();
 
       // If the query is 'update' (or empty), trigger 'git pull' by default
@@ -22,7 +22,7 @@ let handler = async ({ m, bot, query }) => {
             return;
           }
 
-          // Stop the PM2 process
+          // Stop the PM2 process (Qasim)
           exec('pm2 stop Qasim', (stopError, stopStdout, stopStderr) => {
             if (stopError) {
               console.error(`Error stopping pm2 process: ${stopError}`);
@@ -30,20 +30,20 @@ let handler = async ({ m, bot, query }) => {
               return;
             }
 
-            // Restart the PM2 process
-            exec('npm start', (startError, startStdout, startStderr) => {
+            // Restart the PM2 process (Qasim)
+            exec('pm2 start Qasim', (startError, startStdout, startStderr) => {
               if (startError) {
                 console.error(`Error restarting pm2 process: ${startError}`);
                 bot.sendMessage(chatId, "An error occurred while restarting the process. Please try again later.");
                 return;
               }
 
-              // If there's any stderr output
+              // If there's any stderr output from git pull
               if (stderr) {
                 console.error(`git pull stderr: ${stderr}`);
               }
 
-              // Split stdout into lines
+              // Split stdout into lines (git pull output)
               const outputLines = stdout.split('\n');
 
               // Prepare the message to be sent (limit to 10 lines)
