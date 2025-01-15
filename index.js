@@ -91,6 +91,7 @@ initDatabase().then(database => {
 });
 
 // Dynamically import all plugins from the plugins folder using require
+// Load plugins and pass the bot object to them
 const loadPlugins = () => {
   const pluginFiles = fs.readdirSync(pluginsPath);
   const handlers = {};
@@ -105,6 +106,14 @@ const loadPlugins = () => {
       try {
         const pluginHandler = require(pluginPath);
         
+        // Pass bot to the plugin handler
+        if (pluginHandler(bot)) {
+          console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
+        } else {
+          console.warn(chalk.yellow(`No handler found in plugin '${pluginName}'`));
+        }
+        
+        // Check if plugin has callback query data handling
         if (pluginHandler.command) {
           pluginHandler.command.forEach(command => {
             handlers[command.toLowerCase()] = pluginHandler;
@@ -118,7 +127,6 @@ const loadPlugins = () => {
           });
         }
 
-        console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
       } catch (error) {
         const err = syntaxerror(fs.readFileSync(pluginPath, 'utf-8'), file);
         if (err) {
@@ -134,6 +142,7 @@ const loadPlugins = () => {
 
   return handlers;
 };
+
 
 // Load all plugin handlers
 const plugins = loadPlugins();
