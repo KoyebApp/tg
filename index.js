@@ -91,7 +91,6 @@ initDatabase().then(database => {
 });
 
 // Dynamically import all plugins from the plugins folder using require
-// Load plugins and pass the bot object to them
 const loadPlugins = () => {
   const pluginFiles = fs.readdirSync(pluginsPath);
   const handlers = {};
@@ -106,14 +105,6 @@ const loadPlugins = () => {
       try {
         const pluginHandler = require(pluginPath);
         
-        // Pass bot to the plugin handler
-        if (pluginHandler(bot)) {
-          console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
-        } else {
-          console.warn(chalk.yellow(`No handler found in plugin '${pluginName}'`));
-        }
-        
-        // Check if plugin has callback query data handling
         if (pluginHandler.command) {
           pluginHandler.command.forEach(command => {
             handlers[command.toLowerCase()] = pluginHandler;
@@ -127,6 +118,7 @@ const loadPlugins = () => {
           });
         }
 
+        console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
       } catch (error) {
         const err = syntaxerror(fs.readFileSync(pluginPath, 'utf-8'), file);
         if (err) {
@@ -143,7 +135,6 @@ const loadPlugins = () => {
   return handlers;
 };
 
-
 // Load all plugin handlers
 const plugins = loadPlugins();
 
@@ -158,10 +149,6 @@ bot.on('message', (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text.trim();
   const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));
-
-  // Log the chat object to ensure we are detecting the correct chat type
-  console.log("Message received:", msg);
-  console.log(`Chat type: ${msg.chat.type}, Chat ID: ${chatId}`);
 
   if (usedPrefix) {
     const commandWithQuery = text.substring(usedPrefix.length).trim();
@@ -199,23 +186,6 @@ bot.on('message', (msg) => {
       console.error(chalk.red(`Unknown command: ${normalizedCommand} from chatId: ${chatId}`));
     }
   }
-});
-
-// Handle all other events
-const eventTypes = [
-  'message', 'text', 'audio', 'document', 'photo', 'sticker', 'video', 'voice', 'contact', 'location', 'new_chat_members', 'left_chat_member', 'new_chat_title',
-  'new_chat_photo', 'delete_chat_photo', 'group_chat_created', 'game', 'pinned_message', 'poll', 'dice', 'migrate_from_chat_id', 'migrate_to_chat_id', 'channel_chat_created',
-  'supergroup_chat_created', 'successful_payment', 'invoice', 'video_note', 'new_chat_participant', 'left_chat_participant',
-  'callback_query', 'inline_query', 'chosen_inline_result', 'channel_post', 'edited_message', 'edited_channel_post',
-  'shipping_query', 'pre_checkout_query', 'poll_answer', 'chat_member', 'my_chat_member', 'chat_join_request', 'polling_error', 'webhook_error', 'error'
-];
-
-// Add listeners for all events
-eventTypes.forEach((event) => {
-  bot.on(event, (data) => {
-    console.log(chalk.green(`Received ${event}:`), data);
-    // Handle event-specific logic here (optional)
-  });
 });
 
 // Main callback query handler
