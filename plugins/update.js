@@ -51,7 +51,7 @@ let handler = async ({ m, bot, query }) => {
             console.error("PM2 stop error:", stopStderr);
 
             // Restart the PM2 process (Qasim)
-            exec('pm2 start index.js --deep-monitoring --attach --name qasim', (startError, startStdout, startStderr) => {
+            exec('npm start', (startError, startStdout, startStderr) => {
               console.log("Restarting PM2 process...");
               if (startError) {
                 console.error(`Error restarting pm2 process: ${startError}`);
