@@ -1,6 +1,4 @@
-const { execSync } = require('child_process');
-const fs = require('fs');
-const path = require('path'); // for handling paths
+const { execSync, exec } = require('child_process');
 
 let handler = async ({ m, bot, query }) => {
   try {
@@ -9,19 +7,6 @@ let handler = async ({ m, bot, query }) => {
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
       console.log("Starting git pull...");
-
-      // Only proceed if there's no ongoing git pull
-      let gitPullInProgress = false;
-      
-      // Check if git pull is running (for example, checking for a lock file or process flag)
-      const lockFilePath = path.join(__dirname, 'git_pull.lock');
-      if (fs.existsSync(lockFilePath)) {
-        await bot.sendMessage(chatId, "Git pull is already in progress. Please wait.");
-        return;
-      }
-      
-      // Create a lock file to prevent concurrent git pulls
-      fs.writeFileSync(lockFilePath, 'locked'); // Creating a lock file
 
       // Execute the git pull command and capture any output or errors
       let stdout;
@@ -38,19 +23,24 @@ let handler = async ({ m, bot, query }) => {
       const message = stdout || stderr;
       await bot.sendMessage(chatId, message);
 
-      // Always restart PM2 process after git pull, regardless of success or failure
-      console.log("Restarting PM2 process...");
-      const currentDirectory = process.cwd();
-      try {
-        execSync('pm2 restart qasim', { cwd: currentDirectory });
-        console.log("Successfully restarted PM2 process.");
-      } catch (pm2Error) {
-        console.error("Error restarting PM2:", pm2Error);
-        await bot.sendMessage(chatId, "An error occurred while restarting PM2.");
-      }
+      // Restart the bot after git pull
+      console.log("Stopping and restarting the bot...");
 
-      // Remove the lock file to allow future git pulls
-      fs.unlinkSync(lockFilePath);
+      // Exit the current process
+      process.exit(); // This stops the bot process
+
+      // Spawning a new process to restart the bot
+      exec('node index.js', (err, stdout, stderr) => {
+        if (err) {
+          console.error('Error restarting the bot:', err);
+          return;
+        }
+        if (stderr) {
+          console.error('stderr:', stderr);
+        }
+        console.log('Bot restarted successfully');
+      });
+
     } else {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
     }
