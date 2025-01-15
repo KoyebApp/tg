@@ -1,14 +1,18 @@
 let handler = async ({ m, bot, query }) => {
   try {
     const chatId = m.chat.id;
-    const messageFrom = m.from.id;  // User ID who sent the message
+    const userId = m.from.id;  // User ID who sent the message
 
     if (m.chat.type === 'private') {
-      // This is a private chat with the bot, so it's the user's chat ID
-      bot.sendMessage(chatId, `Your chat ID is: ${messageFrom}`);
+      // This is a private chat, showing user's chat ID
+      bot.sendMessage(chatId, `Your chat ID is: ${userId}`);
     } else if (m.chat.type === 'group' || m.chat.type === 'supergroup') {
-      // This is a group chat, so it's the group's chat ID
+      // This is a group chat, showing group's chat ID
       bot.sendMessage(chatId, `The chat ID for this group is: ${chatId}`);
+      
+      // If you want the bot's ID (bot's user ID), it can be fetched like so:
+      const botInfo = await bot.getMe();  // Get the bot's info
+      bot.sendMessage(chatId, `The bot's ID (username): @${botInfo.username}, bot chat ID: ${botInfo.id}`);
     } else {
       bot.sendMessage(chatId, 'This command only works in group or private chats.');
     }
