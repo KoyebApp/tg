@@ -1,33 +1,23 @@
-let handler = async ({ m, bot, query }) => {
+let handler = async ({ m, bot }) => {
   try {
     const chatId = m.chat.id;
-    const userId = m.from.id;  // The user who sent the message
-    const chatType = m.chat.type;  // To check if it is a group or private chat
 
-    // Check if it's a private chat
-    if (chatType === 'private') {
-      bot.sendMessage(chatId, `Your chat ID is: ${userId}`);
-    }
-    // Check if it's a group or supergroup
-    else if (chatType === 'group' || chatType === 'supergroup') {
-      bot.sendMessage(chatId, `This group's chat ID is: ${chatId}`);
-      
-      // To fetch the bot's ID (bot's user ID) and other details
-      const botInfo = await bot.getMe();
-      bot.sendMessage(chatId, `The bot's ID (username): @${botInfo.username}, bot user ID: ${botInfo.id}`);
-    }
-    // For other chat types like channels (it could also show an error)
-    else {
-      bot.sendMessage(chatId, 'This command only works in private or group chats.');
+    // Ensure the bot is in a group chat
+    if (m.chat.type !== 'private') {
+      bot.sendMessage(m.chat.id, `The chat ID of this group is: ${chatId}`);
+    } else {
+      bot.sendMessage(m.chat.id, `The chat ID of your private chat is: ${chatId}`);
     }
   } catch (error) {
-    console.error('Error fetching chatId:', error);
-    bot.sendMessage(m.chat.id, 'An error occurred while fetching the chat ID.');
+    console.error('Error occurred while fetching chatId:', error);
+    if (m.chat && m.chat.id) {
+      await bot.sendMessage(m.chat.id, "An error occurred while fetching the chat ID.");
+    }
   }
 };
 
-handler.command = ['getchatid'];  // Command to get the chat ID
-handler.help = ['getchatid'];  // Help for the command
-handler.tags = ['info'];  // Tags for categorization
+handler.command = ['/getchatid']; // Add the command for fetch chat ID
+handler.help = ['/getchatid'];  // Help for the command
+handler.tags = ['utility'];  // Tags for easy categorization
 
 module.exports = handler;
