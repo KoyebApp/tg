@@ -30,7 +30,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
 
       // Ensure that the image URL is valid
       if (imageUrl && imageUrl.startsWith('http')) {
-        await bot.sendPhoto(chatId, imageUrl, { caption: `Image ${i + 1} for query *${query}*` });
+        await bot.sendPhoto(chatId, imageUrl, { caption: `Image ${i + 1} for query ${query}` });
       } else {
         console.warn(`Skipping invalid URL: ${imageUrl}`);
       }
