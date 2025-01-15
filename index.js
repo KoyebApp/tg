@@ -131,6 +131,7 @@ const loadPlugins = () => {
   return handlers;
 };
 
+
 // Load all plugin handlers
 const plugins = loadPlugins();
 
@@ -168,25 +169,9 @@ bot.on('message', (msg) => {
         query, 
         usedPrefix, 
         command: normalizedCommand,
-        db
+        db,
+        args: queryArr  // Add args as the array of query parts
       };
-
-      // Add specific fields to context based on the command
-      if (normalizedCommand === 'gitclone') {
-        const url = queryArr[0]; // assuming URL is the first word in the query
-        if (url) {
-          context.url = url;
-        }
-      }
-
-      if (normalizedCommand === 'update') {
-        context.username = msg.from.username;
-      }
-
-      if (normalizedCommand === 'info') {
-        context.username = msg.from.username;
-        context.chatId = chatId;
-      }
 
       // Execute the plugin handler
       try {
@@ -202,12 +187,4 @@ bot.on('message', (msg) => {
       console.error(chalk.red(`Unknown command: ${normalizedCommand} from chatId: ${chatId}`));
     }
   }
-});
-
-// Listen to callback queries (inline button callback)
-bot.on('callback_query', (callbackQuery) => {
-  const message = callbackQuery.message;
-  const chatId = message.chat.id;
-
-  // Handle callback query here if needed (show image, etc.)
 });
