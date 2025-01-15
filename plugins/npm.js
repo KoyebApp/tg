@@ -21,20 +21,19 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
 
         // Formatting the message with relevant information
         let message = `
-┌──「 *STALKING NPM* 
-▢ *🔖Name:* ${name} 
-▢ *🔖Creator:* ${author?.name || 'Unknown'}
-▢ *👥Total Versions:* ${versionCount}
-▢ *📌Description:* ${description}
-▢ *🧩Repository:* ${repository?.url || 'No repository available'}
-▢ *🌍Homepage:* ${homepage || 'No homepage available'}
-▢ *🏷️Dist Tags:* Latest Version: ${distTags.latest}
-▢ *🔗Link:* [NPM Package](https://npmjs.com/package/${name})
+┌──「 STALKING NPM 
+▢ 🔖Name: ${name} 
+▢ 🔖Creator: ${author?.name || 'Unknown'}
+▢ 👥Total Versions: ${versionCount}
+▢ 📌Description: ${description}
+▢ 🧩Repository: ${repository?.url || 'No repository available'}
+▢ 🌍Homepage: ${homepage || 'No homepage available'}
+▢ 🏷️Dist Tags: Latest Version: ${distTags.latest}
+▢ 🔗Link: [NPM Package](https://npmjs.com/package/${name})
 └────────────`;
 
         // Send the text message to the chat
         await bot.sendMessage(chatId, message);
-        await bot.sendMessage(chatId, '✅ Package details fetched successfully!');
 
     } catch (error) {
         console.error("Error:", error);
