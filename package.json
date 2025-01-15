@@ -12,11 +12,9 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "run": "pm2 start . --deep-monitoring --attach --name Qasim",
-    "qasim": "pm2 start . --deep-monitoring --attach --name Qasim",
-    "start": "pm2 start . --attach --name Qasim",
-    "restart": "pm2 restart Qasim",
-    "stop": "pm2 stop Qasim"
+    "start": "pm2 start index.js --attach --name qasim",
+    "restart": "pm2 restart qasim",
+    "stop": "pm2 stop qasim"
   },
   "keywords": [
     "telegram",
