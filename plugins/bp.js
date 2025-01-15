@@ -40,4 +40,8 @@ const handler = async ({ bot, m, text, db, usedPrefix, command }) => {
   }
 };
 
+handler.command = ['bp', 'blackpink'];  // Command list
+handler.help = ['bp', 'blackpink'];
+handler.tags = ['image'];
+
 module.exports = handler;
