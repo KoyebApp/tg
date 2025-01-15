@@ -1,5 +1,6 @@
 const { exec } = require('child_process');
 
+// Define the handler function that processes the update command
 let handler = async ({ m, bot, query }) => {
   try {
     const chatId = m.chat.id;
@@ -14,9 +15,17 @@ let handler = async ({ m, bot, query }) => {
 
       // If the query is 'update' (or empty), trigger 'git pull' by default
       if (sanitizedQuery === 'update' || sanitizedQuery === '') {
+        // Use the current working directory for both git pull and pm2
+        const currentDirectory = process.cwd();
+
         // Execute the git pull command
-        exec('git pull', { cwd: process.cwd() }, (error, stdout, stderr) => {
-          // If there's any stderr output from git pull, log it
+        exec('git pull', { cwd: currentDirectory }, (error, stdout, stderr) => {
+          if (error) {
+            console.error(`Error during git pull: ${error.message}`);
+            bot.sendMessage(chatId, "An error occurred while updating. Please try again later.");
+            return;
+          }
+
           if (stderr) {
             console.error(`git pull stderr: ${stderr}`);
           }
@@ -34,30 +43,23 @@ let handler = async ({ m, bot, query }) => {
           console.log(`git pull stdout: ${stdout}`);
           bot.sendMessage(chatId, message);
 
-          // Use the full path to pm2 (adjust the path according to your system)
-          const pm2Path = '/usr/bin/pm2'; // Adjust to the correct path for pm2 in your system
-
-          // Stop the PM2 process (Qasim)
-          exec(`${pm2Path} stop qasim`, (stopError, stopStdout, stopStderr) => {
-            console.log("Stopping PM2 process...");
+          // Stop the PM2 process (Qasim) using the same directory
+          exec('pm2 stop qasim', { cwd: currentDirectory }, (stopError, stopStdout, stopStderr) => {
             if (stopError) {
-              console.error(`Error stopping pm2 process: ${stopError}`);
+              console.error(`Error stopping pm2 process: ${stopError.message}`);
               bot.sendMessage(chatId, "An error occurred while stopping the process. Please try again later.");
               return;
             }
             console.log("PM2 stop output:", stopStdout);
-            console.error("PM2 stop error:", stopStderr);
 
-            // Restart the PM2 process (Qasim)
-            exec(`${pm2Path} start qasim`, (startError, startStdout, startStderr) => {
-              console.log("Restarting PM2 process...");
+            // Restart the PM2 process (Qasim) using the same directory
+            exec('pm2 start qasim', { cwd: currentDirectory }, (startError, startStdout, startStderr) => {
               if (startError) {
-                console.error(`Error restarting pm2 process: ${startError}`);
+                console.error(`Error restarting pm2 process: ${startError.message}`);
                 bot.sendMessage(chatId, "An error occurred while restarting the process. Please try again later.");
                 return;
               }
               console.log("PM2 start output:", startStdout);
-              console.error("PM2 start error:", startStderr);
             });
           });
         });
@@ -75,4 +77,8 @@ let handler = async ({ m, bot, query }) => {
   }
 };
 
-module.exports = handler;
+// Define the necessary properties for the plugin
+  handler.help: ['update'],  // List of commands that trigger this plugin
+  handler.tags: ['owner'],   // Tags for categorization
+  handler.command: ['update'], // Command that this plugin responds to
+  module.exports = handler,
