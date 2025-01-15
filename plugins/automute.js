@@ -1,4 +1,6 @@
-let autoMuteEnabled = false; // Variable to track if auto-mute is enabled
+const muteThreshold = process.env.MUTE_THRESHOLD ? parseInt(process.env.MUTE_THRESHOLD) : 20;  // Default to 5 if not set in .env file
+
+let autoMuteEnabled = false;  // Variable to track if auto-mute is enabled
 
 let handler = async ({ m, bot, query, db }) => {
   try {
@@ -30,15 +32,15 @@ let handler = async ({ m, bot, query, db }) => {
 
     // Reset the message count if more than 30 seconds have passed
     if (Date.now() - user.lastMessageTime > 30000) {
-      user.count = 0;
+      user.count = 0;  // Reset count if no messages within the last 30 seconds
     }
 
     // Increment the message count
     user.count++;
-    user.lastMessageTime = Date.now();
+    user.lastMessageTime = Date.now();  // Update the last message timestamp
 
-    // If auto-mute is enabled and user sends more than 5 messages, mute them
-    if (autoMuteEnabled && user.count > 5) {
+    // If auto-mute is enabled and user sends more than the defined threshold, mute them
+    if (autoMuteEnabled && user.count > muteThreshold) {
       await bot.restrictChatMember(chatId, userId, { can_send_messages: false });
       await bot.sendMessage(chatId, `User ${userId} has been muted for spamming.`);
       console.log(`User ${userId} muted for sending too many messages.`);
