@@ -20,12 +20,12 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
 
     // Prepare the bot menu message
     let menuText = `
-    *Bot Menu*:
+    ALL MENU:
 
-    📖 *Quote For You*: 
+    📖 Quote For You: 
     "${randomQuote}"
 
-    🔧 *Commands*:
+    🔧 Commands:
     - ${usedPrefix}start: Start the bot
     - ${usedPrefix}help: List available commands
     - ${usedPrefix}info: Information about the bot
