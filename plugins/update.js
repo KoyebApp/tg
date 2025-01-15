@@ -8,9 +8,21 @@ let handler = async ({ m, bot, query }) => {
     
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
-      // Execute the git pull command
       console.log("Starting git pull...");
-      let stdout = execSync('git pull' + (query ? ' ' + query : ''));
+      
+      // Execute the git pull command and capture any output or errors
+      let stdout;
+      let stderr;
+      try {
+        stdout = execSync('git pull' + (query ? ' ' + query : ''));
+      } catch (error) {
+        stderr = error.stderr.toString(); // Capture the stderr if there's an error
+        console.error('Error during git pull:', stderr);
+        stdout = error.stdout.toString(); // Capture the stdout in case of an error
+      }
+      
+      // Send the git pull output to the chat
+      bot.sendMessage(chatId, stdout || stderr);
 
       // Reload plugins (make sure to access the correct directory)
       const pluginsPath = path.join(__dirname, '../plugins'); // Correct path to plugins folder
@@ -29,17 +41,12 @@ let handler = async ({ m, bot, query }) => {
         }
       });
 
-      // Send the git pull output to the chat
-      bot.sendMessage(chatId, stdout.toString());
-
-      // Restart PM2 process (using the current working directory)
+      // Always restart PM2 process after git pull, regardless of success or failure
       const currentDirectory = process.cwd();
-      console.log("Stopping PM2 process...");
-      execSync('pm2 stop qasim', { cwd: currentDirectory });
       console.log("Restarting PM2 process...");
-      execSync('pm2 start qasim', { cwd: currentDirectory });
+      execSync('pm2 restart qasim', { cwd: currentDirectory });
 
-      console.log("Successfully updated and restarted PM2 process.");
+      console.log("Successfully restarted PM2 process.");
     } else {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
     }
