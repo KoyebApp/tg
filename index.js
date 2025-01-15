@@ -150,6 +150,10 @@ bot.on('message', (msg) => {
   const text = msg.text.trim();
   const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));
 
+  // Log the chat object to ensure we are detecting the correct chat type
+  console.log("Message received:", msg);
+  console.log(`Chat type: ${msg.chat.type}, Chat ID: ${chatId}`);
+
   if (usedPrefix) {
     const commandWithQuery = text.substring(usedPrefix.length).trim();
     const [command, ...queryArr] = commandWithQuery.split(' ');
