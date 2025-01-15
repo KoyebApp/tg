@@ -76,7 +76,7 @@ let handler = async ({ m, bot, query }) => {
   }
 };
 
-handler.command = ['statussend];  // Commands to set status and manage periodic sending
+handler.command = ['statussend'];  // Commands to set status and manage periodic sending
 handler.help = ['statussend', 'start', 'stop'];  // Help for the commands
 handler.tags = ['owner'];  // Only the owner can use this command
 module.exports = handler;
