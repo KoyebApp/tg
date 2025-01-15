@@ -2,7 +2,7 @@ const fetch = require('node-fetch');
 
 const regex = /(?:https|git)(?::\/\/|@)github\.com[\/:]([^\/:]+)\/(.+)/i;
 
-let handler = async (m, { bot, args, usedPrefix, command }) => {
+let handler = async ({ m, bot, args, usedPrefix, command }) => {
   if (!args[0]) {
     await bot.sendMessage(m.chat.id, `⚠️ Where is the GitHub link?\n\n📌 Example: ${usedPrefix + command} https://github.com/GlobalTechInfo/MEGA-AI`);
     return;
