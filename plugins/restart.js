@@ -21,6 +21,19 @@ let handler = async ({ m, bot, query }) => {
         // Exit the process to trigger a restart
         console.log('Bot restart initiated...');
         process.exit();  // This will stop the bot process, which will trigger a restart if handled by a wrapper or external script
+
+        // After exiting, spawn a new bot process (make sure to replace 'node bot.js' with your start command)
+        exec('node index.js', (err, stdout, stderr) => {
+          if (err) {
+            console.error('Error restarting bot:', err);
+            return;
+          }
+          if (stderr) {
+            console.error('stderr:', stderr);
+            return;
+          }
+          console.log('Bot restarted successfully');
+        });
       } else {
         bot.sendMessage(chatId, "Invalid command. Please use 'restart' to restart the bot.");
       }
