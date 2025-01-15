@@ -1,4 +1,4 @@
-const { exec } = require('child_process');
+/*const { exec } = require('child_process');
 
 let handler = async ({ m, bot, query }) => {
   try {
@@ -53,3 +53,4 @@ handler.help = ['update'];  // Help message list
 handler.tags = ['owner'];   // Tags for categorization
 
 module.exports = handler;
+*/
