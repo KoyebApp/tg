@@ -19,4 +19,8 @@ const handler = async ({ bot, m, db, text }) => {
   }
 };
 
+handler.help = ['alive', 'awake'];
+handler.tags = ['main'];
+handler.command = ['alive', 'awake'];
+
 module.exports = handler;
