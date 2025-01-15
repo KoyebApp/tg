@@ -9,7 +9,20 @@ let handler = async ({ m, bot, query }) => {
     // Ensure the command is executed by the owner
     if (chatId.toString() === process.env.OWNER_ID) {
       console.log("Starting git pull...");
+
+      // Only proceed if there's no ongoing git pull
+      let gitPullInProgress = false;
       
+      // Check if git pull is running (for example, checking for a lock file or process flag)
+      const lockFilePath = path.join(__dirname, 'git_pull.lock');
+      if (fs.existsSync(lockFilePath)) {
+        await bot.sendMessage(chatId, "Git pull is already in progress. Please wait.");
+        return;
+      }
+      
+      // Create a lock file to prevent concurrent git pulls
+      fs.writeFileSync(lockFilePath, 'locked'); // Creating a lock file
+
       // Execute the git pull command and capture any output or errors
       let stdout;
       let stderr;
@@ -25,7 +38,7 @@ let handler = async ({ m, bot, query }) => {
       const message = stdout || stderr;
       await bot.sendMessage(chatId, message);
 
-      // Only restart PM2 after the message is sent
+      // Always restart PM2 process after git pull, regardless of success or failure
       console.log("Restarting PM2 process...");
       const currentDirectory = process.cwd();
       try {
@@ -36,6 +49,8 @@ let handler = async ({ m, bot, query }) => {
         await bot.sendMessage(chatId, "An error occurred while restarting PM2.");
       }
 
+      // Remove the lock file to allow future git pulls
+      fs.unlinkSync(lockFilePath);
     } else {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
     }
