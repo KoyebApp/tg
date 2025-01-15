@@ -38,9 +38,7 @@ const dbConfig = {
 const ensureLowDbExists = async () => {
   const dbFilePath = path.join(__dirname, 'database.json');
 
-  // Check if the database.json file exists
   if (!fs.existsSync(dbFilePath)) {
-    // If not, create it with default structure
     const defaultData = { data: [] };
     fs.writeFileSync(dbFilePath, JSON.stringify(defaultData, null, 2));
     console.log(chalk.green('database.json created successfully with default structure.'));
@@ -52,32 +50,27 @@ const initDatabase = async () => {
   let db;
 
   if (!dbConfig.url || dbConfig.type === 'lowdb') {
-    // Ensure the database.json file exists and create it if necessary
     await ensureLowDbExists();
 
-    // Dynamically import LowDB (ESM Import inside async function)
-    const { Low, JSONFile } = await import('lowdb');  // Use dynamic import
+    const { Low, JSONFile } = await import('lowdb');
     db = new Low(new JSONFile('database.json'));
-    await db.read();  // Read data from the file
+    await db.read();
     console.log(chalk.green('LowDB initialized successfully with database.json'));
   } else {
     try {
-      // MongoDB or CloudDB initialization
       if (dbConfig.type === 'mongodb') {
-        // MongoDB connection
         if (dbConfig.version === 'v2') {
-          db = new mongoDBV2(dbConfig.url);  // Connect to MongoDB v2
+          db = new mongoDBV2(dbConfig.url);
         } else {
-          db = new mongoDB(dbConfig.url);    // Connect to MongoDB v1
+          db = new mongoDB(dbConfig.url);
         }
       } else if (dbConfig.type === 'cloud') {
-        // CloudDB connection
-        db = await CloudDBAdapter(dbConfig.url);  // Connect to cloud DB
+        db = await CloudDBAdapter(dbConfig.url);
       }
       console.log(chalk.green('Database initialized successfully'));
     } catch (err) {
       console.error(chalk.red('Error initializing database:'), err);
-      process.exit(1);  // Critical error: stop the process, PM2 will restart the bot
+      process.exit(1);
     }
   }
 
@@ -105,15 +98,26 @@ const loadPlugins = () => {
   pluginFiles.forEach(file => {
     const pluginPath = path.join(pluginsPath, file);
 
-    // Check if it's a file (not a directory)
     const stat = fs.lstatSync(pluginPath);
 
-    if (stat.isFile() && file.endsWith('.js')) {  // Ensure it's a .js file
+    if (stat.isFile() && file.endsWith('.js')) {
       const pluginName = path.basename(file, '.js');
       try {
-        // Dynamically import the plugin handler using require (CommonJS)
-        const pluginHandler = require(pluginPath);  // No .default needed in CommonJS
-        handlers[pluginName.toLowerCase()] = pluginHandler; // Store plugin with lowercase key
+        const pluginHandler = require(pluginPath);
+        
+        if (pluginHandler.command) {
+          pluginHandler.command.forEach(command => {
+            handlers[command.toLowerCase()] = pluginHandler;
+          });
+        }
+
+        // Check if plugin has callback query data handling
+        if (pluginHandler.callbackQuery) {
+          pluginHandler.callbackQuery.forEach(callbackData => {
+            handlers[`callback_${callbackData.toLowerCase()}`] = pluginHandler;
+          });
+        }
+
         console.log(chalk.blue(`Successfully loaded plugin: ${pluginName}`));
       } catch (error) {
         const err = syntaxerror(fs.readFileSync(pluginPath, 'utf-8'), file);
@@ -131,7 +135,6 @@ const loadPlugins = () => {
   return handlers;
 };
 
-
 // Load all plugin handlers
 const plugins = loadPlugins();
 
@@ -144,24 +147,21 @@ const logUserActivity = (chatId, command) => {
 // Main message handler
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-  const text = msg.text.trim();  // Get the full message text
-  const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));  // Check if text starts with any of the prefixes
+  const text = msg.text.trim();
+  const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));
 
   if (usedPrefix) {
-    // Extract the command and query
     const commandWithQuery = text.substring(usedPrefix.length).trim();
-    const [command, ...queryArr] = commandWithQuery.split(' ');  // Split the command and query
-    const query = queryArr.join(' ').trim();  // Join the remaining words as query
+    const [command, ...queryArr] = commandWithQuery.split(' ');
+    const query = queryArr.join(' ').trim();
     const normalizedCommand = command.toLowerCase();
 
-    // Log the loaded plugins and the handler we're trying to call
     console.log('Loaded plugins:', Object.keys(plugins));
     console.log(`Attempting to invoke handler for command: ${normalizedCommand}`);
 
     const handler = plugins[normalizedCommand];
 
     if (handler) {
-      // Build context based on command type
       let context = { 
         bot, 
         m: msg, 
@@ -170,13 +170,12 @@ bot.on('message', (msg) => {
         usedPrefix, 
         command: normalizedCommand,
         db,
-        args: queryArr  // Add args as the array of query parts
+        args: queryArr
       };
 
-      // Execute the plugin handler
       try {
         console.log(`Executing plugin for command: ${normalizedCommand}`);
-        handler(context);  // Call the handler with the dynamic context
+        handler(context);
         console.log(chalk.green(`Executed plugin: ${normalizedCommand} for chatId: ${chatId}`));
       } catch (error) {
         console.error(chalk.red(`Error executing plugin '${normalizedCommand}':`), error);
@@ -186,5 +185,37 @@ bot.on('message', (msg) => {
       bot.sendMessage(chatId, "Unknown command or no plugin available for that command.");
       console.error(chalk.red(`Unknown command: ${normalizedCommand} from chatId: ${chatId}`));
     }
+  }
+});
+
+// Main callback query handler
+bot.on('callback_query', async (callbackQuery) => {
+  const chatId = callbackQuery.message.chat.id;
+  const callbackData = callbackQuery.data;
+  const normalizedCallbackData = callbackData.toLowerCase();
+
+  console.log(`Handling callback query: ${normalizedCallbackData}`);
+
+  const handler = plugins[`callback_${normalizedCallbackData}`];
+
+  if (handler) {
+    let context = {
+      bot,
+      callbackQuery,
+      chatId,
+      callbackData: normalizedCallbackData,
+      message: callbackQuery.message,
+    };
+
+    try {
+      console.log(`Executing plugin for callback query: ${normalizedCallbackData}`);
+      await handler(context);
+      console.log(chalk.green(`Executed callback handler: ${normalizedCallbackData} for chatId: ${chatId}`));
+    } catch (error) {
+      console.error(chalk.red(`Error executing callback handler '${normalizedCallbackData}':`), error);
+      bot.sendMessage(chatId, `An error occurred while processing the callback query '${normalizedCallbackData}'. Please try again later.`);
+    }
+  } else {
+    console.error(chalk.red(`Unknown callback query: ${normalizedCallbackData} from chatId: ${chatId}`));
   }
 });
