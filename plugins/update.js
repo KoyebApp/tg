@@ -41,22 +41,25 @@ let handler = async ({ m, bot, query }) => {
 
           // Stop and restart the PM2 process (Qasim) regardless of the git pull result
           exec('pm2 stop qasim', (stopError, stopStdout, stopStderr) => {
+            console.log("Stopping PM2 process...");
             if (stopError) {
               console.error(`Error stopping pm2 process: ${stopError}`);
               bot.sendMessage(chatId, "An error occurred while stopping the process. Please try again later.");
               return;
             }
+            console.log("PM2 stop output:", stopStdout);
+            console.error("PM2 stop error:", stopStderr);
 
             // Restart the PM2 process (Qasim)
-            exec('pm2 restart qasim', (startError, startStdout, startStderr) => {
+            exec('pm2 start index.js --deep-monitoring --attach --name qasim', (startError, startStdout, startStderr) => {
+              console.log("Restarting PM2 process...");
               if (startError) {
                 console.error(`Error restarting pm2 process: ${startError}`);
                 bot.sendMessage(chatId, "An error occurred while restarting the process. Please try again later.");
                 return;
               }
-
-              // Log successful restart if no errors
-              console.log('PM2 process restarted successfully.');
+              console.log("PM2 start output:", startStdout);
+              console.error("PM2 start error:", startStderr);
             });
           });
         });
