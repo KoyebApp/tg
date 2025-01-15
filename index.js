@@ -131,7 +131,6 @@ const loadPlugins = () => {
   return handlers;
 };
 
-
 // Load all plugin handlers
 const plugins = loadPlugins();
 
@@ -152,50 +151,55 @@ bot.on('message', (msg) => {
     const commandWithQuery = text.substring(usedPrefix.length).trim();
     const [command, ...queryArr] = commandWithQuery.split(' ');  // Split the command and query
     const query = queryArr.join(' ').trim();  // Join the remaining words as query
-
-    // Convert the command to lowercase to match with plugins
     const normalizedCommand = command.toLowerCase();
 
-    logUserActivity(chatId, normalizedCommand);  // Log user activity
+    // Log the loaded plugins and the handler we're trying to call
+    console.log('Loaded plugins:', Object.keys(plugins));
+    console.log(`Attempting to invoke handler for command: ${normalizedCommand}`);
 
-    console.log(`Received command: ${normalizedCommand}`);  // Debug log
-    console.log(`Received query: ${query}`);  // Debug log
+    const handler = plugins[normalizedCommand];
 
-    // If the message is a command
-    if (normalizedCommand) {
-      console.log(`Processing command: ${normalizedCommand}`);  // Debug log
+    if (handler) {
+      // Build context based on command type
+      let context = { 
+        bot, 
+        m: msg, 
+        text, 
+        query, 
+        usedPrefix, 
+        command: normalizedCommand,
+        db
+      };
 
-      // Debugging: List all loaded plugin names
-      console.log('Loaded plugins:', Object.keys(plugins));
-
-      // Ensure the command is correctly passed to the plugin handler
-      const handler = plugins[normalizedCommand];
-
-      if (handler) {
-        const context = {
-          bot,
-          text,
-          query,  // Pass the query (if any) to the plugin
-          usedPrefix,
-          command: normalizedCommand,
-          m: msg,  // Pass the full message object to the plugin
-          db,  // Pass the database instance to the plugin
-        };
-
-        try {
-          // Debug log before executing the plugin
-          console.log(`Executing plugin for command: ${normalizedCommand} with query: ${query}`);
-          handler(context);  // Call the handler with the context
-          console.log(chalk.green(`Executed plugin: ${normalizedCommand} for chatId: ${chatId}`));
-        } catch (error) {
-          console.error(chalk.red(`Error executing plugin '${normalizedCommand}':`), error);
-          bot.sendMessage(chatId, `An error occurred while processing the command '${normalizedCommand}'. Please try again later.`);
+      // Add specific fields to context based on the command
+      if (normalizedCommand === 'gitclone') {
+        const url = queryArr[0]; // assuming URL is the first word in the query
+        if (url) {
+          context.url = url;
         }
-      } else {
-        // If no plugin is found, send an error message
-        bot.sendMessage(chatId, "Unknown command or no plugin available for that command.");
-        console.error(chalk.red(`Unknown command: ${normalizedCommand} from chatId: ${chatId}`));
       }
+
+      if (normalizedCommand === 'update') {
+        context.username = msg.from.username;
+      }
+
+      if (normalizedCommand === 'info') {
+        context.username = msg.from.username;
+        context.chatId = chatId;
+      }
+
+      // Execute the plugin handler
+      try {
+        console.log(`Executing plugin for command: ${normalizedCommand}`);
+        handler(context);  // Call the handler with the dynamic context
+        console.log(chalk.green(`Executed plugin: ${normalizedCommand} for chatId: ${chatId}`));
+      } catch (error) {
+        console.error(chalk.red(`Error executing plugin '${normalizedCommand}':`), error);
+        bot.sendMessage(chatId, `An error occurred while processing the command '${normalizedCommand}'. Please try again later.`);
+      }
+    } else {
+      bot.sendMessage(chatId, "Unknown command or no plugin available for that command.");
+      console.error(chalk.red(`Unknown command: ${normalizedCommand} from chatId: ${chatId}`));
     }
   }
 });
