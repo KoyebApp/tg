@@ -34,8 +34,11 @@ let handler = async ({ m, bot, query }) => {
           console.log(`git pull stdout: ${stdout}`);
           bot.sendMessage(chatId, message);
 
-          // Regardless of git pull result, stop the PM2 process (Qasim)
-          exec('pm2 stop qasim', (stopError, stopStdout, stopStderr) => {
+          // Use the full path to pm2 (adjust the path according to your system)
+          const pm2Path = '/usr/bin/pm2'; // Adjust to the correct path for pm2 in your system
+
+          // Stop the PM2 process (Qasim)
+          exec(`${pm2Path} stop qasim`, (stopError, stopStdout, stopStderr) => {
             console.log("Stopping PM2 process...");
             if (stopError) {
               console.error(`Error stopping pm2 process: ${stopError}`);
@@ -45,8 +48,8 @@ let handler = async ({ m, bot, query }) => {
             console.log("PM2 stop output:", stopStdout);
             console.error("PM2 stop error:", stopStderr);
 
-            // Restart the PM2 process (Qasim) after stopping
-            exec('pm2 start qasim', (startError, startStdout, startStderr) => {
+            // Restart the PM2 process (Qasim)
+            exec(`${pm2Path} start qasim`, (startError, startStdout, startStderr) => {
               console.log("Restarting PM2 process...");
               if (startError) {
                 console.error(`Error restarting pm2 process: ${startError}`);
