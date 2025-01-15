@@ -1,20 +1,24 @@
 let handler = async ({ m, bot, query }) => {
   try {
     const chatId = m.chat.id;
-    const userId = m.from.id;  // User ID who sent the message
+    const userId = m.from.id;  // The user who sent the message
+    const chatType = m.chat.type;  // To check if it is a group or private chat
 
-    if (m.chat.type === 'private') {
-      // This is a private chat, showing user's chat ID
+    // Check if it's a private chat
+    if (chatType === 'private') {
       bot.sendMessage(chatId, `Your chat ID is: ${userId}`);
-    } else if (m.chat.type === 'group' || m.chat.type === 'supergroup') {
-      // This is a group chat, showing group's chat ID
-      bot.sendMessage(chatId, `The chat ID for this group is: ${chatId}`);
+    }
+    // Check if it's a group or supergroup
+    else if (chatType === 'group' || chatType === 'supergroup') {
+      bot.sendMessage(chatId, `This group's chat ID is: ${chatId}`);
       
-      // If you want the bot's ID (bot's user ID), it can be fetched like so:
-      const botInfo = await bot.getMe();  // Get the bot's info
-      bot.sendMessage(chatId, `The bot's ID (username): @${botInfo.username}, bot chat ID: ${botInfo.id}`);
-    } else {
-      bot.sendMessage(chatId, 'This command only works in group or private chats.');
+      // To fetch the bot's ID (bot's user ID) and other details
+      const botInfo = await bot.getMe();
+      bot.sendMessage(chatId, `The bot's ID (username): @${botInfo.username}, bot user ID: ${botInfo.id}`);
+    }
+    // For other chat types like channels (it could also show an error)
+    else {
+      bot.sendMessage(chatId, 'This command only works in private or group chats.');
     }
   } catch (error) {
     console.error('Error fetching chatId:', error);
