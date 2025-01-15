@@ -5,7 +5,7 @@ const { URLSearchParams } = require('url'); // To work with query parameters
 let handler = async ({ bot, m, text, query }) => {
   // Ensure query (URL) is provided
   if (!query) {
-    await bot.sendMessage(m.chat.id, '❌ You need to provide a MediaFire URL.');
+    await bot.sendMessage(m.chat.id, 'You need to provide a MediaFire URL.');
     return;
   }
 
@@ -19,8 +19,6 @@ let handler = async ({ bot, m, text, query }) => {
     let mediafireResponse = await Qasim.mediafire(mediafireUrl);
     let mediafireData = mediafireResponse;
 
-    // Log the response for debugging
-    console.log('MediaFire Data:', mediafireData);
 
     // Validate the response to ensure valid data
     if (!mediafireData || !mediafireData.name || !mediafireData.link) {
@@ -28,13 +26,13 @@ let handler = async ({ bot, m, text, query }) => {
     }
 
     // Format the caption to display file information
-    let caption = `≡ *MEDIAFIRE DOWNLOADER*:\n`;
+    let caption = `≡ MEDIAFIRE DOWNLOADER:\n`;
     caption += `
-▢ *File:* ${mediafireData.name}
-▢ *Size:* ${mediafireData.size}
-▢ *Type:* ${mediafireData.filetype}
+▢ File: ${mediafireData.name}
+▢ Size: ${mediafireData.size}
+▢ Type: ${mediafireData.filetype}
 
-*Download In Progress....Please Wait ⌛*\n\n*Powered by Ultra-MD*`;
+Download In Progress....Please Wait ⌛\n\nPowered by MEGA-AI`;
 
     await bot.sendMessage(m.chat.id, caption);
 
