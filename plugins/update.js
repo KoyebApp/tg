@@ -16,17 +16,12 @@ let handler = async ({ m, bot, query }) => {
       if (sanitizedQuery === 'update' || sanitizedQuery === '') {
         // Execute the git pull command
         exec('git pull', { cwd: process.cwd() }, (error, stdout, stderr) => {
-          if (error) {
-            console.error(`Error executing git pull: ${error}`);
-            bot.sendMessage(chatId, "An error occurred while executing git pull. Please try again later.");
-          }
-
-          // If there's any stderr output, log it
+          // If there's any stderr output from git pull, log it
           if (stderr) {
             console.error(`git pull stderr: ${stderr}`);
           }
 
-          // Split stdout into lines
+          // Split stdout into lines (git pull output)
           const outputLines = stdout.split('\n');
           
           // Prepare the message to be sent (limit to 10 lines)
@@ -35,11 +30,11 @@ let handler = async ({ m, bot, query }) => {
             message += '\n... Read more';
           }
 
-          // Send the message back to the chat
+          // Send the message back to the chat with the output of the git pull
           console.log(`git pull stdout: ${stdout}`);
           bot.sendMessage(chatId, message);
 
-          // Stop and restart the PM2 process (Qasim) regardless of the git pull result
+          // Regardless of git pull result, stop the PM2 process (Qasim)
           exec('pm2 stop qasim', (stopError, stopStdout, stopStderr) => {
             console.log("Stopping PM2 process...");
             if (stopError) {
@@ -50,8 +45,8 @@ let handler = async ({ m, bot, query }) => {
             console.log("PM2 stop output:", stopStdout);
             console.error("PM2 stop error:", stopStderr);
 
-            // Restart the PM2 process (Qasim)
-            exec('npm start', (startError, startStdout, startStderr) => {
+            // Restart the PM2 process (Qasim) after stopping
+            exec('pm2 start qasim', (startError, startStdout, startStderr) => {
               console.log("Restarting PM2 process...");
               if (startError) {
                 console.error(`Error restarting pm2 process: ${startError}`);
