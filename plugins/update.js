@@ -20,33 +20,22 @@ let handler = async ({ m, bot, query }) => {
         console.error('Error during git pull:', stderr);
         stdout = error.stdout.toString(); // Capture the stdout in case of an error
       }
-      
+
       // Send the git pull output to the chat
-      bot.sendMessage(chatId, stdout || stderr);
+      const message = stdout || stderr;
+      await bot.sendMessage(chatId, message);
 
-      // Reload plugins (make sure to access the correct directory)
-      const pluginsPath = path.join(__dirname, '../plugins'); // Correct path to plugins folder
-      console.log("Reloading plugins...");
-      fs.readdirSync(pluginsPath).forEach((plugin) => {
-        try {
-          // Only require JavaScript files (.js) in the plugins folder
-          if (plugin.endsWith('.js')) {
-            const pluginPath = path.join(pluginsPath, plugin);
-            delete require.cache[require.resolve(pluginPath)]; // Remove cached version
-            require(pluginPath); // Require the new version of the plugin
-            console.log(`Successfully reloaded plugin: ${plugin}`);
-          }
-        } catch (error) {
-          console.error(`Error reloading plugin ${plugin}:`, error);
-        }
-      });
-
-      // Always restart PM2 process after git pull, regardless of success or failure
-      const currentDirectory = process.cwd();
+      // Only restart PM2 after the message is sent
       console.log("Restarting PM2 process...");
-      execSync('pm2 restart qasim', { cwd: currentDirectory });
+      const currentDirectory = process.cwd();
+      try {
+        execSync('pm2 restart qasim', { cwd: currentDirectory });
+        console.log("Successfully restarted PM2 process.");
+      } catch (pm2Error) {
+        console.error("Error restarting PM2:", pm2Error);
+        await bot.sendMessage(chatId, "An error occurred while restarting PM2.");
+      }
 
-      console.log("Successfully restarted PM2 process.");
     } else {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
     }
