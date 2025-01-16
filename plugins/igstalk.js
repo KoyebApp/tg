@@ -10,19 +10,19 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     try {
 
           // Send "waiting" message to indicate the bot is processing
-    await bot.sendMessage(chatId, "⏳ Please wait, fetching the images...");
+    await bot.sendMessage(chatId, "⏳ Please wait, fetching details...");
         // Call the Instagram profile stalking API with the username
         let res = await Qasim.igStalk(query);
 
         let message = `
-┌──「 *STALKING INSTAGRAM PROFILE* 
-▢ *🔖Name:* ${res.name || 'Unknown'} 
-▢ *🔖Username:* ${res.username}
-▢ *👥Followers:* ${res.followers || 'N/A'}
-▢ *🫂Following:* ${res.following || 'N/A'}
-▢ *📌Bio:* ${res.description || 'No bio available'}
-▢ *🏝️Posts:* ${res.posts || 'N/A'}
-▢ *🔗Link:* [Instagram Profile](https://instagram.com/${res.username.replace(/^@/, '')})
+┌──「 STALKING INSTAGRAM
+▢ 🔖Name: ${res.name || 'Unknown'} 
+▢ 🔖Username: ${res.username}
+▢ 👥Followers: ${res.followers || 'N/A'}
+▢ 🫂Following: ${res.following || 'N/A'}
+▢ 📌Bio: ${res.description || 'No bio available'}
+▢ 🏝️Posts: ${res.posts || 'N/A'}
+▢ 🔗Link: [Instagram Profile](https://instagram.com/${res.username.replace(/^@/, '')})
 └────────────`;
 
         // Set default profile picture URL if not available
@@ -36,4 +36,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     }
 };
 
+handler.command = ['igstalk', 'instastalk', 'instagrams'];  // Command list
+handler.help = ['igstalk', 'instastalk', 'instagrams'];
+handler.tags = ['main'];
 module.exports = handler;
