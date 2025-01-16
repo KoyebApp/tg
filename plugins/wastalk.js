@@ -40,8 +40,6 @@ const handler = async ({ bot, m, text, query }) => {
         - *Title*: ${result.title}
         - *Description*: ${result.description}
         - *Followers*: ${result.followers}
-        - *Link*: [Click here](https://wa.me/${result.phone || 'undefined'})
-        - *Profile Image*: [View Image](${result.img})
       `;
 
       // Send the information to the user
@@ -54,6 +52,10 @@ const handler = async ({ bot, m, text, query }) => {
     await bot.sendMessage(chatId, 'An error occurred while processing your request. Please try again later.');
   }
 };
+
+handler.command = ['wachannel', 'wastalk'];  // Command list
+handler.help = ['wachannel', 'wastalk'];
+handler.tags = ['main'];
 
 // Export the handler
 module.exports = handler;
