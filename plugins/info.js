@@ -14,12 +14,16 @@ let handler = async ({ m, bot, query }) => {
       if (sanitizedQuery === 'info') {
         // Fetch bot information (e.g., version, uptime)
         const botInfo = {
-          version: '1.0.0',   // Example version, change based on your version
+          version: '0.0.1',   // Example version, change based on your version
           uptime: process.uptime(), // Uptime in seconds
         };
         const uptime = new Date(botInfo.uptime * 1000).toISOString().substr(11, 8); // Format uptime as hh:mm:ss
         const botMessage = `
-          *Bot Information:*
+          Bot Information:
+          
+          Developer: Qasim Ali
+          Bot Name: MEGA-AI
+          Structure: [Plugins]
           Version: ${botInfo.version}
           Uptime: ${uptime}
         `;
@@ -38,8 +42,8 @@ let handler = async ({ m, bot, query }) => {
   }
 };
 
-handler.command = ['info'];  // Add info command
-handler.help = ['info'];  // Help message for the info command
-handler.tags = ['owner'];  // Only allow the owner to use this command
+handler.command = ['info', 'ping', 'test', 'details'];
+handler.help = ['info', 'ping', 'test', 'details'];
+handler.tags = ['owner'];
 
 module.exports = handler;
