@@ -1,53 +1,50 @@
-const axios = require('axios');
+import fetch from 'node-fetch';  // Import node-fetch for HTTP requests
 
-const handler = async ({ bot, m, db, command, query }) => {
+let handler = async ({ m, command, bot, usedPrefix, text }) => {
   try {
-    // Ask the user to provide a query (e.g., 'akira', 'anime', 'naruto', etc.)
-    if (!query) {
-      return await bot.sendMessage(m.chat.id, "❌ Please provide a query (e.g., 'akira', 'naruto', etc.).");
-    }
+    // Use the text from the query (res is the query in your case)
+    const query = text || command;  // If text is provided, use it; otherwise, use the command name.
 
-    // Define the API mapping based on query
-    const queryMap = {
-      'akira': 'https://raw.githubusercontent.com/GlobalTechInfo/Anime-API/Guru/BOT-JSON/anime-akira.json',
-      'naruto': 'https://raw.githubusercontent.com/GlobalTechInfo/Anime-API/Guru/BOT-JSON/anime-naruto.json',
-      'nezuko': 'https://raw.githubusercontent.com/GlobalTechInfo/Anime-API/Guru/BOT-JSON/anime-nezuko.json',
-      // Add more queries and their corresponding JSON API URLs here
-    };
+    // Fetch the JSON data for the query (anime images for the specific character)
+    const res = await fetch(`https://raw.githubusercontent.com/Guru322/api/Guru/BOT-JSON/anime-${query}.json`);
+    const data = await res.json();
 
-    // Check if the query exists in the mapping
-    const apiUrl = queryMap[query.toLowerCase()];
+    // Select a random image from the fetched data
+    const randomImage = data[Math.floor(Math.random() * data.length)];
 
-    if (!apiUrl) {
-      return await bot.sendMessage(m.chat.id, "❌ Sorry, no images found for this query. Please try a different one.");
-    }
+    // Send the image using the bot, adding a caption with the query
+    await bot.sendPhoto(m.chat.id, randomImage, { caption: `_${query}_` });
 
-    // Fetch the data from the corresponding API
-    const response = await axios.get(apiUrl);
-
-    // Check if the response is valid
-    if (!response.data || response.data.length === 0) {
-      return await bot.sendMessage(m.chat.id, '❌ No images found for this query!');
-    }
-
-    // Pick a random image from the fetched list
-    const randomImage = response.data[Math.floor(Math.random() * response.data.length)];
-
-    // Send the image to the user with the query as the caption
-    await bot.sendPhoto(m.chat.id, randomImage, {
-      caption: `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`,
-    });
+    // Optional: Send a button for "Next" to fetch another image (if applicable)
+    // bot.sendMessage(m.chat.id, `_${query}_`.trim(), {
+    //   reply_markup: {
+    //     inline_keyboard: [
+    //       [{ text: "🔄 NEXT 🔄", callback_data: `${usedPrefix + query}` }]
+    //     ]
+    //   }
+    // });
 
   } catch (error) {
-    console.error('Error fetching image:', error);
-
-    // Send a more specific error message
-    if (error.response) {
-      await bot.sendMessage(m.chat.id, `❌ Error: ${error.response.status} - ${error.response.statusText}`);
-    } else {
-      await bot.sendMessage(m.chat.id, '❌ ERROR: Unable to fetch image. Please try again later.');
-    }
+    console.error('Error fetching anime image:', error);
+    await bot.sendMessage(m.chat.id, '❌ Something went wrong while fetching the image. Please try again later.');
   }
 };
+
+// List of commands (anime character names)
+handler.command = [
+  'akira', 'akiyama', 'anna', 'asuna', 'ayuzawa', 'boruto', 'chiho', 'chitoge', 'deidara',
+  'erza', 'elaina', 'eba', 'emilia', 'hestia', 'hinata', 'inori', 'isuzu', 'itachi', 'itori',
+  'kaga', 'kagura', 'kaori', 'keneki', 'kotori', 'kurumi', 'madara', 'mikasa', 'miku', 'minato',
+  'naruto', 'nezuko', 'sagiri', 'sasuke', 'sakura'
+];
+
+handler.help = [
+  'akira', 'akiyama', 'anna', 'asuna', 'ayuzawa', 'boruto', 'chiho', 'chitoge', 'deidara',
+  'erza', 'elaina', 'eba', 'emilia', 'hestia', 'hinata', 'inori', 'isuzu', 'itachi', 'itori',
+  'kaga', 'kagura', 'kaori', 'keneki', 'kotori', 'kurumi', 'madara', 'mikasa', 'miku', 'minato',
+  'naruto', 'nezuko', 'sagiri', 'sasuke', 'sakura'
+];
+
+handler.tags = ['anime'];  // Define the command tag as anime
 
 module.exports = handler;
