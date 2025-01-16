@@ -54,6 +54,9 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     await bot.sendMessage(m.chat.id, '❌ An error occurred while processing your request. Please try again later.');
   }
 };
+handler.command = ['audio', 'mp3'];
+handler.help = ['audio', 'mp3'];
+handler.tags = ['main'];
 
 // Export the handler
 module.exports = handler;
