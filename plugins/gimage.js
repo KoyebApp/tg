@@ -43,4 +43,8 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
   }
 };
 
+handler.command = ['gimage', 'googleimage'];  // Command list
+handler.help = ['gimage', 'googleimage'];
+handler.tags = ['main'];
+
 module.exports = handler;
