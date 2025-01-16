@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');
 
 let handler = async ({ m, bot, usedPrefix, command, text }) => {
-   let tee = `✳️ ${mssg.notext}\n\n📌 ${mssg.example}: ${usedPrefix + command} MEGA AI
+   let tee = `✳️ ${mssg.notext}\n\n📌 ${mssg.example}: ${usedPrefix + command} MEGA AI`
 
    let apiUrl;
    switch (command) {
