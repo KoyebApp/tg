@@ -8,14 +8,9 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     }
 
     try {
-        // Log the query for debugging
-        console.log('GitHub Stalking Query:', query);
-
         // Fetch GitHub details for the user
         let res = await Qasim.githubStalk(query);
 
-        // Log the response to see the data returned by the API
-        console.log('GitHub Stalking API Response:', res);
 
         // Extracting relevant data from the API response
         const {
@@ -60,5 +55,9 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
         await bot.sendMessage(chatId, `✳️ An error occurred while processing the request: ${error.message || error}`);
     }
 };
+
+handler.command = ['gstalk', 'gitstalk', 'githubstalk'];  // Command list
+handler.help = ['gstalk', 'gitstalk', 'githubstalk'];
+handler.tags = ['main'];
 
 module.exports = handler;
