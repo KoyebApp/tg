@@ -3,7 +3,7 @@ const fetch = require('node-fetch');  // Use require instead of import
 let handler = async ({ m, command, bot, usedPrefix, text }) => {
   try {
     // Use the text from the query (res is the query in your case)
-    const query = text || command;  // If text is provided, use it; otherwise, use the command name.
+    const query = text  // If text is provided, use it; otherwise, use the command name.
 
     // Fetch the JSON data for the query (anime images for the specific character)
     const res = await fetch(`https://raw.githubusercontent.com/Guru322/api/Guru/BOT-JSON/anime-${query}.json`);
