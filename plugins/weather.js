@@ -39,4 +39,8 @@ const handler = async ({ bot, m, query, db, usedPrefix, command }) => {
   }
 };
 
+handler.command = ['weather', 'forecast'];  // Command list
+handler.help = ['weather', 'forecast'];
+handler.tags = ['info'];
+
 module.exports = handler;
