@@ -37,4 +37,8 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     }
 };
 
+handler.command = ['ttstalk', 'tiktokstalk'];  // Command list
+handler.help = ['ttstalk', 'tiktokstalk'];
+handler.tags = ['stalk'];
+
 module.exports = handler;
