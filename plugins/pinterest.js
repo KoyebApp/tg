@@ -44,4 +44,8 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
   }
 };
 
+handler.command = ['pinimg', 'pinterest'];  // Command list
+handler.help = ['pinimg', 'pinterest'];
+handler.tags = ['main'];
+
 module.exports = handler;
