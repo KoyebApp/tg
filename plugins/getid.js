@@ -3,10 +3,6 @@ let handler = async ({ m, bot }) => {
     const chatId = m.chat.id;
     const chatType = m.chat.type; // Get the type of chat
 
-    // Log chat type to see what it is
-    console.log('Chat Type:', chatType);
-    console.log('Chat ID:', chatId);
-
     if (chatType === 'private') {
       // If the message is from a private chat
       bot.sendMessage(m.chat.id, `Your private chat ID is: ${chatId}`);
@@ -25,8 +21,8 @@ let handler = async ({ m, bot }) => {
   }
 };
 
-handler.command = ['/getchatid']; // Command to trigger chat ID fetch
-handler.help = ['/getchatid'];  // Help for the command
+handler.command = ['getchatid', 'getid', 'chatid', 'userid']; // Command to trigger chat ID fetch
+handler.help = ['getchatid', 'getid', 'chatid', 'userid'];  // Help for the command
 handler.tags = ['utility'];  // Tag for categorization
 
 module.exports = handler;
