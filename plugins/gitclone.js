@@ -35,6 +35,6 @@ let handler = async ({ m, bot, args, usedPrefix, command }) => {
 
 handler.help = ['gitclone <url>'];
 handler.tags = ['downloader'];
-handler.command = ['gitclone'];
+handler.command = ['gitclone', 'gitcl'];
 
 module.exports = handler;
