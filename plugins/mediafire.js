@@ -120,4 +120,8 @@ Download In Progress....Please Wait ⌛\n\nPowered by MEGA-AI`;
     bot.sendMessage(m.chat.id, "An error occurred while fetching or downloading the file from MediaFire.");
   }
 };
+
+handler.command = ['mfire', 'mediafire', 'mediafiredl', 'mfiredl'];  // Command list
+handler.help = ['mfire', 'mediafire', 'mediafiredl', 'mfiredl'];
+handler.tags = ['downloader'];
 module.exports = handler;
