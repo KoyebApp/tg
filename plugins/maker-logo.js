@@ -1,7 +1,7 @@
 const fetch = require('node-fetch');  // Use require instead of import
 
 let handler = async ({ m, bot, usedPrefix, command, text }) => {
-   let tee = `✳️ ${mssg.notext}\n\n📌 ${mssg.example}: ${usedPrefix + command} MEGA AI`;  // Fixed string closing
+   let tee = `✳️ Provide Some Text With Command 📌 Example: ${usedPrefix + command} MEGA AI`;  // Fixed string closing
 
    let apiUrl;
    switch (command) {
