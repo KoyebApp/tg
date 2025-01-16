@@ -41,4 +41,8 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     }
 };
 
+handler.command = ['npm', 'npmstalk', 'npm-package'];  // Command list
+handler.help = ['npm', 'npmstalk', 'npm-package'];
+handler.tags = ['main'];
+
 module.exports = handler;
