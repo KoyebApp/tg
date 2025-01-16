@@ -25,7 +25,7 @@ let handler = async ({ m, command, bot, usedPrefix, text }) => {
     // Send the image using the bot, adding a caption with the query
     await bot.sendPhoto(m.chat.id, randomImage, { caption: `_${query}_` });
 
-    // Optional: Send a button for "Next" to fetch another image (if applicable)
+    // Send the inline "Next" button for fetching more images
     bot.sendMessage(m.chat.id, `_${query}_`, {
       reply_markup: {
         inline_keyboard: [
@@ -59,36 +59,30 @@ handler.help = [
 
 handler.tags = ['anime'];  // Define the command tag as anime
 
-// Handle the callback for the "Next" button
+// Handle the callback for the "Next" button (restarts the fetching process)
 handler.action = async (callbackQuery, bot) => {
   const { data } = callbackQuery;
   const query = data.split('-')[1]; // Extract the query part after "next-"
 
-  // Fetch the new random image
+  // Fetch the new random image and restart the process as if the user typed the command again
   try {
+    // Fetch the JSON data for the query (anime images for the specific character)
     const res = await fetch(`https://raw.githubusercontent.com/Guru322/api/Guru/BOT-JSON/anime-${query}.json`);
     const data = await res.json();
 
+    // Select a random image from the fetched data
     const randomImage = data[Math.floor(Math.random() * data.length)];
 
-    // Edit the message with a new image
-    await bot.editMessageMedia({
-      media: randomImage,
-      type: 'photo'
-    }, {
-      chat_id: callbackQuery.message.chat.id,
-      message_id: callbackQuery.message.message_id,
-      caption: `_${query}_`
-    });
+    // Send the image using the bot, adding a caption with the query
+    await bot.sendPhoto(callbackQuery.message.chat.id, randomImage, { caption: `_${query}_` });
 
-    // Update the "Next" button for the next image
-    bot.editMessageReplyMarkup({
-      inline_keyboard: [
-        [{ text: "🔄 NEXT 🔄", callback_data: `next-${query}` }]
-      ]
-    }, {
-      chat_id: callbackQuery.message.chat.id,
-      message_id: callbackQuery.message.message_id
+    // Send the inline "Next" button for fetching more images
+    bot.sendMessage(callbackQuery.message.chat.id, `_${query}_`, {
+      reply_markup: {
+        inline_keyboard: [
+          [{ text: "🔄 NEXT 🔄", callback_data: `next-${query}` }]
+        ]
+      }
     });
 
   } catch (error) {
