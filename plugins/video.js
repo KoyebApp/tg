@@ -20,10 +20,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     // Make the API request
     const response = await fetch(apiUrl);
     const data = await response.json();
-
-    // Log the API response for debugging
-    console.log('API Response:', data);  // Log the response to the console
-
+    
     // Check if the API request was successful
     if (data.success && data.result && data.result.download_url) {
       const downloadUrl = data.result.download_url;
@@ -54,5 +51,10 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     await bot.sendMessage(m.chat.id, '❌ An error occurred while processing your request. Please try again later.');
   }
 };
+
+handler.command = ['video', 'mp4'];  // Command list
+handler.help = ['video', 'mp4'];
+handler.tags = ['downloader'];
+
 // Export the handler
 module.exports = handler;
