@@ -37,14 +37,14 @@ const handler = async ({ bot, m, query, db, usedPrefix, command }) => {
     const thumbnail = resultsToSend[0].thumbnail;
 
     await bot.sendPhoto(m.chat.id, thumbnail, { caption: messageText });
-
-    // React with a done emoji
-    await bot.sendMessage(m.chat.id, '✅ Search completed successfully!');
-
   } catch (error) {
     console.error('Error:', error);
     await bot.sendMessage(m.chat.id, '⚠️ An error occurred while searching for YouTube videos. Please try again later.');
   }
 };
+
+handler.command = ['yts', 'ytsearch'];  // Command list
+handler.help = ['yts', 'ytsearch'];
+handler.tags = ['search'];
 
 module.exports = handler;
