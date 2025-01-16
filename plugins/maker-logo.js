@@ -81,7 +81,7 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
 
       if (data.success && data.result && data.result.image_url) {
          // Send the image to the user
-         bot.sendFile(m.chat, data.result.image_url, 'logo.png', `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`, m);
+         bot.sendDocument(m.chat, data.result.image_url, 'logo.png', `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`, m);
       } else {
          throw 'Failed to generate the image. Please try again later.';
       }
