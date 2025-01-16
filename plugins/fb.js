@@ -44,4 +44,8 @@ let handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
   }
 };
 
+handler.command = ['fb', 'fbdl', 'facebook'];  // Command list
+handler.help = ['fb', 'fbdl', 'facebook'];
+handler.tags = ['main'];
+
 module.exports = handler;
