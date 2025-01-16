@@ -13,7 +13,7 @@ let handler = async ({ bot, m, text, usedPrefix, command, query }) => {
     try {
         res = await Qasim.xdown(query); // Get the download link from the API
     } catch (error) {
-        await bot.sendMessage(m.chat.id, `❌ An error occurred while fetching the media: ${error.message}`);
+        await bot.sendMessage(m.chat.id, `An error occurred while fetching the media: ${error.message}`);
         return;
     }
 
@@ -45,5 +45,9 @@ let handler = async ({ bot, m, text, usedPrefix, command, query }) => {
 
     await bot.sendMessage(m.chat.id, '✅ Media sent successfully!'); // Send success message
 };
+
+handler.command = ['twitter', 'twitterdl', 'xdl', 'xdown'];  // Command list
+handler.help = ['twitter', 'twitterdl', 'xdl', 'xdown'];
+handler.tags = ['downloader'];
 
 module.exports = handler;
