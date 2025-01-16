@@ -1,7 +1,7 @@
-const fetch = require('node-fetch');
+const fetch = require('node-fetch');  // Use require instead of import
 
 let handler = async ({ m, bot, usedPrefix, command, text }) => {
-   let tee = `✳️ ${mssg.notext}\n\n📌 ${mssg.example}: ${usedPrefix + command} MEGA AI`
+   let tee = `✳️ ${mssg.notext}\n\n📌 ${mssg.example}: ${usedPrefix + command} MEGA AI`;  // Fixed string closing
 
    let apiUrl;
    switch (command) {
@@ -92,11 +92,16 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
    }
 }
 
+// Make sure command is an array (even for a single command)
+handler.command = [
+   'papercut', 'logomaker', 'bpstyle', 'writetext', 'glossy', 'cartoon', 'pixelglitch', 'advancedglow', 
+   'lighteffect', 'texteffect', 'galaxy', 'beach', 'clouds'
+]; 
+
 handler.help = [
    'papercut', 'logomaker', 'bpstyle', 'writetext', 'glossy', 'cartoon', 'pixelglitch', 'advancedglow', 
    'lighteffect', 'texteffect', 'galaxy', 'beach', 'clouds'
-]
-handler.tags = ['maker']
-handler.command = /^(papercut|logomaker|bpstyle|pixelglitch|advancedglow|lighteffect|texteffect|galaxy|writetext|glossy|cartoon|beach|clouds)$/i
+];
 
+handler.tags = ['maker'];
 module.exports = handler;
