@@ -35,5 +35,9 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
   }
 };
 
+handler.command = ['gitdl', 'githubdl', 'repodl'];  // Command list
+handler.help = ['gitdl', 'githubdl', 'repodl'];
+handler.tags = ['main'];
+
 // Export the handler
 module.exports = handler;
