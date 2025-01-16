@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';  // Import node-fetch for HTTP requests
+const fetch = require('node-fetch');  // Use require instead of import
 
 let handler = async ({ m, command, bot, usedPrefix, text }) => {
   try {
