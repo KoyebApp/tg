@@ -32,4 +32,8 @@ const handler = async ({ bot, m, query, db, usedPrefix, command }) => {
   }
 };
 
+handler.command = ['wiki', 'wikipedia', 'wikisearch'];  // Command list
+handler.help = ['wiki', 'wikipedia', 'wikisearch'];
+handler.tags = ['search'];
+
 module.exports = handler;
