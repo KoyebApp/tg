@@ -28,5 +28,8 @@ let handler = async ({ m, bot, query, command }) => {
     await bot.sendMessage(m.chat.id, "❌ An error occurred while generating the image. Please try again later.");
   }
 };
+handler.command = ['lexica', 'lexica-art', 'lexica-ai'];  // Command list
+handler.help = ['lexica', 'lexica-art', 'lexica-ai'];
+handler.tags = ['image'];
 
 module.exports = handler;
