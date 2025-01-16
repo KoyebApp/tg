@@ -52,6 +52,10 @@ let handler = async ({ bot, m, query, command }) => {
   }
 };
 
+handler.command = ['mega', 'megadl', 'dlmega'];  // Command list
+handler.help = ['mega', 'megadl', 'dlmega'];
+handler.tags = ['downloader'];
+
 module.exports = handler;
 
 // Function to format bytes into a human-readable string
