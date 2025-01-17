@@ -29,7 +29,7 @@ let handler = async ({ m, command, bot, usedPrefix, text }) => {
     bot.sendMessage(m.chat.id, `_${query}_`, {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "🔄 NEXT 🔄", callback_data: `${usedPrefix}${command}` }]  // Send the same command as callback data
+          [{ text: "🔄 NEXT 🔄", callback_data: `next_${query}` }]  // Send just the query without the prefix
         ]
       }
     });
@@ -61,21 +61,17 @@ handler.tags = ['anime'];  // Define the command tag as anime
 
 // Handle the callback for the "Next" button (restarts the fetching process)
 handler.action = async (callbackQuery, bot) => {
-  const { data } = callbackQuery;  // This will now be `usedPrefix + command`
-  const [prefix, ...commandParts] = data.split(' ');  // Split the prefix and command
-  const command = commandParts.join(' ');  // Join back the command
+  const { data } = callbackQuery;  // This will now be `next_${query}`
+  const query = data.replace('next_', '');  // Remove the "next_" prefix from callback data
 
-  // Ensure that the command is still valid
-  if (!command || !handler.command.includes(command)) {
+  // Ensure that the query is valid
+  if (!query || !handler.command.includes(query)) {
     await bot.sendMessage(callbackQuery.message.chat.id, '❌ Command not found.');
     return;
   }
 
   // Fetch the new random image and restart the process as if the user typed the command again
   try {
-    // Strip the prefix from the command to get the query
-    const query = command.replace(prefix, '').trim();
-
     // Fetch the JSON data for the query (anime images for the specific character)
     const res = await fetch(`https://raw.githubusercontent.com/Guru322/api/Guru/BOT-JSON/anime-${query}.json`);
     const data = await res.json();
@@ -90,7 +86,7 @@ handler.action = async (callbackQuery, bot) => {
     bot.sendMessage(callbackQuery.message.chat.id, `_${query}_`, {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "🔄 NEXT 🔄", callback_data: `${prefix}${command}` }]  // Send the same command again
+          [{ text: "🔄 NEXT 🔄", callback_data: `next_${query}` }]  // Send just the query without the prefix
         ]
       }
     });
