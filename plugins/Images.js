@@ -33,7 +33,7 @@ let handler = async ({ m, bot, command }) => {
       const imageUrl = data[randomIndex];
 
       // Send the image to the user
-      bot.sendPhoto(m.chat.id, imageUrl, { caption: 'Random Image' });
+      bot.sendPhoto(m.chat.id, imageUrl, { caption: '𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸' });
 
    } catch (error) {
       console.error('Error fetching image:', error);
