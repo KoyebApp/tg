@@ -1,4 +1,5 @@
 const fetch = require('node-fetch');  // Use require instead of import
+const { Readable } = require('stream');  // Required to convert the response body into buffer
 
 let handler = async ({ m, bot, usedPrefix, command, text }) => {
    // This error message will show if no text after the command is provided.
@@ -73,14 +74,26 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
    try {
       // Fetch the image URL from the API
       const response = await fetch(apiUrl);
-
-      // Ensure the response is valid JSON
       const data = await response.json();
 
-      // Check if the response is successful and the image URL exists
+      // Ensure the response contains an image URL
       if (data.success && data.result && data.result.image_url) {
-         // Send the image to the user
-         bot.sendDocument(m.chat.id, data.result.image_url, 'logo.png', `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`, m);
+         const imageUrl = data.result.image_url;
+
+         // Fetch the image from the URL
+         const imageResponse = await fetch(imageUrl);
+         
+         if (!imageResponse.ok) {
+            throw 'Failed to fetch image from URL.';
+         }
+
+         // Convert the image to a buffer
+         const imageBuffer = await imageResponse.buffer();
+
+         // Send the image buffer as a photo to the user with a caption
+         bot.sendPhoto(m.chat.id, imageBuffer, {
+            caption: `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`
+         });
       } else {
          throw 'Failed to generate the image. Please try again later.';
       }
@@ -104,3 +117,4 @@ handler.help = [
 handler.tags = ['maker'];
 
 module.exports = handler;
+   
