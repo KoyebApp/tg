@@ -267,7 +267,7 @@
                 const country = data.country;
                 document.getElementById("location").innerHTML = `Country: ${country}`;
             } catch (error) {
-                document.getElementById("location").innerHTML = 'Unable to fetch location: ' + error.message;
+                document.getElementById("location").innerHTML = `Unable to fetch location: ${error.message}`;
             }
         }
 
