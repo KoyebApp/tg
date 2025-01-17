@@ -2,7 +2,7 @@
   "name": "mega-ai",
   "version": "0.0.1",
   "description": "Bot Telegram Node.js",
-  "main": "index.js",
+  "main": "start.js",
   "type": "commonjs",
   "directories": {
     "lib": "lib",
@@ -12,7 +12,7 @@
     "node": ">=20.0.0"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node start.js"
   },
   "keywords": [
     "telegram",
@@ -27,8 +27,10 @@
     "api-qasim": "^3.2.4",
     "megajs": "^1.3.1",
     "path": "^0.12.7",
-    "dotenv": "^16.1.4",
     "chalk": "^4.1.2",
+    "dotenv": "^16.1.4",
+    "express": "^4.18.2",
+    "figlet": "^1.7.0",
     "lowdb": "^3.0.0",
     "mongoose": "^7.4.1",
     "got": "^14.4.5",
