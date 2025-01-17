@@ -4,7 +4,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     const chatId = m.chat.id;
 
     if (!query) {
-        return bot.sendMessage(chatId, "Please provide a username.");
+        return bot.sendMessage(chatId, "Please provide a search query.");
     }
 
     try {
@@ -30,7 +30,12 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
 └────────────`;
 
         // Set default profile picture URL if not available
-        const profilePic = res.profilePic || 'https://github.com/GlobalTechInfo.png';
+        const profilePic = res.profilePic || 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Instagram_logo_2022.svg/1200px-Instagram_logo_2022.svg.png';
+        
+        // Ensure the image URL is valid
+        if (!isValidUrl(profilePic)) {
+            profilePic = 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Instagram_logo_2022.svg/1200px-Instagram_logo_2022.svg.png';
+        }
         
         // Send the profile picture with details
         await bot.sendPhoto(chatId, profilePic, { caption: message });
@@ -39,6 +44,15 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
         await bot.sendMessage(chatId, `✳️ An error occurred while processing the request. Please try again later.`);
     }
 };
+
+function isValidUrl(url) {
+    try {
+        new URL(url); // Try creating a URL object to validate the URL format
+        return true;
+    } catch (_) {
+        return false; // Invalid URL
+    }
+}
 
 handler.command = ['igstalk', 'instastalk', 'instagrams'];  // Command list
 handler.help = ['igstalk', 'instastalk', 'instagrams'];
