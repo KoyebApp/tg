@@ -37,7 +37,7 @@ let handler = async ({ m, bot, query }) => {
           throw new Error('Image file not found');
         }
 
-        // Send bot info with the photo
+        // Send bot info with the photo (content type inferred automatically)
         await bot.sendPhoto(chatId, imagePath, { caption: botMessage });
       } else {
         await bot.sendMessage(chatId, "Invalid command. Please use 'info' to get bot information.");
