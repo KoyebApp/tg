@@ -29,30 +29,13 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
 ▢ 🔗Link: [Instagram Profile](https://instagram.com/${res.username.replace(/^@/, '')})
 └────────────`;
 
-        // Set default profile picture URL if not available
-        const profilePic = res.profilePic || 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Instagram_logo_2022.svg/1200px-Instagram_logo_2022.svg.png';
-        
-        // Ensure the image URL is valid
-        if (!isValidUrl(profilePic)) {
-            profilePic = 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Instagram_logo_2022.svg/1200px-Instagram_logo_2022.svg.png';
-        }
-        
         // Send the profile picture with details
-        await bot.sendPhoto(chatId, profilePic, { caption: message });
+        await bot.Message(chatId, { caption: message });
     } catch (error) {
         console.error("Error:", error);
         await bot.sendMessage(chatId, `✳️ An error occurred while processing the request. Please try again later.`);
     }
 };
-
-function isValidUrl(url) {
-    try {
-        new URL(url); // Try creating a URL object to validate the URL format
-        return true;
-    } catch (_) {
-        return false; // Invalid URL
-    }
-}
 
 handler.command = ['igstalk', 'instastalk', 'instagrams'];  // Command list
 handler.help = ['igstalk', 'instastalk', 'instagrams'];
