@@ -21,34 +21,27 @@ let handler = async ({ m, bot, command }) => {
       const response = await fetch(urls[command]);
       const data = await response.json();
 
-      // Ensure the data has the 'images' property (array of image URLs)
-      if (!data || !Array.isArray(data.images) || data.images.length < 2) {
+      // Ensure the data is an array and has at least 2 images
+      if (!Array.isArray(data) || data.length < 2) {
          throw 'Not enough images in the data source.';
       }
 
       // Generate two random indices to select two images
-      const randomIndex1 = Math.floor(Math.random() * data.images.length);
-      let randomIndex2 = Math.floor(Math.random() * data.images.length);
+      const randomIndex1 = Math.floor(Math.random() * data.length);
+      let randomIndex2 = Math.floor(Math.random() * data.length);
 
       // Ensure the indices are different
       while (randomIndex1 === randomIndex2) {
-         randomIndex2 = Math.floor(Math.random() * data.images.length);
+         randomIndex2 = Math.floor(Math.random() * data.length);
       }
 
-      // Fetch the image URLs
-      const imageUrl1 = data.images[randomIndex1];
-      const imageUrl2 = data.images[randomIndex2];
-
-      // Fetch the images using their URLs
-      const imageResponse1 = await fetch(imageUrl1);
-      const imageBuffer1 = await imageResponse1.buffer();
-
-      const imageResponse2 = await fetch(imageUrl2);
-      const imageBuffer2 = await imageResponse2.buffer();
+      // Get the image URLs
+      const imageUrl1 = data[randomIndex1];
+      const imageUrl2 = data[randomIndex2];
 
       // Send the images to the user
-      bot.sendPhoto(m.chat.id, imageBuffer1, { caption: 'Random Image 1' });
-      bot.sendPhoto(m.chat.id, imageBuffer2, { caption: 'Random Image 2' });
+      bot.sendPhoto(m.chat.id, imageUrl1, { caption: 'Random Image 1' });
+      bot.sendPhoto(m.chat.id, imageUrl2, { caption: 'Random Image 2' });
 
    } catch (error) {
       console.error('Error fetching images:', error);
