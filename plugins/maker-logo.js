@@ -3,10 +3,13 @@ const fetch = require('node-fetch');  // Use require instead of import
 let handler = async ({ m, bot, usedPrefix, command, text }) => {
    let tee = `✳️ Provide Some Text With Command 📌 Example: ${usedPrefix + command} MEGA AI`;  // Fixed string closing
 
-   // Ensure text is valid
-   if (!text) throw tee;
+   // Ensure that there is text after the command (remove the prefix + command)
+   let textAfterCommand = text.trim();  // Remove extra spaces from the text
+
+   if (!textAfterCommand) throw tee;  // If there's no text after the command, show error
 
    let apiUrl;
+
    switch (command) {
       case 'papercut':
       case 'logomaker':
@@ -21,8 +24,8 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
       case 'galaxy':
       case 'beach':
       case 'clouds':
-         // Here we ensure to send only the part of the message after the command and prefix
-         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/${command}?apikey=gifted-md&text=${encodeURIComponent(text)}`;
+         // Here we send only the part of the message after the command
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/${command}?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
          break;
 
       default:
@@ -38,7 +41,7 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
 
       if (data.success && data.result && data.result.image_url) {
          // Send the image to the user
-         bot.sendDocument(m.chat, data.result.image_url, 'logo.png', `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`, m);
+         bot.sendDocument(m.chat.id, data.result.image_url, 'logo.png', `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`, m);
       } else {
          throw 'Failed to generate the image. Please try again later.';
       }
