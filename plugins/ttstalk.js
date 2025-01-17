@@ -8,12 +8,11 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     }
 
     try {
-
         // Fetching the TikTok user details from the API
         let res = await Qasim.tiktokStalk(query);
 
         // Extracting relevant data from the API response
-        const { name, username, followers, following, description, profilePic } = res.obj;
+        const { name, username, followers, following, description } = res.obj;
 
         // Formatting the message with relevant information
         let message = `
@@ -26,11 +25,8 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
 ▢ 🔗Link: [TikTok Profile](https://www.tiktok.com/@${username.replace(/^@/, '') || 'NoUsername'})
 └────────────`;
 
-        // Handle profilePic: If it's missing, use a default fallback image
-        const profilePicToSend = profilePic || 'https://upload.wikimedia.org/wikipedia/commons/8/85/TikTok_logo_2018.svg';
-
-        // Send the formatted message and the profile picture (or default image)
-        await bot.sendPhoto(chatId, profilePicToSend, { caption: message });
+        // Send the formatted message with details
+        await bot.sendMessage(chatId, message);
     } catch (error) {
         console.error("Error:", error);
         await bot.sendMessage(chatId, `✳️ An error occurred while processing the request: ${error.message || error}`);
