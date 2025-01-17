@@ -30,7 +30,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
 └────────────`;
 
         // Set default profile picture URL if not available
-        const profilePic = res.profilePic || 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Instagram_logo_2022.svg/1200px-Instagram_logo_2022.svg.png';
+        const profilePic = res.profilePic || 'https://github.com/GlobalTechInfo.png';
         
         // Send the profile picture with details
         await bot.sendPhoto(chatId, profilePic, { caption: message });
