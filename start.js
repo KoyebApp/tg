@@ -39,10 +39,7 @@ figlet(
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Using __filename and __dirname in CommonJS
-const __filename = path.basename(__filename);  // No need for 'import.meta.url'
-const __dirname = path.dirname(__filename);
-
+// No need to redefine __filename or __dirname, they are globally available
 app.use(express.static(path.join(__dirname, 'assets')));
 
 app.get('/', (req, res) => {
@@ -59,7 +56,7 @@ async function start(file) {
   if (isRunning) return;
   isRunning = true;
 
-  const currentFilePath = __filename;
+  const currentFilePath = __filename; // __filename is already available in CommonJS
   const args = [path.join(path.dirname(currentFilePath), file), ...process.argv.slice(2)];
   const p = spawn(process.argv[0], args, {
     stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
