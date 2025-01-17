@@ -1,9 +1,15 @@
 const fetch = require('node-fetch');  // Use require instead of import
 
-let handler = async ({ m, command, bot, usedPrefix, text }) => {
+let handler = async ({ m, command, bot, usedPrefix, text, prefixes }) => {
   try {
-    // Strip the prefix from the command to get the query
-    const query = command.replace(usedPrefix, '').trim();  // Remove prefix and extra spaces
+    // Strip the prefix from the command (works with multiple prefixes)
+    let query = '';
+    for (let prefix of prefixes) {
+      if (command.startsWith(prefix)) {
+        query = command.replace(prefix, '').trim();
+        break;  // Stop once the correct prefix is found
+      }
+    }
 
     // Ensure the query is not empty, and throw an error if it is
     if (!query) {
@@ -29,7 +35,7 @@ let handler = async ({ m, command, bot, usedPrefix, text }) => {
     bot.sendMessage(m.chat.id, `_${query}_`, {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "🔄 NEXT 🔄", callback_data: `${query}` }]  // Send just the query (no "next_" prefix)
+          [{ text: "🔄 NEXT 🔄", callback_data: `next_${query}` }]  // Include "next_" in callback data to handle next action
         ]
       }
     });
@@ -60,9 +66,9 @@ handler.help = [
 handler.tags = ['anime'];  // Define the command tag as anime
 
 // Handle the callback for the "Next" button (restarts the fetching process)
-handler.action = async (callbackQuery, bot) => {
+handler.action = async (callbackQuery, bot, prefixes) => {
   const { data } = callbackQuery;  // This will now be the query (no "next_" prefix)
-  const query = data;  // No need to strip "next_" because it is no longer part of the callback data
+  let query = data.replace('next_', '');  // Strip "next_" prefix to get the actual character name
 
   // Ensure that the query is valid
   if (!query || !handler.command.includes(query)) {
@@ -86,7 +92,7 @@ handler.action = async (callbackQuery, bot) => {
     bot.sendMessage(callbackQuery.message.chat.id, `_${query}_`, {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "🔄 NEXT 🔄", callback_data: `${query}` }]  // Send just the query (no "next_" prefix)
+          [{ text: "🔄 NEXT 🔄", callback_data: `next_${query}` }]  // Include "next_" in callback data to handle next action
         ]
       }
     });
