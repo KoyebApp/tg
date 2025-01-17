@@ -29,7 +29,7 @@ let handler = async ({ m, command, bot, usedPrefix, text }) => {
     bot.sendMessage(m.chat.id, `_${query}_`, {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "🔄 NEXT 🔄", callback_data: `usedPrefix + command` }]
+          [{ text: "🔄 NEXT 🔄", callback_data: `next_${query}` }]  // Changed callback data format
         ]
       }
     });
@@ -62,7 +62,7 @@ handler.tags = ['anime'];  // Define the command tag as anime
 // Handle the callback for the "Next" button (restarts the fetching process)
 handler.action = async (callbackQuery, bot) => {
   const { data } = callbackQuery;
-  const query = data.split('-')[1]; // Extract the query part after "next-"
+  const query = data.split('_')[1];  // Changed to handle the "_" separator in callback data
 
   // Fetch the new random image and restart the process as if the user typed the command again
   try {
@@ -80,7 +80,7 @@ handler.action = async (callbackQuery, bot) => {
     bot.sendMessage(callbackQuery.message.chat.id, `_${query}_`, {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "🔄 NEXT 🔄", callback_data: `next-${query}` }]
+          [{ text: "🔄 NEXT 🔄", callback_data: `next_${query}` }]  // Match callback data format
         ]
       }
     });
