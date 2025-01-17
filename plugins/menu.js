@@ -64,4 +64,8 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
   }
 };
 
+handler.command = ['menu', 'help', 'list']
+handler.help = ['menu', 'help', 'list']
+handler.tags = ['main']
+
 module.exports = handler;
