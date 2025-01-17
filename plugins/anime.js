@@ -1,6 +1,9 @@
 const fetch = require('node-fetch');  // Use require instead of import
 
-let handler = async ({ m, command, bot, usedPrefix, text, prefixes }) => {
+// List of possible prefixes
+const prefixes = ['!', '/', '-', '$', '.'];
+
+let handler = async ({ m, command, bot, usedPrefix, text }) => {
   try {
     // Strip the prefix from the command (works with multiple prefixes)
     let query = '';
@@ -66,7 +69,7 @@ handler.help = [
 handler.tags = ['anime'];  // Define the command tag as anime
 
 // Handle the callback for the "Next" button (restarts the fetching process)
-handler.action = async (callbackQuery, bot, prefixes) => {
+handler.action = async (callbackQuery, bot) => {
   const { data } = callbackQuery;  // This will now be the query (no "next_" prefix)
   let query = data.replace('next_', '');  // Strip "next_" prefix to get the actual character name
 
