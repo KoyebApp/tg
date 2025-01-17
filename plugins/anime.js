@@ -29,7 +29,7 @@ let handler = async ({ m, command, bot, usedPrefix, text }) => {
     bot.sendMessage(m.chat.id, `_${query}_`, {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "🔄 NEXT 🔄", callback_data: `next-${query}` }]
+          [{ text: "🔄 NEXT 🔄", callback_data: `usedPrefix + command` }]
         ]
       }
     });
