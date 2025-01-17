@@ -4,7 +4,6 @@ const express = require('express');
 const figlet = require('figlet');
 const fs = require('fs');
 const path = require('path');
-const { fileURLToPath } = require('url');
 
 figlet(
   'MEGA AI',
@@ -41,7 +40,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 
 // Using __filename and __dirname in CommonJS
-const __filename = fileURLToPath(require('url').pathToFileURL(__filename).href);
+const __filename = path.basename(__filename);  // No need for 'import.meta.url'
 const __dirname = path.dirname(__filename);
 
 app.use(express.static(path.join(__dirname, 'assets')));
@@ -60,7 +59,7 @@ async function start(file) {
   if (isRunning) return;
   isRunning = true;
 
-  const currentFilePath = new URL(require('url').pathToFileURL(__filename).href).pathname;
+  const currentFilePath = __filename;
   const args = [path.join(path.dirname(currentFilePath), file), ...process.argv.slice(2)];
   const p = spawn(process.argv[0], args, {
     stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
