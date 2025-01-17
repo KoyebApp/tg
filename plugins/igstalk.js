@@ -29,8 +29,8 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
 ▢ 🔗Link: [Instagram Profile](https://instagram.com/${res.username.replace(/^@/, '')})
 └────────────`;
 
-        // Send the profile picture with details
-        await bot.Message(chatId, { caption: message });
+        // Send the profile details as a message
+        await bot.sendMessage(chatId, message);
     } catch (error) {
         console.error("Error:", error);
         await bot.sendMessage(chatId, `✳️ An error occurred while processing the request. Please try again later.`);
