@@ -3,6 +3,9 @@ const fetch = require('node-fetch');  // Use require instead of import
 let handler = async ({ m, bot, usedPrefix, command, text }) => {
    let tee = `✳️ Provide Some Text With Command 📌 Example: ${usedPrefix + command} MEGA AI`;  // Fixed string closing
 
+   // Ensure text is valid
+   if (!text) throw tee;
+
    let apiUrl;
    switch (command) {
       case 'papercut':
@@ -18,7 +21,7 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
       case 'galaxy':
       case 'beach':
       case 'clouds':
-         if (!text) throw tee;
+         // Here we ensure to send only the part of the message after the command and prefix
          apiUrl = `https://api.giftedtech.web.id/api/ephoto360/${command}?apikey=gifted-md&text=${encodeURIComponent(text)}`;
          break;
 
@@ -26,24 +29,26 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
          throw 'Command not recognized.';
    }
 
-   // Fetch the image URL from the API
    try {
+      // Fetch the image URL from the API
       const response = await fetch(apiUrl);
+      
+      // Ensure the response is valid JSON
       const data = await response.json();
 
       if (data.success && data.result && data.result.image_url) {
-         // Send the image URL to the user
-         await bot.sendDocument(m.chat.id, data.result.image_url, { caption: '𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸' });
+         // Send the image to the user
+         bot.sendDocument(m.chat, data.result.image_url, 'logo.png', `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`, m);
       } else {
          throw 'Failed to generate the image. Please try again later.';
       }
    } catch (error) {
       console.error('Error fetching image:', error);
-      await bot.sendMessage(m.chat.id, '❌ An error occurred while fetching the image. Please try again later.');
+      bot.sendMessage(m.chat.id, '❌ An error occurred while fetching the image. Please try again later.');
    }
-};
+}
 
-// List of supported commands
+// Make sure command is an array (even for a single command)
 handler.command = [
    'papercut', 'logomaker', 'bpstyle', 'writetext', 'glossy', 'cartoon', 'pixelglitch', 'advancedglow', 
    'lighteffect', 'texteffect', 'galaxy', 'beach', 'clouds'
