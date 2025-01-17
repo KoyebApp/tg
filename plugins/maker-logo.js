@@ -12,22 +12,58 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
 
    let apiUrl;
 
+   // Define the correct API URLs for each command
    switch (command) {
       case 'papercut':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/papercut?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'logomaker':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/logomaker?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'cartoon':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/cartoonstyle?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'writetext':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/writetext?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'glossy':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/glossysilver?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'bpstyle':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/blackpinkstyle?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'pixelglitch':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/pixelglitch?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'advancedglow':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/advancedglow?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'lighteffect':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/lighteffect?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'texteffect':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/texteffect?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'galaxy':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/galaxy?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'beach':
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/summerbeach?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         break;
+
       case 'clouds':
-         // Here we pass only the text after the command to the API
-         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/${command}?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
+         apiUrl = `https://api.giftedtech.web.id/api/ephoto360/effectclouds?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
          break;
 
       default:
@@ -37,10 +73,11 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
    try {
       // Fetch the image URL from the API
       const response = await fetch(apiUrl);
-      
+
       // Ensure the response is valid JSON
       const data = await response.json();
 
+      // Check if the response is successful and the image URL exists
       if (data.success && data.result && data.result.image_url) {
          // Send the image to the user
          bot.sendDocument(m.chat.id, data.result.image_url, 'logo.png', `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`, m);
