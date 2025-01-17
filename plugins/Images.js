@@ -6,7 +6,7 @@ let handler = async ({ m, bot, command }) => {
       'cyberspace': 'https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/CyberSpace.json',
       'technology': 'https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Technology.json',
       'islamic': 'https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Islamic.json',
-      'gamewallp': 'https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Gamewallp.json',
+      'gamewallp': 'https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/GameWallp.json',
       'mountain': 'https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Mountain.json',
       'programming': 'https://raw.githubusercontent.com/GlobalTechInfo/Islamic-Database/main/Programming.json',
    };
