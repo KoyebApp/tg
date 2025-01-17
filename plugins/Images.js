@@ -21,31 +21,23 @@ let handler = async ({ m, bot, command }) => {
       const response = await fetch(urls[command]);
       const data = await response.json();
 
-      // Ensure the data is an array and has at least 2 images
-      if (!Array.isArray(data) || data.length < 2) {
+      // Ensure the data is an array and has at least one image
+      if (!Array.isArray(data) || data.length < 1) {
          throw 'Not enough images in the data source.';
       }
 
-      // Generate two random indices to select two images
-      const randomIndex1 = Math.floor(Math.random() * data.length);
-      let randomIndex2 = Math.floor(Math.random() * data.length);
+      // Generate a random index to select an image
+      const randomIndex = Math.floor(Math.random() * data.length);
+      
+      // Get the image URL
+      const imageUrl = data[randomIndex];
 
-      // Ensure the indices are different
-      while (randomIndex1 === randomIndex2) {
-         randomIndex2 = Math.floor(Math.random() * data.length);
-      }
-
-      // Get the image URLs
-      const imageUrl1 = data[randomIndex1];
-      const imageUrl2 = data[randomIndex2];
-
-      // Send the images to the user
-      bot.sendPhoto(m.chat.id, imageUrl1, { caption: 'Random Image 1' });
-      bot.sendPhoto(m.chat.id, imageUrl2, { caption: 'Random Image 2' });
+      // Send the image to the user
+      bot.sendPhoto(m.chat.id, imageUrl, { caption: 'Random Image' });
 
    } catch (error) {
-      console.error('Error fetching images:', error);
-      bot.sendMessage(m.chat.id, '❌ An error occurred while fetching the images. Please try again later.');
+      console.error('Error fetching image:', error);
+      bot.sendMessage(m.chat.id, '❌ An error occurred while fetching the image. Please try again later.');
    }
 }
 
