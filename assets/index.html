@@ -281,7 +281,7 @@
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
         function updateNetworkStatus() {
-            const status = navigator.onLine ? 'Online' : 'Online';
+            const status = navigator.onLine ? 'Online' : 'Offline';  // Corrected here
             const networkStatus = document.getElementById("network-status");
             networkStatus.innerHTML = status;
             if (navigator.onLine) {
