@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ULTRA MD Status</title>
+    <title>MEGA AI Status</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
@@ -178,11 +178,11 @@
 <body>
     <div class="container">
         <div class="header">
-            ULTRA MD STATUS
+            MEGA AI STATUS
         </div>
         
         <div class="running-status">
-            ULTRA MD IS RUNNING
+            MEGA AI IS RUNNING
         </div>
 
         <div class="battery-status">
@@ -277,21 +277,28 @@
         }
         fetchSystemInfo();
 
-        // Check Network Status
+        // Check Network Status using fetch request
         window.addEventListener('online', updateNetworkStatus);
         window.addEventListener('offline', updateNetworkStatus);
         function updateNetworkStatus() {
-            const status = navigator.onLine ? 'Online' : 'Offline';  // Corrected here
             const networkStatus = document.getElementById("network-status");
-            networkStatus.innerHTML = status;
-            if (navigator.onLine) {
-                networkStatus.classList.remove('offline');
-                networkStatus.classList.add('online');
-            } else {
-                networkStatus.classList.remove('online');
-                networkStatus.classList.add('offline');
-            }
+
+            // Use fetch request to check if online
+            fetch('https://www.google.com/favicon.ico', { method: 'HEAD', cache: 'no-cache' })
+                .then(() => {
+                    networkStatus.innerHTML = 'Online';
+                    networkStatus.classList.remove('offline');
+                    networkStatus.classList.add('online');
+                })
+                .catch(() => {
+                    networkStatus.innerHTML = 'Offline';
+                    networkStatus.classList.remove('online');
+                    networkStatus.classList.add('offline');
+                });
         }
+
+        // Initial network check on page load
+        updateNetworkStatus();
 
         // Dark Mode Toggle
         function toggleDarkMode() {
