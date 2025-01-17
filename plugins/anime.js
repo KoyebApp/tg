@@ -29,7 +29,7 @@ let handler = async ({ m, command, bot, usedPrefix, text }) => {
     bot.sendMessage(m.chat.id, `_${query}_`, {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "🔄 NEXT 🔄", callback_data: `next_${query}` }]  // Send just the query without the prefix
+          [{ text: "🔄 NEXT 🔄", callback_data: `${query}` }]  // Send just the query (no "next_" prefix)
         ]
       }
     });
@@ -61,8 +61,8 @@ handler.tags = ['anime'];  // Define the command tag as anime
 
 // Handle the callback for the "Next" button (restarts the fetching process)
 handler.action = async (callbackQuery, bot) => {
-  const { data } = callbackQuery;  // This will now be `next_${query}`
-  const query = data.replace('next_', '');  // Remove the "next_" prefix from callback data
+  const { data } = callbackQuery;  // This will now be the query (no "next_" prefix)
+  const query = data;  // No need to strip "next_" because it is no longer part of the callback data
 
   // Ensure that the query is valid
   if (!query || !handler.command.includes(query)) {
@@ -86,7 +86,7 @@ handler.action = async (callbackQuery, bot) => {
     bot.sendMessage(callbackQuery.message.chat.id, `_${query}_`, {
       reply_markup: {
         inline_keyboard: [
-          [{ text: "🔄 NEXT 🔄", callback_data: `next_${query}` }]  // Send just the query without the prefix
+          [{ text: "🔄 NEXT 🔄", callback_data: `${query}` }]  // Send just the query (no "next_" prefix)
         ]
       }
     });
