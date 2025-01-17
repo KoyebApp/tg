@@ -1,12 +1,14 @@
 const fetch = require('node-fetch');  // Use require instead of import
 
 let handler = async ({ m, bot, usedPrefix, command, text }) => {
-   let tee = `✳️ Provide Some Text With Command 📌 Example: ${usedPrefix + command} MEGA AI`;  // Fixed string closing
+   // This error message will show if no text after the command is provided.
+   let tee = `✳️ Provide Some Text With Command 📌 Example: ${usedPrefix + command} MEGA AI`;  
 
-   // Ensure that there is text after the command (remove the prefix + command)
-   let textAfterCommand = text.trim();  // Remove extra spaces from the text
+   // Strip the prefix and the command from the full message
+   let textAfterCommand = text.replace(new RegExp(`^${usedPrefix}${command}`, 'i'), '').trim();
 
-   if (!textAfterCommand) throw tee;  // If there's no text after the command, show error
+   // Ensure that there is text after the command (if not, show an error message)
+   if (!textAfterCommand) throw tee;
 
    let apiUrl;
 
@@ -24,7 +26,7 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
       case 'galaxy':
       case 'beach':
       case 'clouds':
-         // Here we send only the part of the message after the command
+         // Here we pass only the text after the command to the API
          apiUrl = `https://api.giftedtech.web.id/api/ephoto360/${command}?apikey=gifted-md&text=${encodeURIComponent(textAfterCommand)}`;
          break;
 
@@ -51,7 +53,7 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
    }
 }
 
-// Make sure command is an array (even for a single command)
+// List of commands (for which this plugin should work)
 handler.command = [
    'papercut', 'logomaker', 'bpstyle', 'writetext', 'glossy', 'cartoon', 'pixelglitch', 'advancedglow', 
    'lighteffect', 'texteffect', 'galaxy', 'beach', 'clouds'
