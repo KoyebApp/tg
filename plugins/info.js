@@ -1,3 +1,6 @@
+const fs = require('fs');
+const path = require('path');
+
 let handler = async ({ m, bot, query }) => {
   try {
     const chatId = m.chat.id;
@@ -19,13 +22,23 @@ let handler = async ({ m, bot, query }) => {
         };
         const uptime = new Date(botInfo.uptime * 1000).toISOString().substr(11, 8); // Format uptime as hh:mm:ss
         const botMessage = `
-        ➠ Bot Name : 𝙼𝙴𝙶𝙰-𝙰𝙸
+➠ Bot Name : 𝙼𝙴𝙶𝙰-𝙰𝙸
 ➠ Version : ${botInfo.version}
 ➠ Structure: [Plugins]
 ➠ Runtime: ${uptime}
 ➠ Platform: Linux Machine
         `;
-        await bot.sendMessage(chatId, botMessage, { parse_mode: 'Markdown' });
+        
+        // Define the correct path for the image
+        const imagePath = path.join(__dirname, '..', 'assets', 'A.jpg');
+        
+        // Check if the image file exists
+        if (!fs.existsSync(imagePath)) {
+          throw new Error('Image file not found');
+        }
+
+        // Send bot info with the photo
+        await bot.sendPhoto(chatId, imagePath, { caption: botMessage });
       } else {
         await bot.sendMessage(chatId, "Invalid command. Please use 'info' to get bot information.");
       }
