@@ -37,7 +37,7 @@ let handler = async ({ m, bot, command }) => {
       const randomFact = facts[randomIndex];
 
       // Send the fact to the user
-      bot.sendMessage(m.chat.id, `💬 *Random Fact:*\n\n${randomFact}`);
+      bot.sendMessage(m.chat.id, `💬 𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸\n\n${randomFact}`);
 
    } catch (error) {
       console.error('Error fetching fact:', error);
