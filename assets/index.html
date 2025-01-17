@@ -38,21 +38,20 @@
             text-transform: uppercase;
         }
 
-        .running-status {
+        .current-time {
             font-size: 20px;
             font-weight: 600;
             color: #FF5722;
             margin-bottom: 20px;
-            animation: blink 1.5s infinite;
         }
 
-        @keyframes blink {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
+        .battery-status, .ip-address, .geolocation, .system-info {
+            margin-bottom: 15px;
+            font-size: 18px;
+            color: #333;
         }
 
-        .battery-status, .ip-address, .geolocation, .system-info, .network-status {
+        .network-status {
             margin-bottom: 15px;
             font-size: 18px;
             color: #333;
@@ -92,19 +91,6 @@
             color: #F44336; /* Red for low battery */
         }
 
-        /* Icons and Text Color */
-        .ip-address i {
-            color: #2196F3; /* Blue for IP Address */
-        }
-
-        .geolocation i {
-            color: #FFC107; /* Amber for Location */
-        }
-
-        .system-info i {
-            color: #9C27B0; /* Purple for System Info */
-        }
-
         /* Toggle Button */
         .toggle-dark-mode {
             margin-top: 20px;
@@ -132,38 +118,6 @@
             background-color: #424242;
             color: #fff;
         }
-
-        /* Animation Styles */
-        .animated-background {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: -1;
-        }
-
-        .circle {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 30px;
-            height: 30px;
-            background-color: #4CAF50;
-            border-radius: 50%;
-            animation: animate-circle 2s linear infinite;
-            opacity: 0.2;
-        }
-
-        @keyframes animate-circle {
-            0% {
-                transform: translate(-50%, -50%) scale(0);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
     </style>
 </head>
 <body>
@@ -171,9 +125,9 @@
         <div class="header">
             ULTRA MD STATUS
         </div>
-        
-        <div class="running-status">
-            ULTRA MD IS RUNNING
+
+        <div class="current-time" id="current-time">
+            Loading current time...
         </div>
 
         <div class="battery-status">
@@ -195,20 +149,56 @@
             <i class="fas fa-cogs"></i> <span id="system-info">Loading system info...</span>
         </div>
 
-        <div class="current-time">
-            <i class="fas fa-clock"></i> <span id="current-time">Loading current time...</span>
-        </div>
-
         <button class="toggle-dark-mode" onclick="toggleDarkMode()">Toggle Dark Mode</button>
     </div>
 
-    <div class="animated-background">
-        <div class="circle"></div>
-        <div class="circle"></div>
-        <div class="circle"></div>
-    </div>
-
     <script>
+        // Get User IP Address
+        async function fetchIpAddress() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                document.getElementById("ip-address").innerHTML = data.ip;
+
+                // Get Location info from IP address
+                fetchLocation(data.ip);
+            } catch (error) {
+                document.getElementById("ip-address").innerHTML = 'Unable to fetch IP';
+            }
+        }
+        fetchIpAddress();
+
+        // Fetch the user's location (country and timezone) from their IP
+        async function fetchLocation(ip) {
+            try {
+                const response = await fetch(`https://ipinfo.io/${ip}/json`);
+                const data = await response.json();
+                const country = data.country;
+                const timezone = data.timezone;
+
+                document.getElementById("location").innerHTML = `Country: ${country}`;
+
+                // Fetch current time for the user's country timezone
+                fetchCurrentTime(timezone);
+            } catch (error) {
+                document.getElementById("location").innerHTML = 'Unable to fetch location';
+            }
+        }
+
+        // Fetch the current time for the user's timezone
+        async function fetchCurrentTime(timezone) {
+            try {
+                const response = await fetch(`http://worldtimeapi.org/api/timezone/${timezone}.json`);
+                const data = await response.json();
+                const currentTime = data.datetime;
+                const formattedTime = new Date(currentTime).toLocaleString();
+
+                document.getElementById("current-time").innerHTML = `Current time: ${formattedTime}`;
+            } catch (error) {
+                document.getElementById("current-time").innerHTML = 'Unable to fetch time';
+            }
+        }
+
         // Get Battery Status
         if ('getBattery' in navigator) {
             navigator.getBattery().then(function(battery) {
@@ -234,49 +224,6 @@
                 });
             });
         }
-
-        // Get User IP Address
-        async function fetchIpAddress() {
-            try {
-                const response = await fetch('https://api.ipify.org?format=json');
-                const data = await response.json();
-                document.getElementById("ip-address").innerHTML = data.ip;
-                fetchLocation(data.ip); // Fetch location based on IP
-            } catch (error) {
-                document.getElementById("ip-address").innerHTML = 'Unable to fetch IP';
-            }
-        }
-        fetchIpAddress();
-
-        // Get User Location (Country) based on IP
-        async function fetchLocation(ip) {
-            try {
-                const response = await fetch(`https://ipinfo.io/${ip}/json`);
-                const data = await response.json();
-                document.getElementById("location").innerHTML = data.city + ', ' + data.country;
-                fetchCurrentTime(data.timezone); // Fetch current time for the timezone
-            } catch (error) {
-                document.getElementById("location").innerHTML = 'Unable to fetch location';
-            }
-        }
-
-        // Get Current Time based on the country's timezone
-        async function fetchCurrentTime(timezone) {
-            try {
-                const response = await fetch(`http://worldtimeapi.org/api/timezone/${timezone}`);
-                const data = await response.json();
-                document.getElementById("current-time").innerHTML = `Current time: ${data.datetime.split('T')[1].split('.')[0]}`;
-            } catch (error) {
-                document.getElementById("current-time").innerHTML = 'Unable to fetch current time';
-            }
-        }
-
-        // Get System Information
-        function fetchSystemInfo() {
-            const systemInfo = `Browser: ${navigator.userAgent}, OS: ${navigator.platform}`;
-            document.getElementById("system-info").innerHTML = systemInfo;
-        }
-        fetchSystemInfo();
 
         // Dark Mode Toggle
         function toggleDarkMode() {
