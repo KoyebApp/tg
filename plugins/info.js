@@ -22,11 +22,16 @@ let handler = async ({ m, bot, query }) => {
         };
         const uptime = new Date(botInfo.uptime * 1000).toISOString().substr(11, 8); // Format uptime as hh:mm:ss
         const botMessage = `
+        
 ➠ Bot Name : 𝙼𝙴𝙶𝙰-𝙰𝙸
+
 ➠ Version : ${botInfo.version}
-➠ Structure: [Plugins]
+
+➠ Structure: Plugins
+
 ➠ Runtime: ${uptime}
-➠ Platform: Linux Machine
+
+➠ Platform: Linux
         `;
         
         // Define the correct path for the image
