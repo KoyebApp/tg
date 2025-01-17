@@ -4,15 +4,19 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
     const chatId = m.chat.id;
 
     if (!query) {
-        return bot.sendMessage(chatId, "Please provide a search query.");
+        return bot.sendMessage(chatId, "Please provide a username.");
     }
 
     try {
-
-          // Send "waiting" message to indicate the bot is processing
-    await bot.sendMessage(chatId, "⏳ Please wait, fetching details...");
+        // Send "waiting" message to indicate the bot is processing
+        await bot.sendMessage(chatId, "⏳ Please wait, fetching details...");
+        
         // Call the Instagram profile stalking API with the username
         let res = await Qasim.igStalk(query);
+
+        if (!res.username) {
+            return await bot.sendMessage(chatId, "Sorry, we couldn't find that Instagram profile.");
+        }
 
         let message = `
 ┌──「 STALKING INSTAGRAM
@@ -32,7 +36,7 @@ const handler = async ({ bot, m, text, db, usedPrefix, command, query }) => {
         await bot.sendPhoto(chatId, profilePic, { caption: message });
     } catch (error) {
         console.error("Error:", error);
-        await bot.sendMessage(chatId, `✳️ An error occurred while processing the request: ${error.message || error}`);
+        await bot.sendMessage(chatId, `✳️ An error occurred while processing the request. Please try again later.`);
     }
 };
 
