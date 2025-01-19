@@ -163,7 +163,7 @@ bot.on('message', (msg) => {
 
     if (handler) {
       let context = {
-        bot: conn,
+        bot,
         m: msg, 
         text, 
         query, 
