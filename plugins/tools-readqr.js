@@ -3,47 +3,53 @@ const fetch = require('node-fetch');  // Fetch for making API calls
 
 let handler = async ({ m, bot, query, usedPrefix, command }) => {
   try {
-    // Check if the image is in the query, either from the main message or as a reply
-    let mime = (query || m).mimetype || '';  // Get mime type from the message or query
-    console.log('Mime type:', mime);  // Log mime type to check if we get the correct value
-    
-    // Ensure the mime type exists and is an image
+    // Log message details to see what is being received
+    console.log("Received message:", m);
+    console.log("Received query:", query);
+
+    // Get mime type from the query (or the main message if no query)
+    let mime = (query || m).mimetype || '';  
+    console.log('Mime type:', mime);  // Log mime type to check if it's correct
+
+    // Ensure mime type exists and it's an image
     if (!mime || !mime.startsWith('image/')) {
       throw '*Respond with a QR code image!*';  // Error if it's not an image
     }
 
-    // Case: Download the image from the query message or main message
-    let img = await (query || m).download?.();  // Download the image from the query or main message
-    console.log('Image download success:', !!img);  // Log download success/failure
+    // Download the image from the query or the main message
+    let img = await (query || m).download?.();  
+    console.log('Image download success:', !!img);  // Log if image was downloaded
 
+    // If image was not downloaded, throw error
     if (!img) {
-      throw '*Failed to download the image, please try again!*';  // If no image was downloaded, show error
+      throw '*Failed to download the image, please try again!*';
     }
 
-    // Case: Upload the image to telegra.ph and get the URL
-    let url = await uploadImage(img);  // Upload image to get the URL
+    // Upload image to telegra.ph and get the URL
+    let url = await uploadImage(img);  
     console.log('Uploaded image URL:', url);  // Log the uploaded image URL
 
-    // Case: Fetch the result from the QR code reading API
+    // Fetch result from QR code reading API
     let anu = await fetch(`https://api.lolhuman.xyz/api/read-qr?apikey=GataDios&img=${url}`);
-    let json = await anu.json();  // Parse the API response
+    let json = await anu.json();  // Parse API response
 
-    // Case: If API does not return success status, throw error
+    // If the API response is not successful, throw an error
     if (json.status !== 200) {
-      throw `Error: ${json.message || 'Unable to read the QR code.'}`;  // Handle API errors
+      throw `Error: ${json.message || 'Unable to read the QR code.'}`;
     }
 
-    // Case: Successfully decoded QR code, send the result
+    // Send back the decoded QR code result
     await bot.sendMessage(m.chat.id, `*Here you go:* ${json.result}`);
   } catch (error) {
-    console.error('Error in readqr handler:', error);  // Log any errors encountered during the process
-    await bot.sendMessage(m.chat.id, `*Error occurred:* ${error.message || error}`);  // Send error message to user
+    // Log the error and send a message to the user
+    console.error('Error in readqr handler:', error);
+    await bot.sendMessage(m.chat.id, `*Error occurred:* ${error.message || error}`);
   }
 };
 
 // Command configuration
-handler.command = ['readqr'];
+handler.command = ['readqr'];  // Command to trigger the QR code reading
 handler.help = ['readqr'];
 handler.tags = ['qr'];
 
-module.exports = handler;
+module.exports = handler;  // Export the handler for use by the bot
