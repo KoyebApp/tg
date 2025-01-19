@@ -5,6 +5,8 @@ const os = require('os');  // For platform-independent temp directories
 
 let handler = async ({ bot, m, text, usedPrefix, command, args }) => {
   try {
+    console.log("Command received:", command);  // Logging the command
+
     // Get quoted message or current message
     let q = m.quoted ? m.quoted : m;
 
@@ -60,8 +62,8 @@ let handler = async ({ bot, m, text, usedPrefix, command, args }) => {
     console.log('Temporary file cleaned up.');
 
   } catch (error) {
-    // Handle any errors and send an error message
-    console.error('Error processing media:', error);
+    // Log error for debugging
+    console.error("Error processing media:", error);
     await bot.sendMessage(m.chat.id, `❌ Error: ${error}`);
   }
 };
@@ -73,3 +75,4 @@ handler.command = ['url', 'tourl'];
 
 // Export the handler for use in the bot
 module.exports = handler;
+        
