@@ -162,8 +162,8 @@ bot.on('message', (msg) => {
     const handler = plugins[normalizedCommand];
 
     if (handler) {
-      let context = { 
-        bot, 
+      let context = {
+        conn: bot,
         m: msg, 
         text, 
         query, 
