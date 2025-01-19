@@ -16,17 +16,27 @@ let handler = async ({ m, bot, query, usedPrefix, command }) => {
   }
 
   try {
-    // Generate the QR code and save it to a temporary file using `toFile`
+    // Define the absolute file path for the temporary QR code image
     const filePath = path.join(__dirname, 'qrcode.png'); // Set the path for the temporary file
+
+    // Generate the QR code and save it to the file
     await toFile(filePath, query.slice(0, 2048));
 
-    // Send the generated QR code image to the user
-    await bot.sendPhoto(chatId, { path: filePath }, { caption: 'Here you go!' });
+    // Check if the file was generated successfully
+    if (fs.existsSync(filePath)) {
+      console.log(`QR code generated at: ${filePath}`);
 
-    // Clean up: delete the temporary file after sending it
-    fs.unlinkSync(filePath); // Remove the temporary file after sending
+      // Send the generated QR code image to the user
+      await bot.sendPhoto(chatId, { path: filePath }, { caption: 'Here you go!' });
+
+      // Clean up: delete the temporary file after sending it
+      fs.unlinkSync(filePath); // Remove the temporary file after sending
+    } else {
+      throw new Error("QR code file not found after generation.");
+    }
   } catch (err) {
     // Handle any errors in generating the QR code
+    console.error(err);
     await bot.sendMessage(chatId, `Error generating QR code: ${err.message}`);
   }
 };
