@@ -1,21 +1,22 @@
 const Qasim = require('api-qasim');  // Import the trendtwit function from the api-qasim package
 
-let handler = async ({ bot, m, text, usedPrefix, command }) => {
-    const suggest = `Please provide a country name. Example: ${usedPrefix}${command} Pakistan`;
-    if (!text) throw suggest;
+let handler = async ({ bot, m, query, usedPrefix, command }) => {
+    // If no query is provided, ask for a country name directly
+    if (!query) {
+        throw `Please provide a country name. Example: *${usedPrefix}${command} Pakistan*`;
+    }
 
     try {
-        const chatId = m.chat.id
         // Fetch the trending topics using the trendtwit function
-        let trendtwitResult = await Qasim.trendtwit(text);
+        let trendtwitResult = await Qasim.trendtwit(query);
 
         // Check if trendtwitResult is a valid string or object
         if (typeof trendtwitResult === 'string') {
             // If it's a string, send it as a message
             const data = {
-                text: `Trending topics in ${text}:\n\n${trendtwitResult}`,
+                text: `Trending topics in ${query}:\n\n${trendtwitResult}`,
             };
-            await bot.sendMessage(chatId, data.text);
+            await bot.sendMessage(m.chat.id, data.text, { reply_to_message_id: m.message_id });
         } else if (trendtwitResult && typeof trendtwitResult === 'object' && trendtwitResult.result && Array.isArray(trendtwitResult.result) && trendtwitResult.result.length > 0) {
             // If it's an object with trends
             const trends = trendtwitResult.result.map((trend, index) => {
@@ -28,9 +29,9 @@ let handler = async ({ bot, m, text, usedPrefix, command }) => {
             }).join('\n');
 
             const data = {
-                text: `Trending topics in ${text}:\n\n${trends}\n\n*Powered by © ULTRA-MD*`,
+                text: `Trending topics in ${query}:\n\n${trends}\n\n*Powered by © ULTRA-MD*`,
             };
-            await bot.sendMessage(chatId, data.text);
+            await bot.sendMessage(m.chat.id, data.text, { reply_to_message_id: m.message_id });
         } else {
             // If no trends are found
             throw "No trending data found for this country.";
