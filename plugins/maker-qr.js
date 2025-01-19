@@ -6,42 +6,18 @@ let handler = async (m, bot, query) => {
     // If not, ask the user for a query
     await bot.sendMessage(m.chat.id, "Please provide the text to generate the QR code.");
     
-    // Wait for the user to reply
-    bot.on('message', async (response) => {
-      // Ensure it's a valid response and belongs to the same user/chat
-      if (response.chat.id === m.chat.id && response.text) {
-        query = response.text; // Store the response as the query
-
-        try {
-          // Generate the QR code from the provided query text (limit length to 2048 characters)
-          const qrCodeDataUrl = await toDataURL(query.slice(0, 2048), { scale: 8 });
-
-          // Send the generated QR code to the user
-          await bot.sendPhoto(
-            m.chat.id,
-            qrCodeDataUrl,
-            'qrcode.png',
-            'Here you go!',
-            m
-          );
-        } catch (err) {
-          // Handle any errors in generating the QR code
-          await bot.sendMessage(m.chat.id, `Error generating QR code: ${err.message}`);
-        }
-      }
-    });
-  } else {
     try {
+
+      const chatId = msg.chat.id;
       // Generate the QR code from the provided query text (limit length to 2048 characters)
       const qrCodeDataUrl = await toDataURL(query.slice(0, 2048), { scale: 8 });
 
       // Send the generated QR code to the user
       await bot.sendPhoto(
-        m.chat.id,
+        chatId,
         qrCodeDataUrl,
         'qrcode.png',
-        'Here you go!',
-        m
+        'Here you go!'
       );
     } catch (err) {
       // Handle any errors in generating the QR code
