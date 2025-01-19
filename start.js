@@ -1,37 +1,72 @@
 const chalk = require('chalk');
 const { spawn } = require('child_process');
+const express = require('express');
+const figlet = require('figlet');
 const fs = require('fs');
 const path = require('path');
-const figlet = require('figlet');
+const { fileURLToPath } = require('url');
 
-// Import the `connect` function from server.js (no need to deal with express setup here)
-const connect = require('./server'); // Ensure you are calling this properly for server-side logic
-
-// Display the welcome banner
-figlet('MEGA AI', { font: 'Ghost', horizontalLayout: 'default', verticalLayout: 'default' }, (err, data) => {
-  if (err) {
-    console.error(chalk.red('Figlet error:', err));
-    return;
+// Print ASCII Art for Bot Name
+figlet(
+  'MEGA',
+  {
+    font: 'Ghost',
+    horizontalLayout: 'default',
+    verticalLayout: 'default',
+  },
+  (err, data) => {
+    if (err) {
+      console.error(chalk.red('Figlet error:', err));
+      return;
+    }
+    console.log(chalk.yellow(data));
   }
-  console.log(chalk.yellow(data));
+);
+
+// Print ASCII Art for Bot Description
+figlet(
+  'Telegram',
+  {
+    horizontalLayout: 'default',
+    verticalLayout: 'default',
+  },
+  (err, data) => {
+    if (err) {
+      console.error(chalk.red('Figlet error:', err));
+      return;
+    }
+    console.log(chalk.magenta(data));
+  }
+);
+
+const app = express();
+const port = process.env.PORT || 5000;
+
+// Resolve the file paths
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Serve static files from the 'Assets' folder
+app.use(express.static(path.join(__dirname, 'Assets')));
+
+// Route to redirect to `guru.html`
+app.get('/', (req, res) => {
+  res.redirect('/index.html');
 });
 
-figlet('Advanced Telegram Bot', { horizontalLayout: 'default', verticalLayout: 'default' }, (err, data) => {
-  if (err) {
-    console.error(chalk.red('Figlet error:', err));
-    return;
-  }
-  console.log(chalk.magenta(data));
+// Start the server
+app.listen(port, () => {
+  console.log(chalk.green(`Port ${port} is open`));
 });
 
 let isRunning = false;
 
-// Start the application and spawn a new process
+// Function to start a file with child process
 async function start(file) {
   if (isRunning) return;
   isRunning = true;
 
-  const currentFilePath = __filename; // Get the current file path
+  const currentFilePath = __filename; // Use the current file for path resolution
   const args = [path.join(path.dirname(currentFilePath), file), ...process.argv.slice(2)];
 
   const p = spawn(process.argv[0], args, {
@@ -44,7 +79,7 @@ async function start(file) {
       case 'reset':
         p.kill();
         isRunning = false;
-        start.apply(this, arguments); // Restart the app if required
+        start.apply(this, arguments);
         break;
       case 'uptime':
         p.send(process.uptime());
@@ -58,10 +93,9 @@ async function start(file) {
 
     if (code === 0) return;
 
-    // Watch for file changes and restart the app if necessary
     fs.watchFile(args[0], () => {
       fs.unwatchFile(args[0]);
-      start('index.js');
+      start('index.js'); // Replacing guru.js with index.js
     });
   });
 
@@ -69,7 +103,7 @@ async function start(file) {
     console.error(chalk.red(`Error: ${err}`));
     p.kill();
     isRunning = false;
-    start('index.js');
+    start('index.js'); // Replacing guru.js with index.js
   });
 
   const pluginsFolder = path.join(path.dirname(currentFilePath), 'plugins');
@@ -81,17 +115,7 @@ async function start(file) {
     }
     console.log(chalk.yellow(`Installed ${files.length} plugins`));
 
-    try {
-      console.log(chalk.yellow('Telegram bot is ready.'));
-      // Call the connect function to start the server and the bot
-      connect(null, process.env.PORT || 5000, { keepalive: true }); // Assuming you want the server to keep alive
-    } catch (e) {
-      console.error(chalk.red('Error initializing Telegram bot.'));
-    }
-  });
-}
-
-// Start the bot server with the main file
+// Start the bot by running index.js
 start('index.js');
 
 process.on('unhandledRejection', () => {
