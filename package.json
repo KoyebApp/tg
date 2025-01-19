@@ -31,10 +31,12 @@
     "lowdb": "^3.0.0",
     "mongoose": "^8.9.5",
     "got": "^14.4.5",
+    "http": "^7.0.2",
     "perf_hooks": "^0.0.1",
     "lodash": "^4.17.21",
     "qrcode": "^1.5.1",
     "simple-git": "^3.27.0",
+    "socket.io": "^4.5.2",
     "syntax-error": "^1.4.0",
     "mime-types": "^2.1.35"
   },
