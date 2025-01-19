@@ -1,14 +1,14 @@
 const { toDataURL } = require('qrcode');
 
 let handler = async ({ m, bot, query }) => {
+
+  const chatId = msg.chat.id;
   // Check if the user has provided the text in the command directly
   if (!query) {
     // If not, ask the user for a query
     await bot.sendMessage(chatId, "Please provide the text to generate the QR code.");
     
     try {
-
-      const chatId = msg.chat.id;
       // Generate the QR code from the provided query text (limit length to 2048 characters)
       const qrCodeDataUrl = await toDataURL(query.slice(0, 2048), { scale: 8 });
 
