@@ -7,7 +7,7 @@ let handler = async ({ bot, m, text, usedPrefix, command }) => {
     try {
         
         // Fetch the trending topics using the trendtwit function
-        let trendtwitResult = await trendtwit(text);
+        let trendtwitResult = await Qasim.trendtwit(text);
 
         // Check if trendtwitResult is a valid string or object
         if (typeof trendtwitResult === 'string') {
