@@ -1,4 +1,4 @@
-const { toFileStream } = require('qrcode');
+const { toFile } = require('qrcode');
 const fs = require('fs');
 const path = require('path');
 
@@ -16,10 +16,9 @@ let handler = async ({ m, bot, query, usedPrefix, command }) => {
   }
 
   try {
-    // Generate the QR code and save it to a temporary file
+    // Generate the QR code and save it to a temporary file using `toFile`
     const filePath = path.join(__dirname, 'qrcode.png'); // Set the path for the temporary file
-    const writeStream = fs.createWriteStream(filePath);
-    await toFileStream(query.slice(0, 2048), writeStream);
+    await toFile(filePath, query.slice(0, 2048));
 
     // Send the generated QR code image to the user
     await bot.sendPhoto(chatId, { path: filePath }, { caption: 'Here you go!' });
