@@ -5,7 +5,7 @@ let handler = async ({ bot, m, text, usedPrefix, command }) => {
     if (!text) throw suggest;
 
     try {
-        
+        const chatId = m.chat.id
         // Fetch the trending topics using the trendtwit function
         let trendtwitResult = await Qasim.trendtwit(text);
 
@@ -15,7 +15,7 @@ let handler = async ({ bot, m, text, usedPrefix, command }) => {
             const data = {
                 text: `Trending topics in ${text}:\n\n${trendtwitResult}`,
             };
-            await bot.sendMessage(m.chat.id, data.text, { reply_to_message_id: m.message_id });
+            await bot.sendMessage(chatId, data.text);
         } else if (trendtwitResult && typeof trendtwitResult === 'object' && trendtwitResult.result && Array.isArray(trendtwitResult.result) && trendtwitResult.result.length > 0) {
             // If it's an object with trends
             const trends = trendtwitResult.result.map((trend, index) => {
@@ -28,9 +28,9 @@ let handler = async ({ bot, m, text, usedPrefix, command }) => {
             }).join('\n');
 
             const data = {
-                text: `Trending topics in ${text}:\n\n${trends}\n\n𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝚄𝙻𝚃𝚁𝙰-𝙼𝙳`,
+                text: `Trending topics in ${text}:\n\n${trends}\n\n*Powered by © ULTRA-MD*`,
             };
-            await bot.sendMessage(m.chat.id, data.text, { reply_to_message_id: m.message_id });
+            await bot.sendMessage(chatId, data.text);
         } else {
             // If no trends are found
             throw "No trending data found for this country.";
@@ -39,6 +39,11 @@ let handler = async ({ bot, m, text, usedPrefix, command }) => {
     } catch (e) {
         // Handle any errors that occur
         console.error('Error:', e);
+
+        // Handle 404 error specifically
+        if (e.response && e.response.status === 404) {
+            throw "The requested API endpoint is not found. Please check the service URL.";
+        }
 
         const errorMessage = e.message || e || "Unknown error occurred.";
         throw `An error occurred: ${errorMessage}`;
