@@ -13,7 +13,7 @@ dotenv.config();
 // Fetch secrets from environment variables
 const DATABASE_URL = process.env.DATABASE_URL;
 const BOT_TOKEN = process.env.BOT_TOKEN;
-const PREFIX = process.env.PREFIX ? process.env.PREFIX.split(',') : ['/', '!', '.', '*', '"', ':', ';', '?', '(', ')', '+', '-', '&', '_', '$', '#'];
+const PREFIX = process.env.PREFIX ? process.env.PREFIX.split(',') : ['/', '!', '.', '#'];  // Default to multiple prefixes
 
 // Ensure BOT_TOKEN is provided
 if (!BOT_TOKEN) {
@@ -21,23 +21,17 @@ if (!BOT_TOKEN) {
   process.exit(1); // Exit the process if the token is missing
 }
 
-const bot = new TelegramBot(BOT_TOKEN, {
-  polling: {
-    enabled: true,
-    params: {
-      timeout: 10, // Define the polling timeout (in seconds)
-    }
-  }
-});
+// Initialize Telegram bot with token
+const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 
 // Get the path of the plugins folder
 const pluginsPath = path.join(__dirname, 'plugins');
 
 // Database configuration and initialization
 const dbConfig = {
-  type: DATABASE_URL ? 'mongodb' : 'lowdb',
-  version: 'v2',
-  url: DATABASE_URL || 'database.json',
+  type: DATABASE_URL ? 'mongodb' : 'lowdb',    // 'mongodb' or 'lowdb' based on presence of DATABASE_URL
+  version: 'v2',                                // Optional (if 'mongodb' is used, specify version 'v1' or 'v2')
+  url: DATABASE_URL || 'database.json',         // MongoDB URL or LowDB file path
 };
 
 // Check if database.json exists, if not, create it
@@ -65,7 +59,11 @@ const initDatabase = async () => {
   } else {
     try {
       if (dbConfig.type === 'mongodb') {
-        db = dbConfig.version === 'v2' ? new mongoDBV2(dbConfig.url) : new mongoDB(dbConfig.url);
+        if (dbConfig.version === 'v2') {
+          db = new mongoDBV2(dbConfig.url);
+        } else {
+          db = new mongoDB(dbConfig.url);
+        }
       } else if (dbConfig.type === 'cloud') {
         db = await CloudDBAdapter(dbConfig.url);
       }
@@ -113,6 +111,7 @@ const loadPlugins = () => {
           });
         }
 
+        // Check if plugin has callback query data handling
         if (pluginHandler.callbackQuery) {
           pluginHandler.callbackQuery.forEach(callbackData => {
             handlers[`callback_${callbackData.toLowerCase()}`] = pluginHandler;
@@ -148,10 +147,9 @@ const logUserActivity = (chatId, command) => {
 // Main message handler
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-  const text = msg.text?.trim(); // Optional chaining to ensure it's not undefined
-  if (!text) return; // If no text, return early
-
+  const text = msg.text.trim();
   const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));
+
   if (usedPrefix) {
     const commandWithQuery = text.substring(usedPrefix.length).trim();
     const [command, ...queryArr] = commandWithQuery.split(' ');
@@ -190,22 +188,7 @@ bot.on('message', (msg) => {
   }
 });
 
-// Polling error handler
-bot.on('polling_error', (error) => {
-  console.error('Polling error occurred:', error);
-  
-  setTimeout(() => {
-    try {
-      bot.stopPolling();
-      bot.startPolling();
-      console.log('Polling restarted after error.');
-    } catch (err) {
-      console.error('Error restarting polling:', err);
-    }
-  }, 3000); // Retry after 3 seconds.
-});
-
-// Callback query handler
+// Main callback query handler
 bot.on('callback_query', async (callbackQuery) => {
   const chatId = callbackQuery.message.chat.id;
   const callbackData = callbackQuery.data;
