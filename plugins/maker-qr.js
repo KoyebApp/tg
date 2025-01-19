@@ -53,6 +53,6 @@ handler.help = ['qr <text>', 'qr code <text>'];
 handler.tags = ['tools'];
 
 // Define the command to match (qr or qrcode)
-handler.command = /^qr(code)?$/i;
+handler.command = ['qrcode', 'qr'];
 
 module.exports = handler;
