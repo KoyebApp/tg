@@ -4,11 +4,9 @@ const express = require('express');
 const figlet = require('figlet');
 const fs = require('fs');
 const path = require('path');
-const { fileURLToPath } = require('url');
 
-// Print ASCII Art for Bot Name
 figlet(
-  'MEGA',
+  'QASIM',
   {
     font: 'Ghost',
     horizontalLayout: 'default',
@@ -23,7 +21,6 @@ figlet(
   }
 );
 
-// Print ASCII Art for Bot Description
 figlet(
   'Telegram',
   {
@@ -42,33 +39,25 @@ figlet(
 const app = express();
 const port = process.env.PORT || 5000;
 
-// Resolve the file paths
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// No need to redefine __filename or __dirname, they are globally available
+app.use(express.static(path.join(__dirname, 'assets')));
 
-// Serve static files from the 'Assets' folder
-app.use(express.static(path.join(__dirname, 'Assets')));
-
-// Route to redirect to `guru.html`
 app.get('/', (req, res) => {
   res.redirect('/index.html');
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(chalk.green(`Port ${port} is open`));
 });
 
 let isRunning = false;
 
-// Function to start a file with child process
 async function start(file) {
   if (isRunning) return;
   isRunning = true;
 
-  const currentFilePath = __filename; // Use the current file for path resolution
+  const currentFilePath = __filename; // __filename is already available in CommonJS
   const args = [path.join(path.dirname(currentFilePath), file), ...process.argv.slice(2)];
-
   const p = spawn(process.argv[0], args, {
     stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
   });
@@ -95,7 +84,7 @@ async function start(file) {
 
     fs.watchFile(args[0], () => {
       fs.unwatchFile(args[0]);
-      start('index.js'); // Replacing guru.js with index.js
+      start('index.js'); // Replacing global.js with index.js
     });
   });
 
@@ -103,7 +92,7 @@ async function start(file) {
     console.error(chalk.red(`Error: ${err}`));
     p.kill();
     isRunning = false;
-    start('index.js'); // Replacing guru.js with index.js
+    start('index.js');
   });
 
   const pluginsFolder = path.join(path.dirname(currentFilePath), 'plugins');
@@ -115,8 +104,16 @@ async function start(file) {
     }
     console.log(chalk.yellow(`Installed ${files.length} plugins`));
 
-// Start the bot by running index.js
-start('index.js');
+    try {
+      // Removed Baileys logic, as we are now using Telegram Bot API
+      console.log(chalk.yellow('Telegram bot is ready.'));
+    } catch (e) {
+      console.error(chalk.red('Error initializing Telegram bot.'));
+    }
+  });
+}
+
+start('index.js'); // Ensure to start index.js for the bot
 
 process.on('unhandledRejection', () => {
   console.error(chalk.red('Unhandled promise rejection. Bot will restart...'));
