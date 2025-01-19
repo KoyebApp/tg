@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const { createServer } = require('http');
 const socketIo = require('socket.io');
@@ -8,7 +10,7 @@ const { bot } = require('./index');  // Assuming the bot is initialized in index
 
 // Define the keep-alive function directly inside server.js
 function keepAlive() {
-  const url = `https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`;  // Adjust the URL for your platform
+  const url = process.env.APP_URL
   if (/(\/\/|\.)undefined\./.test(url)) return;  // Avoid invalid URLs
   
   setInterval(() => {
