@@ -21,6 +21,7 @@ let handler = async ({ bot, m }) => {
     if (!mediaBuffer || mediaBuffer.length === 0) {
       throw '❌ Failed to download the media file. Please try again.';
     }
+    console.log('Media downloaded successfully, buffer size:', mediaBuffer.length);
 
     // Check if media size exceeds 10 MB
     if (mediaBuffer.length > 10 * 1024 * 1024) {
@@ -36,6 +37,7 @@ let handler = async ({ bot, m }) => {
     // Generate a path for the media file
     let mediaPath = path.join(tmpDir, `media_${Date.now()}.${mime.split('/')[1]}`);
     fs.writeFileSync(mediaPath, mediaBuffer);
+    console.log('Media saved to temp file:', mediaPath);
 
     // Check if the file is a valid image/video (basic check for png/jpg/gif/mp4)
     let isTele = /image\/(png|jpe?g|gif)|video\/mp4/.test(mime);
@@ -45,6 +47,9 @@ let handler = async ({ bot, m }) => {
 
     // Upload the media to imgur and get the URL
     let link = await uploadtoimgur(mediaPath);
+    if (!link) {
+      throw '❌ Failed to upload to imgur. Please try again later.';
+    }
 
     // Calculate the file size in MB
     const fileSizeMB = (mediaBuffer.length / (1024 * 1024)).toFixed(2);
@@ -54,6 +59,7 @@ let handler = async ({ bot, m }) => {
 
     // Clean up the temporary media file
     fs.unlinkSync(mediaPath);
+    console.log('Temporary file cleaned up.');
 
   } catch (error) {
     // Handle any errors and send an error message
