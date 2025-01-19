@@ -4,7 +4,7 @@ let handler = async ({ bot, m, query, usedPrefix, command }) => {
     try {
         // Check if query is empty, if so ask for a country name directly
         if (!query) {
-            return bot.sendMessage(m.chat.id, `Please provide a country name. Example: *${usedPrefix}${command} Pakistan*`, { reply_to_message_id: m.message_id });
+            return bot.sendMessage(m.chat.id, `Please provide a country name. Example: ${usedPrefix}${command} Pakistan`, { reply_to_message_id: m.message_id });
         }
 
         // Fetch the trending topics using the trendtwit function
@@ -29,7 +29,7 @@ let handler = async ({ bot, m, query, usedPrefix, command }) => {
             }).join('\n');
 
             const data = {
-                text: `Trending topics in ${query}:\n\n${trends}\n\n*Powered by © ULTRA-MD*`,
+                text: `Trending topics in ${query}:\n\n${trends}\n\n𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`,
             };
             await bot.sendMessage(m.chat.id, data.text, { reply_to_message_id: m.message_id });
         } else {
