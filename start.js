@@ -5,6 +5,9 @@ const figlet = require('figlet');
 const fs = require('fs');
 const path = require('path');
 
+// Import the `connect` function from server.js
+const connect = require('./server'); // Adjust the path to server.js if needed
+
 figlet(
   'MEGA AI',
   {
@@ -39,7 +42,7 @@ figlet(
 const app = express();
 const port = process.env.PORT || 5000;
 
-// No need to redefine __filename or __dirname, they are globally available
+// Serve static files from the 'assets' folder
 app.use(express.static(path.join(__dirname, 'assets')));
 
 app.get('/', (req, res) => {
@@ -50,13 +53,14 @@ app.listen(port, () => {
   console.log(chalk.green(`Port ${port} is open`));
 });
 
+// Now we'll start the Telegram bot server using the connect function
 let isRunning = false;
 
 async function start(file) {
   if (isRunning) return;
   isRunning = true;
 
-  const currentFilePath = __filename; // __filename is already available in CommonJS
+  const currentFilePath = __filename;
   const args = [path.join(path.dirname(currentFilePath), file), ...process.argv.slice(2)];
   const p = spawn(process.argv[0], args, {
     stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
@@ -84,7 +88,7 @@ async function start(file) {
 
     fs.watchFile(args[0], () => {
       fs.unwatchFile(args[0]);
-      start('index.js'); // Replacing global.js with index.js
+      start('index.js');
     });
   });
 
@@ -105,8 +109,10 @@ async function start(file) {
     console.log(chalk.yellow(`Installed ${files.length} plugins`));
 
     try {
-      // Removed Baileys logic, as we are now using Telegram Bot API
       console.log(chalk.yellow('Telegram bot is ready.'));
+      // Here we call the connect function to initialize the server and bot
+      // Assuming the bot instance is passed to `connect`
+      connect(null, port, { keepalive: true });  // pass the bot instance if necessary
     } catch (e) {
       console.error(chalk.red('Error initializing Telegram bot.'));
     }
