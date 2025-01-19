@@ -2,9 +2,9 @@ const { toDataURL } = require('qrcode');
 
 let handler = async ({ m, bot, query, usedPrefix, command }) => {
   const chatId = m.chat.id;
-  
+
   // Extract the query text (everything after the command)
-  query = query.trim(); 
+  query = query.trim();
 
   // Check if the query is provided
   if (!query) {
@@ -17,8 +17,11 @@ let handler = async ({ m, bot, query, usedPrefix, command }) => {
     // Generate the QR code from the provided query text (limit length to 2048 characters)
     const qrCodeDataUrl = await toDataURL(query.slice(0, 2048), { scale: 8 });
 
-    // Send the generated QR code to the user as an image using Base64 encoding
-    await bot.sendPhoto(chatId, qrCodeDataUrl, { caption: 'Here you go!' });
+    // Ensure the Base64 data URL is in the correct format (remove the 'data:image/png;base64,' part)
+    const imageUrl = qrCodeDataUrl.replace(/^data:image\/png;base64,/, '');
+
+    // Send the generated QR code to the user as an image using the proper Base64 string
+    await bot.sendPhoto(chatId, `data:image/png;base64,${imageUrl}`, { caption: 'Here you go!' });
   } catch (err) {
     // Handle any errors in generating the QR code
     await bot.sendMessage(chatId, `Error generating QR code: ${err.message}`);
