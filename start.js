@@ -1,67 +1,39 @@
 const chalk = require('chalk');
 const { spawn } = require('child_process');
-const express = require('express');
-const figlet = require('figlet');
 const fs = require('fs');
 const path = require('path');
+const figlet = require('figlet');
 
-// Import the `connect` function from server.js
-const connect = require('./server'); // Adjust the path to server.js if needed
+// Import the `connect` function from server.js (no need to deal with express setup here)
+const connect = require('./server'); // Ensure you are calling this properly for server-side logic
 
-figlet(
-  'MEGA AI',
-  {
-    font: 'Ghost',
-    horizontalLayout: 'default',
-    verticalLayout: 'default',
-  },
-  (err, data) => {
-    if (err) {
-      console.error(chalk.red('Figlet error:', err));
-      return;
-    }
-    console.log(chalk.yellow(data));
+// Display the welcome banner
+figlet('MEGA AI', { font: 'Ghost', horizontalLayout: 'default', verticalLayout: 'default' }, (err, data) => {
+  if (err) {
+    console.error(chalk.red('Figlet error:', err));
+    return;
   }
-);
-
-figlet(
-  'Advanced Telegram Bot',
-  {
-    horizontalLayout: 'default',
-    verticalLayout: 'default',
-  },
-  (err, data) => {
-    if (err) {
-      console.error(chalk.red('Figlet error:', err));
-      return;
-    }
-    console.log(chalk.magenta(data));
-  }
-);
-
-const app = express();
-const port = process.env.PORT || 5000;
-
-// Serve static files from the 'assets' folder
-app.use(express.static(path.join(__dirname, 'assets')));
-
-app.get('/', (req, res) => {
-  res.redirect('/index.html');
+  console.log(chalk.yellow(data));
 });
 
-app.listen(port, () => {
-  console.log(chalk.green(`Port ${port} is open`));
+figlet('Advanced Telegram Bot', { horizontalLayout: 'default', verticalLayout: 'default' }, (err, data) => {
+  if (err) {
+    console.error(chalk.red('Figlet error:', err));
+    return;
+  }
+  console.log(chalk.magenta(data));
 });
 
-// Now we'll start the Telegram bot server using the connect function
 let isRunning = false;
 
+// Start the application and spawn a new process
 async function start(file) {
   if (isRunning) return;
   isRunning = true;
 
-  const currentFilePath = __filename;
+  const currentFilePath = __filename; // Get the current file path
   const args = [path.join(path.dirname(currentFilePath), file), ...process.argv.slice(2)];
+
   const p = spawn(process.argv[0], args, {
     stdio: ['inherit', 'inherit', 'inherit', 'ipc'],
   });
@@ -72,7 +44,7 @@ async function start(file) {
       case 'reset':
         p.kill();
         isRunning = false;
-        start.apply(this, arguments);
+        start.apply(this, arguments); // Restart the app if required
         break;
       case 'uptime':
         p.send(process.uptime());
@@ -86,6 +58,7 @@ async function start(file) {
 
     if (code === 0) return;
 
+    // Watch for file changes and restart the app if necessary
     fs.watchFile(args[0], () => {
       fs.unwatchFile(args[0]);
       start('index.js');
@@ -110,16 +83,16 @@ async function start(file) {
 
     try {
       console.log(chalk.yellow('Telegram bot is ready.'));
-      // Here we call the connect function to initialize the server and bot
-      // Assuming the bot instance is passed to `connect`
-      connect(null, port, { keepalive: true });  // pass the bot instance if necessary
+      // Call the connect function to start the server and the bot
+      connect(null, process.env.PORT || 5000, { keepalive: true }); // Assuming you want the server to keep alive
     } catch (e) {
       console.error(chalk.red('Error initializing Telegram bot.'));
     }
   });
 }
 
-start('index.js'); // Ensure to start index.js for the bot
+// Start the bot server with the main file
+start('index.js');
 
 process.on('unhandledRejection', () => {
   console.error(chalk.red('Unhandled promise rejection. Bot will restart...'));
