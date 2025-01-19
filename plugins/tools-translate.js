@@ -7,10 +7,10 @@ let handler = async ({ bot, m, args, usedPrefix, command }) => {
   let err = `
 📌 *Example:*
 
-*${usedPrefix + command}* <id> [text]
-*${usedPrefix + command}* en Hello World
+${usedPrefix + command} <id> [text]
+${usedPrefix + command} en Hello World
 
-≡ *List of supported languages:* 
+≡ List of supported languages:
 
 https://cloud.google.com/translate/docs/languages
 `.trim();
