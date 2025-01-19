@@ -21,8 +21,18 @@ if (!BOT_TOKEN) {
   process.exit(1); // Exit the process if the token is missing
 }
 
-const bot = new TelegramBot(BOT_TOKEN, { polling: { interval: 3000, timeout: 10 } });
-
+const bot = new TelegramBot(BOT_TOKEN, {
+  polling: {
+    enabled: true,
+    params: {
+      timeout: 10, // Define the polling timeout (in seconds)
+      // other parameters if needed, like:
+      // limit: 100, 
+      // offset: 0,
+      // ...
+    }
+  }
+});
 
 // Get the path of the plugins folder
 const pluginsPath = path.join(__dirname, 'plugins');
