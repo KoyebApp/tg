@@ -26,10 +26,6 @@ const bot = new TelegramBot(BOT_TOKEN, {
     enabled: true,
     params: {
       timeout: 10, // Define the polling timeout (in seconds)
-      // other parameters if needed, like:
-      // limit: 100, 
-      // offset: 0,
-      // ...
     }
   }
 });
@@ -69,11 +65,7 @@ const initDatabase = async () => {
   } else {
     try {
       if (dbConfig.type === 'mongodb') {
-        if (dbConfig.version === 'v2') {
-          db = new mongoDBV2(dbConfig.url);
-        } else {
-          db = new mongoDB(dbConfig.url);
-        }
+        db = dbConfig.version === 'v2' ? new mongoDBV2(dbConfig.url) : new mongoDB(dbConfig.url);
       } else if (dbConfig.type === 'cloud') {
         db = await CloudDBAdapter(dbConfig.url);
       }
@@ -121,7 +113,6 @@ const loadPlugins = () => {
           });
         }
 
-        // Check if plugin has callback query data handling
         if (pluginHandler.callbackQuery) {
           pluginHandler.callbackQuery.forEach(callbackData => {
             handlers[`callback_${callbackData.toLowerCase()}`] = pluginHandler;
@@ -157,9 +148,10 @@ const logUserActivity = (chatId, command) => {
 // Main message handler
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-  const text = msg.text.trim();
-  const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));
+  const text = msg.text?.trim(); // Optional chaining to ensure it's not undefined
+  if (!text) return; // If no text, return early
 
+  const usedPrefix = PREFIX.find(prefix => text.startsWith(prefix));
   if (usedPrefix) {
     const commandWithQuery = text.substring(usedPrefix.length).trim();
     const [command, ...queryArr] = commandWithQuery.split(' ');
@@ -198,13 +190,12 @@ bot.on('message', (msg) => {
   }
 });
 
+// Polling error handler
 bot.on('polling_error', (error) => {
   console.error('Polling error occurred:', error);
   
-  // Handle retry logic only if you have control over the polling process.
   setTimeout(() => {
     try {
-      // Stop polling before retrying to prevent multiple polling instances.
       bot.stopPolling();
       bot.startPolling();
       console.log('Polling restarted after error.');
@@ -214,7 +205,7 @@ bot.on('polling_error', (error) => {
   }, 3000); // Retry after 3 seconds.
 });
 
-// Main callback query handler
+// Callback query handler
 bot.on('callback_query', async (callbackQuery) => {
   const chatId = callbackQuery.message.chat.id;
   const callbackData = callbackQuery.data;
