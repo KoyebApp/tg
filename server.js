@@ -10,8 +10,13 @@ const { bot } = require('./index');  // Assuming the bot is initialized in index
 
 // Define the keep-alive function directly inside server.js
 function keepAlive() {
-  const url = process.env.APP_URL
-  if (/(\/\/|\.)undefined\./.test(url)) return;  // Avoid invalid URLs
+  const url = process.env.APP_URL;  // Get the URL from .env
+
+  // If APP_URL is not defined, skip the keep-alive logic
+  if (!url || /(\/\/|\.)undefined\./.test(url)) {
+    console.log("APP_URL is not defined or is invalid. Skipping keep-alive.");
+    return;
+  }
   
   setInterval(() => {
     fetch(url).catch(console.error);  // Send a request to keep the server awake
