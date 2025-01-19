@@ -13,7 +13,7 @@ dotenv.config();
 // Fetch secrets from environment variables
 const DATABASE_URL = process.env.DATABASE_URL;
 const BOT_TOKEN = process.env.BOT_TOKEN;
-const PREFIX = process.env.PREFIX ? process.env.PREFIX.split(',') : ['/', '!', '.', '#'];  // Default to multiple prefixes
+const PREFIX = process.env.PREFIX ? process.env.PREFIX.split(',') : ['/', '!', '.', '*', '"', ':', ';', '?', '(', ')', '+', '-', '&', '_', '$', '#'];
 
 // Ensure BOT_TOKEN is provided
 if (!BOT_TOKEN) {
@@ -21,17 +21,17 @@ if (!BOT_TOKEN) {
   process.exit(1); // Exit the process if the token is missing
 }
 
-// Initialize Telegram bot with token
-const bot = new TelegramBot(BOT_TOKEN, { polling: true });
+const bot = new TelegramBot(BOT_TOKEN, { polling: { interval: 3000, timeout: 10 } });
+
 
 // Get the path of the plugins folder
 const pluginsPath = path.join(__dirname, 'plugins');
 
 // Database configuration and initialization
 const dbConfig = {
-  type: DATABASE_URL ? 'mongodb' : 'lowdb',    // 'mongodb' or 'lowdb' based on presence of DATABASE_URL
-  version: 'v2',                                // Optional (if 'mongodb' is used, specify version 'v1' or 'v2')
-  url: DATABASE_URL || 'database.json',         // MongoDB URL or LowDB file path
+  type: DATABASE_URL ? 'mongodb' : 'lowdb',
+  version: 'v2',
+  url: DATABASE_URL || 'database.json',
 };
 
 // Check if database.json exists, if not, create it
@@ -186,6 +186,22 @@ bot.on('message', (msg) => {
       console.error(chalk.red(`Unknown command: ${normalizedCommand} from chatId: ${chatId}`));
     }
   }
+});
+
+bot.on('polling_error', (error) => {
+  console.error('Polling error occurred:', error);
+  
+  // Handle retry logic only if you have control over the polling process.
+  setTimeout(() => {
+    try {
+      // Stop polling before retrying to prevent multiple polling instances.
+      bot.stopPolling();
+      bot.startPolling();
+      console.log('Polling restarted after error.');
+    } catch (err) {
+      console.error('Error restarting polling:', err);
+    }
+  }, 3000); // Retry after 3 seconds.
 });
 
 // Main callback query handler
