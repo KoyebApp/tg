@@ -26,13 +26,8 @@ let handler = async ({ m, bot, query, usedPrefix, command }) => {
     if (fs.existsSync(filePath)) {
       console.log(`QR code generated at: ${filePath}`);
 
-      // Send the generated QR code image to the user
-      const photoOptions = { path: filePath }; // Ensure the path is correct
-
-      // Log the photo options to ensure they are correct
-      console.log('Sending photo with options:', photoOptions);
-
-      await bot.sendPhoto(chatId, photoOptions, { caption: 'Here you go!' });
+      // Send the generated QR code image to the user (pass filePath directly, not in an object)
+      await bot.sendPhoto(chatId, filePath, { caption: 'Here you go!' });
 
       // Clean up: delete the temporary file after sending it
       fs.unlinkSync(filePath); // Remove the temporary file after sending
