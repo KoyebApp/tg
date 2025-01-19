@@ -1,14 +1,17 @@
 const uploadtoimgur = require('../lib/imgur');  // Import imgur upload function
 const fs = require('fs');  // File system module
 const path = require('path');  // Path module
+const os = require('os');  // For platform-independent temp directories
 
 let handler = async ({ bot, m }) => {
   try {
     // Get quoted message or current message
     let q = m.quoted ? m.quoted : m;
-    
+
     // Ensure message has mime type (for media)
     let mime = (q.msg || q).mimetype || '';
+    console.log('Mime Type Detected:', mime);  // Add logging to check mime type
+
     if (!mime) {
       throw '✳️ Respond to an image/video';
     }
@@ -25,32 +28,29 @@ let handler = async ({ bot, m }) => {
     }
 
     // Prepare temporary directory for storing the file
-    let currentModuleDirectory = path.dirname(__filename);
-    let tmpDir = path.join(currentModuleDirectory, '../lib');
+    let tmpDir = path.join(os.tmpdir(), 'telegram_media');
     if (!fs.existsSync(tmpDir)) {
-      fs.mkdirSync(tmpDir);  // Create tmp directory if it doesn't exist
+      fs.mkdirSync(tmpDir, { recursive: true });  // Ensure the directory is created if it doesn't exist
     }
 
     // Generate a path for the media file
     let mediaPath = path.join(tmpDir, `media_${Date.now()}.${mime.split('/')[1]}`);
     fs.writeFileSync(mediaPath, mediaBuffer);
 
-    // Check if file is a valid image/video
+    // Check if the file is a valid image/video (basic check for png/jpg/gif/mp4)
     let isTele = /image\/(png|jpe?g|gif)|video\/mp4/.test(mime);
-
-    if (isTele) {
-      // Upload the media to imgur and get the URL
-      let link = await uploadtoimgur(mediaPath);
-
-      // Calculate the file size in MB
-      const fileSizeMB = (mediaBuffer.length / (1024 * 1024)).toFixed(2);
-
-      // Send success message with the URL using bot.sendMessage
-      await bot.sendMessage(m.chat.id, `✅ *Media Upload Successful*\n☆ *File Size:* ${fileSizeMB} MB\n☆ *URL:* ${link}`);
-    } else {
-      // If not an image/video, send the file as a document
-      await bot.sendDocument(m.chat.id, mediaPath, { caption: `☆ ${mediaBuffer.length} Byte(s)\n☆ (Unknown)` });
+    if (!isTele) {
+      throw '❌ Unsupported media type. Please upload an image or video.';
     }
+
+    // Upload the media to imgur and get the URL
+    let link = await uploadtoimgur(mediaPath);
+
+    // Calculate the file size in MB
+    const fileSizeMB = (mediaBuffer.length / (1024 * 1024)).toFixed(2);
+
+    // Send success message with the URL using bot.sendMessage
+    await bot.sendMessage(m.chat.id, `✅ *Media Upload Successful*\n☆ *File Size:* ${fileSizeMB} MB\n☆ *URL:* ${link}`);
 
     // Clean up the temporary media file
     fs.unlinkSync(mediaPath);
