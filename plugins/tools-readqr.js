@@ -2,12 +2,19 @@ const uploadImage = require('../lib/uploadImage');  // Import uploadImage
 const fetch = require('node-fetch');  // Fetch for making API calls
 
 let handler = async ({ m, bot, text, usedPrefix, command }) => {
-  
-  if (!mime) throw '*Respond to a QR code image!*';  // If no mime type, it's not an image, throw error
+  let q = m.quoted ? m.quoted : m;  // Get quoted message if any, or the current message
+  let mime = (q.msg || q).mimetype || '';  // Get mime type of the message media
+
+  // Ensure mime type exists and it's an image
+  if (!mime || !mime.startsWith('image/')) {
+    throw '*Respond to a QR code image!*';  // If no mime type or it's not an image, throw error
+  }
 
   let img = await q.download?.();  // Download the image file
 
-  if (!img) throw '*Failed to download the image, please try again!*';  // Ensure image was downloaded
+  if (!img) {
+    throw '*Failed to download the image, please try again!*';  // Ensure image was downloaded
+  }
 
   let url = await uploadImage(img);  // Upload the image to get its URL
 
@@ -20,10 +27,11 @@ let handler = async ({ m, bot, text, usedPrefix, command }) => {
   }
 
   // Send the decoded QR code data back to the user
-  await m.sendMessage(`*Here you go:* ${json.result}`);
-}
+  await bot.sendMessage(m.chat.id, `*Here you go:* ${json.result}`);
+};
 
 handler.command = ['readqr'];  // Command to trigger the QR code reading
 handler.help = ['readqr'];
 handler.tags = ['qr'];
+
 module.exports = handler;  // Export the handler to be used by the bot
