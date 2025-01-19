@@ -1,6 +1,6 @@
 const { toDataURL } = require('qrcode');
 
-let handler = async ({ m, bot, query }) => {
+let handler = async ({ m, bot, query, usedPrefix, command }) => {
 
   const chatId = m.chat.id;
   // Check if the user has provided the text in the command directly
