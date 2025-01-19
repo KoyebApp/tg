@@ -1,4 +1,6 @@
-const { toDataURL } = require('qrcode');
+const { toFileStream } = require('qrcode');
+const fs = require('fs');
+const path = require('path');
 
 let handler = async ({ m, bot, query, usedPrefix, command }) => {
   const chatId = m.chat.id;
@@ -14,11 +16,16 @@ let handler = async ({ m, bot, query, usedPrefix, command }) => {
   }
 
   try {
-    // Generate the QR code from the provided query text (limit length to 2048 characters)
-    const qrCodeDataUrl = await toDataURL(query.slice(0, 2048), { scale: 8 });
+    // Generate the QR code and save it to a temporary file
+    const filePath = path.join(__dirname, 'qrcode.png'); // Set the path for the temporary file
+    const writeStream = fs.createWriteStream(filePath);
+    await toFileStream(query.slice(0, 2048), writeStream);
 
-    // Send the generated QR code to the user as an image using the correct Base64 string
-    await bot.sendPhoto(chatId, qrCodeDataUrl, { caption: 'Here you go!' });
+    // Send the generated QR code image to the user
+    await bot.sendPhoto(chatId, { path: filePath }, { caption: 'Here you go!' });
+
+    // Clean up: delete the temporary file after sending it
+    fs.unlinkSync(filePath); // Remove the temporary file after sending
   } catch (err) {
     // Handle any errors in generating the QR code
     await bot.sendMessage(chatId, `Error generating QR code: ${err.message}`);
