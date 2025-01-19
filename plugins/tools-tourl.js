@@ -3,7 +3,7 @@ const fs = require('fs');  // File system module
 const path = require('path');  // Path module
 const os = require('os');  // For platform-independent temp directories
 
-let handler = async ({ bot, m }) => {
+let handler = async ({ bot, m, text, usedPrefix, command, args }) => {
   try {
     // Get quoted message or current message
     let q = m.quoted ? m.quoted : m;
@@ -21,7 +21,6 @@ let handler = async ({ bot, m }) => {
     if (!mediaBuffer || mediaBuffer.length === 0) {
       throw '❌ Failed to download the media file. Please try again.';
     }
-    console.log('Media downloaded successfully, buffer size:', mediaBuffer.length);
 
     // Check if media size exceeds 10 MB
     if (mediaBuffer.length > 10 * 1024 * 1024) {
@@ -37,7 +36,6 @@ let handler = async ({ bot, m }) => {
     // Generate a path for the media file
     let mediaPath = path.join(tmpDir, `media_${Date.now()}.${mime.split('/')[1]}`);
     fs.writeFileSync(mediaPath, mediaBuffer);
-    console.log('Media saved to temp file:', mediaPath);
 
     // Check if the file is a valid image/video (basic check for png/jpg/gif/mp4)
     let isTele = /image\/(png|jpe?g|gif)|video\/mp4/.test(mime);
