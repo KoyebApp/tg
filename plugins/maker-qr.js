@@ -27,7 +27,12 @@ let handler = async ({ m, bot, query, usedPrefix, command }) => {
       console.log(`QR code generated at: ${filePath}`);
 
       // Send the generated QR code image to the user
-      await bot.sendPhoto(chatId, { path: filePath }, { caption: 'Here you go!' });
+      const photoOptions = { path: filePath }; // Ensure the path is correct
+
+      // Log the photo options to ensure they are correct
+      console.log('Sending photo with options:', photoOptions);
+
+      await bot.sendPhoto(chatId, photoOptions, { caption: 'Here you go!' });
 
       // Clean up: delete the temporary file after sending it
       fs.unlinkSync(filePath); // Remove the temporary file after sending
@@ -36,7 +41,7 @@ let handler = async ({ m, bot, query, usedPrefix, command }) => {
     }
   } catch (err) {
     // Handle any errors in generating the QR code
-    console.error(err);
+    console.error('Error generating QR code:', err);
     await bot.sendMessage(chatId, `Error generating QR code: ${err.message}`);
   }
 };
