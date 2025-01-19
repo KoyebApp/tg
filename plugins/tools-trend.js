@@ -2,9 +2,9 @@ const Qasim = require('api-qasim');  // Import the trendtwit function from the a
 
 let handler = async ({ bot, m, query, usedPrefix, command }) => {
     try {
-        // If no query is provided, ask for a country name directly
+        // Check if query is empty, if so ask for a country name directly
         if (!query) {
-            throw new Error(`Please provide a country name. Example: *${usedPrefix}${command} Pakistan*`);
+            return bot.sendMessage(m.chat.id, `Please provide a country name. Example: *${usedPrefix}${command} Pakistan*`, { reply_to_message_id: m.message_id });
         }
 
         // Fetch the trending topics using the trendtwit function
