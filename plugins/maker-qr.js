@@ -1,13 +1,20 @@
 const { toDataURL } = require('qrcode');
 
 let handler = async (m, bot, query) => {
+  // Check if the bot object exists
+  if (!bot) {
+    console.error("Bot object is not defined.");
+    return;
+  }
+
   // Check if the user has provided the text in the command directly
   if (!query) {
     // If not, ask the user for a query
     await bot.sendMessage(m.chat.id, "Please provide the text to generate the QR code.");
-    // Assuming that you are storing the next response from the user as `query`
-    bot.on('message', async (response) => {
-      // Ensure it's a valid response and belongs to the same user/chat
+    
+    // Wait for the user's response
+    bot.once('message', async (response) => {
+      // Ensure the response is from the same chat
       if (response.chat.id === m.chat.id && response.text) {
         query = response.text; // Store the response as the query
 
