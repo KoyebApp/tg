@@ -1,8 +1,10 @@
 const uploadImage = require('../lib/uploadImage');  // Import uploadImage
 const fetch = require('node-fetch');  // Fetch for making API calls
 
-let handler = async ({ m, bot, query, usedPrefix, command }) => {
+const handler = async ({ m, bot, query, usedPrefix, command }) => {
   try {
+
+    const chatId = m.chat.id
     // Log message details to see what is being received
     console.log("Received message:", m);
     console.log("Received query:", query);
@@ -39,11 +41,11 @@ let handler = async ({ m, bot, query, usedPrefix, command }) => {
     }
 
     // Send back the decoded QR code result
-    await bot.sendMessage(m.chat.id, `*Here you go:* ${json.result}`);
+    await bot.sendMessage(chatId, `*Here you go:* ${json.result}`);
   } catch (error) {
     // Log the error and send a message to the user
     console.error('Error in readqr handler:', error);
-    await bot.sendMessage(m.chat.id, `*Error occurred:* ${error.message || error}`);
+    await bot.sendMessage(chatId, `*Error occurred:* ${error.message || error}`);
   }
 };
 
