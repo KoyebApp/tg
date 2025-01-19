@@ -17,8 +17,8 @@ let handler = async ({ m, bot, query, usedPrefix, command }) => {
     // Generate the QR code from the provided query text (limit length to 2048 characters)
     const qrCodeDataUrl = await toDataURL(query.slice(0, 2048), { scale: 8 });
 
-    // Send the generated QR code to the user
-    await bot.sendPhoto(chatId, qrCodeDataUrl, 'qrcode.png', 'Here you go!');
+    // Send the generated QR code to the user as an image using Base64 encoding
+    await bot.sendPhoto(chatId, qrCodeDataUrl, { caption: 'Here you go!' });
   } catch (err) {
     // Handle any errors in generating the QR code
     await bot.sendMessage(chatId, `Error generating QR code: ${err.message}`);
