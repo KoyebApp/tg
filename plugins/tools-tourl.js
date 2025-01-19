@@ -4,36 +4,38 @@ const path = require('path');  // Path module
 
 let handler = async ({ bot, m }) => {
   try {
-    let q = m.quoted ? m.quoted : m;  // Get quoted message if any, else the current message
-    let mime = (q.msg || q).mimetype || '';  // Get the mime type of the message media
-
-    // Ensure mime type exists
+    // Get quoted message or current message
+    let q = m.quoted ? m.quoted : m;
+    
+    // Ensure message has mime type (for media)
+    let mime = (q.msg || q).mimetype || '';
     if (!mime) {
       throw '✳️ Respond to an image/video';
     }
 
-    // Download media file
+    // Download the media file (make sure it's an image/video)
     let mediaBuffer = await q.download();
+    if (!mediaBuffer || mediaBuffer.length === 0) {
+      throw '❌ Failed to download the media file. Please try again.';
+    }
 
-    // Check if the media size exceeds 10 MB
+    // Check if media size exceeds 10 MB
     if (mediaBuffer.length > 10 * 1024 * 1024) {
       throw '✴️ Media size exceeds 10 MB. Please upload a smaller file.';
     }
 
-    // Get the current module directory
-    let currentModuleDirectory = path.dirname(__filename);  // Use __filename to get the current file path
-
-    // Create a temporary directory for storing the downloaded file
-    let tmpDir = path.join(currentModuleDirectory, '../tmp');
+    // Prepare temporary directory for storing the file
+    let currentModuleDirectory = path.dirname(__filename);
+    let tmpDir = path.join(currentModuleDirectory, '../lib');
     if (!fs.existsSync(tmpDir)) {
       fs.mkdirSync(tmpDir);  // Create tmp directory if it doesn't exist
     }
 
     // Generate a path for the media file
     let mediaPath = path.join(tmpDir, `media_${Date.now()}.${mime.split('/')[1]}`);
-    fs.writeFileSync(mediaPath, mediaBuffer);  // Write media to file
+    fs.writeFileSync(mediaPath, mediaBuffer);
 
-    // Check if the mime type is valid for uploading
+    // Check if file is a valid image/video
     let isTele = /image\/(png|jpe?g|gif)|video\/mp4/.test(mime);
 
     if (isTele) {
@@ -46,16 +48,16 @@ let handler = async ({ bot, m }) => {
       // Send success message with the URL using bot.sendMessage
       await bot.sendMessage(m.chat.id, `✅ *Media Upload Successful*\n☆ *File Size:* ${fileSizeMB} MB\n☆ *URL:* ${link}`);
     } else {
-      // If not an image/video, send a document instead of a photo
+      // If not an image/video, send the file as a document
       await bot.sendDocument(m.chat.id, mediaPath, { caption: `☆ ${mediaBuffer.length} Byte(s)\n☆ (Unknown)` });
     }
 
-    // Clean up by deleting the temporary media file
+    // Clean up the temporary media file
     fs.unlinkSync(mediaPath);
 
   } catch (error) {
     // Handle any errors and send an error message
-    console.error(error);
+    console.error('Error processing media:', error);
     await bot.sendMessage(m.chat.id, `❌ Error: ${error}`);
   }
 };
