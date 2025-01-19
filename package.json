@@ -1,15 +1,12 @@
 {
   "name": "mega-ai",
   "version": "0.0.1",
-  "description": "Bot Telegram Node.js",
+  "description": "Bot Telegram Node js",
   "main": "start.js",
   "type": "commonjs",
   "directories": {
     "lib": "lib",
     "plugins": "plugins"
-  },
-  "engines": {
-    "node": ">=20.0.0"
   },
   "scripts": {
     "start": "node start.js"
