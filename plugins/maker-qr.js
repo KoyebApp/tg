@@ -5,7 +5,8 @@ let handler = async ({ m, text, bot }) => {
 
   try {
     const qrCodeDataUrl = await toDataURL(text.slice(0, 2048), { scale: 8 });
-    
+
+    // Send the QR code as a photo to the chat
     bot.sendPhoto(
       m.chat.id,
       qrCodeDataUrl,
@@ -21,6 +22,8 @@ let handler = async ({ m, text, bot }) => {
 // Define help command and command tags
 handler.help = ['', 'code'].map(v => 'qr' + v + ' <text>');
 handler.tags = ['tools'];
-handler.command = /^qr(code)?$/i;
+
+// Fix: Make `command` an array for `.forEach` to work
+handler.command = [/^qr(code)?$/i]; 
 
 module.exports = handler;
