@@ -1,12 +1,12 @@
 const Qasim = require('api-qasim');  // Import the trendtwit function from the api-qasim package
 
 let handler = async ({ bot, m, query, usedPrefix, command }) => {
-    // If no query is provided, ask for a country name directly
-    if (!query) {
-        throw `Please provide a country name. Example: *${usedPrefix}${command} Pakistan*`;
-    }
-
     try {
+        // If no query is provided, ask for a country name directly
+        if (!query) {
+            throw new Error(`Please provide a country name. Example: *${usedPrefix}${command} Pakistan*`);
+        }
+
         // Fetch the trending topics using the trendtwit function
         let trendtwitResult = await Qasim.trendtwit(query);
 
@@ -34,20 +34,15 @@ let handler = async ({ bot, m, query, usedPrefix, command }) => {
             await bot.sendMessage(m.chat.id, data.text, { reply_to_message_id: m.message_id });
         } else {
             // If no trends are found
-            throw "No trending data found for this country.";
+            throw new Error("No trending data found for this country.");
         }
-
     } catch (e) {
-        // Handle any errors that occur
+        // Catch errors and handle them gracefully
         console.error('Error:', e);
 
-        // Handle 404 error specifically
-        if (e.response && e.response.status === 404) {
-            throw "The requested API endpoint is not found. Please check the service URL.";
-        }
-
+        // Ensure that the error message is sent back properly
         const errorMessage = e.message || e || "Unknown error occurred.";
-        throw `An error occurred: ${errorMessage}`;
+        await bot.sendMessage(m.chat.id, `❌ Error: ${errorMessage}`, { reply_to_message_id: m.message_id });
     }
 };
 
