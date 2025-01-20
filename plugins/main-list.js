@@ -66,12 +66,12 @@ let handler = async ({ m, command, bot, usedPrefix, text }) => {
         case 'botmenu':
         await bot.sendPhoto(m.chat.id, imagePath, { caption: `
           🤖 Bot Menu:
-          ▢ 1. Info
-          ▢ 2. Alive
-          ▢ 3. Echo
-          ▢ 4. Menu
-          ▢ 5. Update
-          ▢ 0. Settings` });
+          ▢ 1. info
+          ▢ 2. alive
+          ▢ 3. echo
+          ▢ 4. menu
+          ▢ 5. update
+          ▢ 0. shutdown` });
         break;
 
         case 'infomenu':
