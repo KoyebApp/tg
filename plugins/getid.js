@@ -5,7 +5,7 @@ let handler = async ({ m, bot }) => {
 
     if (chatType === 'private') {
       // If the message is from a private chat
-      bot.sendMessage(m.chat.id, `Your private chat ID is: ${chatId}`);
+      bot.sendMessage(m.chat.id, `Your User ID is: ${chatId}`);
     } else if (chatType === 'group' || chatType === 'supergroup') {
       // If the message is from a group chat
       bot.sendMessage(m.chat.id, `This group chat ID is: ${chatId}`);
@@ -21,7 +21,7 @@ let handler = async ({ m, bot }) => {
   }
 };
 
-handler.command = ['getchatid', 'getid', 'chatid', 'userid']; // Command to trigger chat ID fetch
+handler.command = ['getchatid', 'getid', 'chatid', 'userid'];
 handler.help = ['getchatid', 'getid', 'chatid', 'userid'];  // Help for the command
 handler.tags = ['utility'];  // Tag for categorization
 
