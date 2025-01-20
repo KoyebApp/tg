@@ -1,0 +1,61 @@
+{
+  "name": "Telegram Bot",
+  "description": " Telegram Ai",
+  "keywords": [
+    "Telegram"
+  ],
+  "repository": "https://github.com/GlobalTechInfo/TELEGRAM-AI",
+  "stack": "container",
+  "env": {
+    "OWNER_ID": {
+      "description": "User Id",
+      "required": false,
+      "value": ""
+    },
+    "BOT_TOKEN": {
+      "description": "Telegram Bot Token",
+      "required": true,
+      "value": ""
+    },
+    "DATABASE_URL": {
+      "description": "your mongodb database url",
+      "required": false,
+      "value": ""
+    },
+    "PREFIX": {
+      "description": "put any one symbol here except @ and + , leave it Blank if you want to use multiple prefix",
+      "required": false,
+      "value": ""
+    },
+     "HKEY": {
+      "description": "Put your Heroku api key Here , Get one from here https://dashboard.heroku.com/account",
+      "required": true,
+      "value": ""
+    },
+     "HAPP": {
+      "description": "Put the Heroku app name, same as above entered",
+      "required": true,
+      "value": ""
+     }
+    },
+    "buildpacks": [
+    {
+      "url": "heroku/nodejs"
+    },
+    {
+      "url": "https://github.com/DuckyTeam/heroku-buildpack-imagemagick.git"
+    },
+    {
+      "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest"
+    },
+    {
+      "url": "https://github.com/clhuang/heroku-buildpack-webp-binaries.git"
+    }
+  ],
+  "formation": {
+    "web": {
+      "quantity": 1,
+      "size": "basic"
+    }
+  }
+}
