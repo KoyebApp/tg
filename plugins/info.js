@@ -22,20 +22,21 @@ let handler = async ({ m, bot, query }) => {
         };
         const uptime = new Date(botInfo.uptime * 1000).toISOString().substr(11, 8); // Format uptime as hh:mm:ss
         const botMessage = `
+        Bot Information:
         
-➠ Bot Name : 𝙼𝙴𝙶𝙰-𝙰𝙸
+        ➠ Bot Name : 𝙼𝙴𝙶𝙰-𝙰𝙸
 
-➠ Version : ${botInfo.version}
+        ➠ Version : ${botInfo.version}
 
-➠ Structure: Plugins
+        ➠ Structure: Plugins
 
-➠ Runtime: ${uptime}
+        ➠ Runtime: ${uptime}
 
-➠ Platform: Linux
+        ➠ Platform: Linux
         `;
         
         // Define the correct path for the image
-        const imagePath = path.join(__dirname, '..', 'assets', 'A.jpg');
+        const imagePath = path.join(__dirname, '..', 'assets', 'C.jpg');
         
         // Check if the image file exists
         if (!fs.existsSync(imagePath)) {
