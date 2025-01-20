@@ -13,13 +13,18 @@ let handler = async ({ m, bot, query }) => {
 
       // Check if the query is 'shutdown'
       if (sanitizedQuery === 'shutdown') {
-        bot.sendMessage(chatId, "Bot is shutting down...");
+        // Send the shutdown message first
+        await bot.sendMessage(chatId, "Bot is shutting down...🏮");
 
-        // Log the shutdown and stop the process
+        // Log the shutdown initiation
         console.log('Bot shutdown initiated...');
-        process.exit();  // This will terminate the bot process
+
+        // Wait for a few seconds before shutting down the bot
+        setTimeout(() => {
+          process.exit();  // This will terminate the bot process after the message is sent
+        }, 5000);  // 5000 milliseconds (5 seconds) delay
       } else {
-        bot.sendMessage(chatId, "Invalid command. Please use 'shutdown' to shut down the bot.");
+        await bot.sendMessage(chatId, "Invalid command. Please use 'shutdown' to shut down the bot.");
       }
     } else {
       await bot.sendMessage(chatId, "You are not authorized to use this command.");
