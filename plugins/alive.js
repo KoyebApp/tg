@@ -9,7 +9,7 @@ const handler = async ({ bot, m }) => {
   }
 
   try {
-    await bot.sendPhoto(m.chat.id, photoPath, { caption: 'Bot Is Alive And Running!\n\nSupport By Subscribe youtube.com/@GlobalTechInfo\n' });
+    await bot.sendPhoto(m.chat.id, photoPath, { caption: 'Bot Is Alive And Running!\n\nSupport By Subscribe: youtube.com/@GlobalTechInfo\n' });
   } catch (error) {
     console.error('Error sending photo:', error);
   }
