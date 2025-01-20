@@ -53,5 +53,8 @@ let handler = async ({ m, bot, query }) => {
     }
   }
 };
+handler.command = ['update', 'gitpull'];  // Command list
+handler.help = ['update', 'gitpull'];
+handler.tags = ['main'];
 
 module.exports = handler;
