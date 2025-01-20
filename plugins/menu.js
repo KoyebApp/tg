@@ -20,17 +20,21 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
 
     // Prepare the bot menu message
     let menuText = `
-    ALL MENU:
+    MAIN MENU:
 
-    📖 Quote For You: 
+    📖 Quote Of The Day: 
     "${randomQuote}"
 
     🔧 Commands:
-    - ${usedPrefix}start: Start the bot
-    - ${usedPrefix}help: List available commands
-    - ${usedPrefix}info: Information about the bot
-    - ${usedPrefix}update: Update the bot
-    - ${usedPrefix}ping: Check bot status
+      - ▢ 1. /downloadmenu
+      - ▢ 2. /textpromenu
+      - ▢ 3. /animenu
+      - ▢ 3. /botmenu
+      - ▢ 4. /infomenu
+      - ▢ 5. /quotesmenu
+      - ▢ 6. /toolsmenu
+      - ▢ 7. /imagesmenu
+      - ▢ 0. /mainmenu
 
     Enjoy your time with the bot! 😊`;
 
@@ -64,8 +68,8 @@ const handler = async ({ bot, m, text, db, usedPrefix }) => {
   }
 };
 
-handler.command = ['menu', 'help', 'list']
-handler.help = ['menu', 'help', 'list']
+handler.command = ['menu', 'list']
+handler.help = ['menu', 'list']
 handler.tags = ['main']
 
 module.exports = handler;
