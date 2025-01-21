@@ -34,21 +34,36 @@ https://cloud.google.com/translate/docs/languages
     return;
   }
 
-  try {
-    // Call the Google Translate API
-    let result = await translate(text, { to: lang, autoCorrect: true });
+  // Retry mechanism to handle "Too Many Requests" error
+  const retryTranslate = async (text, lang, retries = 3) => {
+    try {
+      // Call the Google Translate API
+      let result = await translate(text, { to: lang, autoCorrect: true });
 
-    if (result && result.text) {
-      // Send the translated text as the response
-      await bot.sendMessage(m.chat.id, result.text);
-    } else {
-      throw new Error('Translation failed. Please try again.');
+      if (result && result.text) {
+        // Send the translated text as the response
+        await bot.sendMessage(m.chat.id, result.text);
+      } else {
+        throw new Error('Translation failed. Please try again later.');
+      }
+    } catch (e) {
+      console.error('Translation Error:', e);
+
+      // Check if the error is related to rate limiting
+      if (e.message.includes('Too Many Requests') && retries > 0) {
+        // Retry after 5 seconds
+        console.log('Rate limit reached. Retrying...');
+        await new Promise(resolve => setTimeout(resolve, 5000));  // Wait for 5 seconds
+        await retryTranslate(text, lang, retries - 1);  // Retry with a reduced number of retries
+      } else {
+        // If no retries left or a different error, send error message
+        await bot.sendMessage(m.chat.id, err);
+      }
     }
-  } catch (e) {
-    // Handle any errors, including issues with the Google Translate API
-    console.error('Translation Error:', e);
-    await bot.sendMessage(m.chat.id, err);
-  }
+  };
+
+  // Start the translation process with retries
+  await retryTranslate(text, lang);
 };
 
 // Help and command configuration
