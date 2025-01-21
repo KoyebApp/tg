@@ -74,6 +74,9 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
    try {
       // Fetch the image URL from the API
       const response = await fetch(apiUrl);
+      if (!response.ok) {
+         throw new Error(`Failed to fetch from API: ${response.status} ${response.statusText}`);
+      }
       const data = await response.json();
 
       // Ensure the response contains an image URL
@@ -82,9 +85,8 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
 
          // Fetch the image from the URL
          const imageResponse = await fetch(imageUrl);
-         
          if (!imageResponse.ok) {
-            throw 'Failed to fetch image from URL.';
+            throw new Error(`Failed to fetch image from URL: ${imageResponse.status} ${imageResponse.statusText}`);
          }
 
          // Convert the image to a buffer
@@ -95,13 +97,17 @@ let handler = async ({ m, bot, usedPrefix, command, text }) => {
             caption: `𝙿𝙾𝚆𝙴𝚁𝙴𝙳 𝙱𝚈 © 𝙼𝙴𝙶𝙰-𝙰𝙸`
          });
       } else {
-         throw 'Failed to generate the image. Please try again later.';
+         throw new Error('Failed to generate the image. The API response was incomplete or unsuccessful.');
       }
    } catch (error) {
-      console.error('Error fetching image:', error);
-      bot.sendMessage(m.chat.id, '❌ An error occurred while fetching the image. Please try again later.');
+      console.error('Error during image generation and fetching:', error.message);  // Log detailed error
+      // Send a detailed error message to the user
+      bot.sendMessage(m.chat.id, `❌ Error: ${error.message}. Please try again later.`);
+
+      // Optionally, you can log the error stack if you need more debugging information
+      console.error(error.stack);
    }
-}
+};
 
 // List of commands (for which this plugin should work)
 handler.command = [
@@ -117,4 +123,3 @@ handler.help = [
 handler.tags = ['maker'];
 
 module.exports = handler;
-   
